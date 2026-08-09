@@ -275,7 +275,7 @@ export default function DashboardPage() {
                                                     <div>
                                                         <p style={{ fontSize: 14, fontWeight: 600, color: '#111827', margin: 0 }}>{sale.customerName || 'Walk-in Customer'}</p>
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
-                                                            <span style={{ fontSize: 12, color: '#9CA3AF' }}>#{sale.invoiceNo || sale.id.substring(0,6).toUpperCase()}</span>
+                                                            <p style={{ fontSize: 12, color: '#9CA3AF' }}>#{sale.invoiceNumber || sale.id.substring(0,6).toUpperCase()}</p>
                                                             <span style={{ width: 3, height: 3, borderRadius: '50%', background: '#D1D5DB' }} />
                                                             <span style={{ fontSize: 12, color: '#9CA3AF', display: 'flex', alignItems: 'center', gap: 4 }}><Clock size={10} /> {timeDisplay}</span>
                                                         </div>
