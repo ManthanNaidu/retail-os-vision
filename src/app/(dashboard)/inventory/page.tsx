@@ -377,13 +377,14 @@ export default function InventoryPage() {
         />
       )}
 
-      <ConfirmDelete
-        isOpen={!!productToDelete}
-        title="Delete Product"
-        message="Are you sure you want to delete this product? This action cannot be undone."
-        onConfirm={handleDelete}
-        onCancel={() => setProductToDelete(null)}
-      />
+      {!!productToDelete && (
+        <ConfirmDelete
+          title="Delete Product"
+          message="Are you sure you want to delete this product? This action cannot be undone."
+          onConfirm={handleDelete}
+          onCancel={() => setProductToDelete(null)}
+        />
+      )}
 
     </div>
   );
