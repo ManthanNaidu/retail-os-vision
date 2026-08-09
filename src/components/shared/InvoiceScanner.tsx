@@ -22,10 +22,10 @@ interface ExtractedProduct {
 
 // Models to try in order — Gemini supports multi-modal vision
 const GEMINI_MODELS = [
+  'gemini-3.6-flash',
+  'gemini-3.5-flash',
+  'gemini-2.5-flash',
   'gemini-2.0-flash',
-  'gemini-2.0-flash-exp',
-  'gemini-1.5-flash',
-  'gemini-1.5-flash-latest',
 ];
 
 async function callGeminiVision(
