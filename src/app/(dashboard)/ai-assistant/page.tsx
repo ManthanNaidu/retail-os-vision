@@ -17,7 +17,7 @@ export interface AIMessage {
 }
 
 const GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent';
 
 const localResponses: Record<string, string> = {
   sales:    "Today's sales: **₹16,700** across 47 orders.\nProfit margin is **26.9%**. Saturday is your best day — consider extra stock for weekends!",
