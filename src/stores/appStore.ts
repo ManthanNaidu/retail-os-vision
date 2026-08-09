@@ -137,6 +137,7 @@ export const useBillingStore = create<BillingState>()((set, get) => ({
         productName: product.name,
         quantity: 1,
         sellingPrice: product.sellingPrice,
+        purchasePrice: product.purchasePrice,
         discount: 0,
         gstPercent: product.gstPercent,
         total: product.sellingPrice,

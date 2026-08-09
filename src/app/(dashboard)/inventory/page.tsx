@@ -12,10 +12,26 @@ import { Product } from '@/types';
 import { ConfirmDelete } from '@/components/shared/ConfirmDelete';
 import { InvoiceScanner } from '@/components/shared/InvoiceScanner';
 
+import { getStoreType } from '@/lib/storeTypes';
+
 type FilterType = 'all' | 'low' | 'expiring' | 'out';
 
-const CATEGORIES = ['Grocery', 'Dairy', 'Hygiene', 'Medicine', 'Beverages', 'Cleaning', 'Personal Care'];
-const UNITS = ['Piece', 'Kg', 'Litre', 'Strip', 'Box', 'Packet', 'Bundle'];
+function getProfileCategories(): string[] {
+  try {
+    const p = JSON.parse(localStorage.getItem('retailos_profile') || '{}');
+    if (p.storeType) return getStoreType(p.storeType).categories;
+  } catch {}
+  return ['Grocery', 'Dairy', 'Hygiene', 'Medicine', 'Beverages', 'Cleaning', 'Personal Care', 'Electronics', 'Clothing', 'Other'];
+}
+
+function getProfileUnits(): string[] {
+  try {
+    const p = JSON.parse(localStorage.getItem('retailos_profile') || '{}');
+    if (p.storeType) return getStoreType(p.storeType).units;
+  } catch {}
+  return ['Piece', 'Kg', 'Litre', 'Strip', 'Box', 'Packet', 'Bundle', 'Dozen', 'Gram', 'Ml'];
+}
+
 const GST_RATES = ['0', '5', '12', '18', '28'];
 
 const CATEGORY_COLORS: Record<string, { bg: string; color: string }> = {
@@ -108,7 +124,7 @@ function ProductForm({ product, onSave, onClose }: {
             <div>
               <label className="text-xs font-semibold block mb-1.5" style={{ color: 'var(--text-secondary)' }}>Category</label>
               <select className="input-premium text-sm" value={form.category} onChange={e => set('category', e.target.value)}>
-                {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                {getProfileCategories().map(c => <option key={c}>{c}</option>)}
               </select>
             </div>
             <div>
@@ -156,7 +172,7 @@ function ProductForm({ product, onSave, onClose }: {
             <div>
               <label className="text-xs font-semibold block mb-1.5" style={{ color: 'var(--text-secondary)' }}>Unit</label>
               <select className="input-premium text-sm" value={form.unit} onChange={e => set('unit', e.target.value)}>
-                {UNITS.map(u => <option key={u}>{u}</option>)}
+                {getProfileUnits().map(u => <option key={u}>{u}</option>)}
               </select>
             </div>
           </div>
@@ -373,7 +389,7 @@ export default function InventoryPage() {
 
         {/* Category filter — horizontal scroll */}
         <div className="flex gap-2 overflow-x-auto pb-2 mb-4" style={{ scrollbarWidth: 'none' }}>
-          {['all', ...CATEGORIES].map(cat => (
+          {['all', ...getProfileCategories()].map(cat => (
             <button key={cat} onClick={() => setCategoryFilter(cat)}
               className="flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all"
               style={{
@@ -432,3 +448,5 @@ export default function InventoryPage() {
     </div>
   );
 }
+
+

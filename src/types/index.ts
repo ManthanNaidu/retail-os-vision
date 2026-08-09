@@ -56,6 +56,7 @@ export interface SaleItem {
   productName: string;
   quantity: number;
   sellingPrice: number;
+  purchasePrice?: number;  // Cost price for profit calculation
   discount: number;
   gstPercent: number;
   total: number;

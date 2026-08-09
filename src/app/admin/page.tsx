@@ -274,9 +274,8 @@ export default function AdminPage() {
     // Seed demo stores if empty
     let all = getAllStores();
     if (all.length === 0) {
-      const { saveAllStores } = require('@/lib/licenseManager');
       saveAllStores(DEMO_STORES);
-      all = DEMO_STORES;
+      all = [...DEMO_STORES];
     }
     setStores([...all].sort((a, b) => new Date(b.lastLogin).getTime() - new Date(a.lastLogin).getTime()));
   }, []);
