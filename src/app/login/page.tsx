@@ -49,6 +49,16 @@ export default function LoginPage() {
       setStep('otp');
     } catch (err: any) {
       console.error("OTP Send Error:", err);
+      
+      // Fallback to demo mode if Firebase API key is missing or invalid
+      if (err.code === 'auth/invalid-api-key' || err.message?.includes('api-key-not-valid') || err.message?.includes('dummy-api-key')) {
+        console.warn("Using Firebase Demo Mode due to missing API Key");
+        setConfirmationResult(null);
+        setStep('otp');
+        setLoading(false);
+        return;
+      }
+
       setError(err.message || 'Failed to send OTP. Try again.');
       
       // Reset reCAPTCHA so the user can try again
@@ -200,7 +210,7 @@ export default function LoginPage() {
                     <div>
                       <label className="block text-sm font-medium text-slate-300 mb-2">Phone Number</label>
                       <div className="relative flex items-center group">
-                        <div className="absolute left-0 top-0 bottom-0 px-4 flex items-center bg-white/5 border-r border-white/10 rounded-l-2xl transition-colors group-focus-within:bg-white/10">
+                        <div className="absolute left-0 top-0 bottom-0 px-4 flex items-center bg-white/5 border-r border-white/10 rounded-l-2xl z-10 transition-colors group-focus-within:bg-white/10">
                           <span className="text-slate-300 font-medium">+91</span>
                         </div>
                         <input
@@ -208,15 +218,16 @@ export default function LoginPage() {
                           value={phone}
                           onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                           placeholder="Enter 10 digit number"
-                          className="w-full bg-black/20 border border-white/10 rounded-2xl py-4 pl-20 pr-4 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all text-lg tracking-wide"
+                          className="w-full bg-black/20 border border-white/10 rounded-2xl py-4 pr-4 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all text-lg tracking-wide relative z-0"
+                          style={{ paddingLeft: '5rem' }}
                         />
                       </div>
                     </div>
 
                     {error && (
-                      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 text-red-300 text-sm bg-red-500/10 p-3 rounded-xl border border-red-500/20">
-                        <AlertTriangle className="w-4 h-4 shrink-0" />
-                        <span>{error}</span>
+                      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start gap-3 text-red-300 text-sm bg-red-500/10 p-4 rounded-xl border border-red-500/20">
+                        <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
+                        <span className="break-words flex-1 leading-snug">{error}</span>
                       </motion.div>
                     )}
 
