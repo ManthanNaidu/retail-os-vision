@@ -26,7 +26,7 @@ export default function InventoryPage() {
     category: '',
     brand: '',
     purchasePrice: 0,
-    sellPrice: 0,
+    sellingPrice: 0,
     mrp: 0,
     stock: 0,
     minStock: 5,
@@ -78,7 +78,7 @@ export default function InventoryPage() {
 
   const handleSaveProduct = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.sellPrice) return;
+    if (!formData.name || !formData.sellingPrice) return;
 
     if (editingProduct) {
       updateProduct(editingProduct.id, formData as Product);
@@ -209,7 +209,7 @@ export default function InventoryPage() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {filteredProducts.map(product => {
-              const margin = calculateMargin(product.sellPrice, product.purchasePrice);
+              const margin = calculateMargin(product.sellingPrice, product.purchasePrice);
               const isLowStock = product.stock > 0 && product.stock <= (product.minStock || 5);
               const isOutOfStock = product.stock === 0;
               
@@ -244,7 +244,7 @@ export default function InventoryPage() {
                     <div>
                       <p style={{ fontSize: 11, color: '#6B7280', margin: '0 0 2px' }}>Sell Price</p>
                       <p style={{ fontSize: 14, fontWeight: 700, color: '#111827', margin: 0 }}>
-                        {formatCurrency(product.sellPrice)}
+                        {formatCurrency(product.sellingPrice)}
                       </p>
                     </div>
                     <div>
@@ -317,11 +317,11 @@ export default function InventoryPage() {
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#4B5563', marginBottom: 6 }}>Selling Price (₹) *</label>
-                    <input required type="number" step="0.01" value={formData.sellPrice || ''} onChange={e => setFormData({...formData, sellPrice: parseFloat(e.target.value) || 0})} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 14, outline: 'none' }} placeholder="0.00" />
+                    <input required type="number" step="0.01" value={formData.sellingPrice || ''} onChange={e => setFormData({...formData, sellingPrice: parseFloat(e.target.value) || 0})} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 14, outline: 'none' }} placeholder="0.00" />
                   </div>
                   <div style={{ gridColumn: 'span 2', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: 'white', borderRadius: 8 }}>
                     <span style={{ fontSize: 12, color: '#6B7280' }}>Estimated Margin</span>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: '#10B981' }}>{calculateMargin(formData.sellPrice, formData.purchasePrice)}%</span>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: '#10B981' }}>{calculateMargin(formData.sellingPrice, formData.purchasePrice)}%</span>
                   </div>
                 </div>
 
