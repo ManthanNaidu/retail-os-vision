@@ -91,7 +91,10 @@ export const useAppStore = create<AppState>()(
         unreadCount: state.unreadCount + 1,
       })),
     }),
-    { name: 'retailos-app' }
+    { 
+      name: 'retailos-app',
+      version: 2
+    }
   )
 );
 
@@ -193,8 +196,4 @@ export const useBillingStore = create<BillingState>()((set, get) => ({
     state.clearCart();
     return sale;
   },
-}), {
-  name: 'retailos-store',
-  version: 2,
-}
-));
+}));
