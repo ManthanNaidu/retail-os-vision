@@ -105,9 +105,10 @@ function demoExtraction(): ExtractedProduct[] {
 
 interface InvoiceScannerProps {
   onClose: () => void;
+  onImport?: (products: Partial<Product>[]) => void;
 }
 
-export function InvoiceScanner({ onClose }: InvoiceScannerProps) {
+export function InvoiceScanner({ onClose, onImport }: InvoiceScannerProps) {
   const { addProduct } = useAppStore();
   const fileRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<'upload' | 'scanning' | 'review' | 'manual' | 'done'>('upload');
@@ -177,7 +178,7 @@ export function InvoiceScanner({ onClose }: InvoiceScannerProps) {
 
   const handleAddToInventory = () => {
     const selected = products.filter(p => p.selected && p.name.trim());
-    selected.forEach(p => {
+    const productsToImport = selected.map(p => {
       const product: Product = {
         id: `p-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
         sku: `INV-${Date.now()}`,
@@ -194,8 +195,15 @@ export function InvoiceScanner({ onClose }: InvoiceScannerProps) {
         isActive: true,
         createdAt: new Date().toISOString(),
       };
-      addProduct(product);
+      return product;
     });
+
+    if (onImport) {
+      onImport(productsToImport);
+    } else {
+      productsToImport.forEach(p => addProduct(p as Product));
+    }
+    
     setAddedCount(selected.length);
     setStep('done');
   };
