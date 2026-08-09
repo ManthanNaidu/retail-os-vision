@@ -31,7 +31,7 @@ export default function InventoryPage() {
     stock: 0,
     minStock: 5,
     unit: 'pcs',
-    gstRate: 0,
+    gstPercent: 0,
     expiryDate: ''
   };
 
@@ -332,7 +332,7 @@ export default function InventoryPage() {
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#4B5563', marginBottom: 6 }}>GST %</label>
-                    <input type="number" value={formData.gstRate || ''} onChange={e => setFormData({...formData, gstRate: parseFloat(e.target.value) || 0})} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 14, outline: 'none' }} placeholder="e.g., 18" />
+                    <input type="number" value={formData.gstPercent || ''} onChange={e => setFormData({...formData, gstPercent: parseFloat(e.target.value) || 0})} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 14, outline: 'none' }} placeholder="e.g., 18" />
                   </div>
                 </div>
 
