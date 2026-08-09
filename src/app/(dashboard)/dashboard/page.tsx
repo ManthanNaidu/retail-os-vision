@@ -41,7 +41,7 @@ export default function DashboardPage() {
         
         // Estimate profit if explicit cost not provided on items
         const profit = todaySales.reduce((sum, sale) => {
-            if (sale.profit) return sum + sale.profit;
+            if ((sale as any).profit) return sum + (sale as any).profit;
             let saleProfit = 0;
             if (sale.items && Array.isArray(sale.items)) {
                 saleProfit = sale.items.reduce((pSum: number, item: any) => {
@@ -50,7 +50,7 @@ export default function DashboardPage() {
                     return pSum + ((price - cost) * (item.quantity || 1));
                 }, 0);
             } else {
-                saleProfit = (sale.total || sale.amount || 0) * 0.2;
+                saleProfit = (sale.total || 0) * 0.2;
             }
             return sum + saleProfit;
         }, 0);
