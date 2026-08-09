@@ -33,11 +33,11 @@ export default function DashboardPage() {
         today.setHours(0, 0, 0, 0);
 
         const todaySales = sales.filter(s => {
-            const saleDate = new Date(s.timestamp || s.createdAt || s.date);
+            const saleDate = new Date(s.createdAt);
             return saleDate >= today;
         });
 
-        const revenue = todaySales.reduce((sum, sale) => sum + (sale.total || sale.amount || 0), 0);
+        const revenue = todaySales.reduce((sum, sale) => sum + (sale.total || 0), 0);
         
         // Estimate profit if explicit cost not provided on items
         const profit = todaySales.reduce((sum, sale) => {
@@ -80,8 +80,8 @@ export default function DashboardPage() {
     // Recent Sales
     const recentSales = useMemo(() => {
         return [...sales].sort((a, b) => {
-            const dateA = new Date(a.timestamp || a.createdAt || a.date).getTime();
-            const dateB = new Date(b.timestamp || b.createdAt || b.date).getTime();
+            const dateA = new Date(a.createdAt).getTime();
+            const dateB = new Date(b.createdAt).getTime();
             return dateB - dateA;
         }).slice(0, 3);
     }, [sales]);
@@ -262,7 +262,7 @@ export default function DashboardPage() {
                                 </div>
                                 <div style={{ background: 'white', borderRadius: 16, border: '1px solid #E5E7EB', overflow: 'hidden' }}>
                                     {recentSales.map((sale, index) => {
-                                        const saleDate = new Date(sale.timestamp || sale.createdAt || sale.date);
+                                        const saleDate = new Date(sale.createdAt);
                                         const timeAgo = Math.floor((new Date().getTime() - saleDate.getTime()) / 60000);
                                         const timeDisplay = timeAgo < 60 ? `${timeAgo}m ago` : timeAgo < 1440 ? `${Math.floor(timeAgo/60)}h ago` : `${Math.floor(timeAgo/1440)}d ago`;
                                         
