@@ -25,7 +25,8 @@ interface Profile {
 }
 
 const SettingsPage = () => {
-  const { currentStoreId } = useAppStore();
+  // Store data from localStorage profile
+  const { products, customers, sales } = useAppStore();
   const [profile, setProfile] = useState<Profile>({
     storeName: '', ownerName: '', phone: '', city: '', 
     address: '', gstNumber: '', upiId: '', storeType: ''
@@ -40,13 +41,17 @@ const SettingsPage = () => {
   const [subscription, setSubscription] = useState({ plan: 'Trial', daysRemaining: 0 });
   const [hasPassword, setHasPassword] = useState(false);
   
-  const [stats, setStats] = useState({ products: 0, customers: 0, sales: 0 });
-  const [storeTypes, setStoreTypes] = useState<{id: string, label: string}[]>([]);
+  // Stats computed from store
+  const thisMonthSales = sales
+    .filter(s => new Date(s.createdAt).getMonth() === new Date().getMonth())
+    .reduce((sum, s) => sum + s.total, 0);
+  const stats = { products: products.length, customers: customers.length, sales: thisMonthSales };
+  const [storeTypes, setStoreTypes] = useState<{id: string, name: string}[]>([]);
 
   useEffect(() => {
     // Load store types
     try {
-      setStoreTypes(getStoreTypeList());
+      setStoreTypes(getStoreTypeList().map(t => ({ id: t.id, name: t.name })));
     } catch (e) {
       // ignore
     }
@@ -87,19 +92,9 @@ const SettingsPage = () => {
       } catch(e) {}
     }
     
-    // Load stats
-    if (currentStoreId) {
-      const products = localStorage.getItem('retailos_products_' + currentStoreId);
-      const customers = localStorage.getItem('retailos_customers_' + currentStoreId);
-      const sales = localStorage.getItem('retailos_sales_' + currentStoreId);
-      
-      setStats({
-        products: products ? JSON.parse(products).length : 0,
-        customers: customers ? JSON.parse(customers).length : 0,
-        sales: sales ? JSON.parse(sales).reduce((acc: number, s: any) => acc + (s.total || 0), 0) : 0
-      });
-    }
-  }, [currentStoreId]);
+    // Load stats from Zustand store (already loaded elsewhere)
+    // Stats are set in the component body via useAppStore
+  }, []);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -231,7 +226,7 @@ const SettingsPage = () => {
               >
                 <option value="">Select type...</option>
                 {storeTypes.map(st => (
-                  <option key={st.id} value={st.id}>{st.label}</option>
+                  <option key={st.id} value={st.id}>{st.name}</option>
                 ))}
               </select>
             </div>
@@ -434,13 +429,16 @@ const SettingsPage = () => {
 
       </div>
 
-      <ConfirmDelete 
-        isOpen={isClearDataOpen}
-        onClose={() => setIsClearDataOpen(false)}
-        onConfirm={handleClearData}
-        title="Clear All Data?"
-        description="This will permanently delete all your products, sales, and settings from this device. This cannot be undone."
-      />
+      <AnimatePresence>
+        {isClearDataOpen && (
+          <ConfirmDelete
+            title="Clear All Data?"
+            message="This will permanently delete all your products, sales, and settings from this device. This cannot be undone."
+            onConfirm={handleClearData}
+            onCancel={() => setIsClearDataOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {toastMessage && (
@@ -460,3 +458,6 @@ const SettingsPage = () => {
 };
 
 export default SettingsPage;
+
+
+

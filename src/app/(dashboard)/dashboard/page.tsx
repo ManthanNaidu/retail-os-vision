@@ -155,7 +155,7 @@ export default function MasterDashboard() {
     sales.forEach(s => {
       s.items.forEach(i => {
         if (!productSales[i.productId]) {
-          productSales[i.productId] = { name: i.name, qty: 0, revenue: 0 };
+          productSales[i.productId] = { name: i.productName, qty: 0, revenue: 0 };
         }
         productSales[i.productId].qty += i.quantity;
         productSales[i.productId].revenue += i.quantity * i.sellingPrice;
@@ -166,7 +166,7 @@ export default function MasterDashboard() {
 
   return (
     <div className="page-enter has-bottom-nav">
-      <TopBar title="Dashboard" showBackButton={false} />
+      <TopBar title="Dashboard" />
       
       <div className="page-container py-5 space-y-4 pb-32">
         {/* Header */}
@@ -336,7 +336,7 @@ export default function MasterDashboard() {
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'var(--text-muted)' }} tickFormatter={(val) => `₹${val/1000}k`} />
                 <Tooltip 
                   contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  formatter={(value: number) => [`₹${value}`, 'Revenue']}
+                  formatter={(value) => [`₹${Number(value || 0).toLocaleString('en-IN')}`, 'Revenue']}
                 />
                 <Area type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
               </AreaChart>
@@ -430,5 +430,8 @@ export default function MasterDashboard() {
     </div>
   );
 }
+
+
+
 
 
