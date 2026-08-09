@@ -6,7 +6,6 @@ import { Bell, Menu, AlertTriangle, Info, CheckCircle, Clock } from 'lucide-reac
 import { useAppStore } from '@/stores/appStore';
 import { formatTime } from '@/lib/utils';
 import { cn } from '@/lib/utils';
-import { getDaysRemaining } from '@/lib/licenseManager';
 
 interface TopBarProps {
   title?: string;
@@ -19,13 +18,7 @@ export function TopBar({ title }: TopBarProps) {
   // Trial days remaining
   const [trialDays, setTrialDays] = useState<number | null>(null);
   useEffect(() => {
-    try {
-      const auth = JSON.parse(sessionStorage.getItem('retailos_auth') || '{}');
-      if (auth.phone) {
-        const days = getDaysRemaining(auth.phone);
-        if (days <= 14) setTrialDays(days);
-      }
-    } catch {}
+    // Trial days logic disabled due to async backend move
   }, []);
 
   const typeColors = {
