@@ -3,7 +3,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { CartItem, Product, Customer, Sale, Notification } from '@/types';
-import { mockProducts, mockCustomers, mockRecentSales, mockNotifications } from '@/lib/mockData';
 import { generateInvoiceNumber } from '@/lib/utils';
 
 // ─── App Store (Global) ────────────────────────────────────────
@@ -31,12 +30,12 @@ interface AppState {
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
-      notifications: mockNotifications,
-      unreadCount: mockNotifications.filter(n => !n.isRead).length,
+      notifications: [],
+      unreadCount: 0,
       sidebarOpen: false,
-      products: mockProducts,
-      customers: mockCustomers,
-      sales: mockRecentSales,
+      products: [],
+      customers: [],
+      sales: [],
 
       toggleSidebar: () => set(state => ({ sidebarOpen: !state.sidebarOpen })),
 
@@ -194,4 +193,8 @@ export const useBillingStore = create<BillingState>()((set, get) => ({
     state.clearCart();
     return sale;
   },
-}));
+}), {
+  name: 'retailos-store',
+  version: 2,
+}
+));

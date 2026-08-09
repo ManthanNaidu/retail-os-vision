@@ -1,426 +1,399 @@
 'use client';
-
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Shield, Lock, Store, Users, TrendingUp, Check,
-  X, Phone, MessageCircle, AlertTriangle, CheckCircle,
-  Clock, RefreshCw, LogOut, Eye, EyeOff,
-  DollarSign, Calendar, PauseCircle, PlayCircle,
-  ChevronRight, BarChart3, Zap, Crown, Search, Edit2
-} from 'lucide-react';
-import {
-  adminLogin, isAdminLoggedIn, adminLogout, saveAllStores,
-  getAllStores, activateStore, suspendStore, unsuspendStore,
-  updateStore, StoreRecord, getDaysRemaining
-} from '@/lib/licenseManager';
+import { Shield, LogOut, Store, Users, DollarSign, TrendingUp, PauseCircle, PlayCircle, Phone, MessageCircle, Search, RefreshCw, Crown, Zap, CheckCircle, XCircle, Clock, BarChart3, Eye, EyeOff, ChevronRight, AlertTriangle } from 'lucide-react';
+import { getAllStores, saveAllStores, adminLogin, isAdminLoggedIn, adminLogout, StoreRecord } from '@/lib/licenseManager';
 
-const STATUS_CONFIG = {
-  active:    { label: 'Active',    bg: '#d1fae5', color: '#059669', icon: CheckCircle },
-  trial:     { label: 'Trial',     bg: '#dbeafe', color: 'var(--primary)', icon: Clock },
-  suspended: { label: 'Suspended', bg: '#fee2e2', color: '#dc2626', icon: PauseCircle },
-  expired:   { label: 'Expired',   bg: '#f1f5f9', color: '#64748b', icon: AlertTriangle },
-};
-
-const PLAN_CONFIG = {
-  trial: { label: 'Free Trial', color: '#64748b' },
-  basic: { label: 'Basic ₹999/mo', color: 'var(--primary)' },
-  pro:   { label: 'Pro ₹1,999/mo', color: '#7c3aed' },
-};
-
-// Seed some demo stores for the admin panel to look impressive
 const DEMO_STORES: StoreRecord[] = [
-  {
-    phone: '9876543200', ownerName: 'Rajesh Kumar', storeName: 'Shree Ram Medical & General',
-    city: 'Bangalore', registeredAt: new Date(Date.now() - 30 * 86400000).toISOString(),
-    lastLogin: new Date().toISOString(), status: 'active',
-    trialEndsAt: new Date(Date.now() + 14 * 86400000).toISOString(),
-    paidUntil: new Date(Date.now() + 25 * 86400000).toISOString(),
-    plan: 'basic', notes: '', monthlyFee: 999,
-  },
-  {
-    phone: '9845001234', ownerName: 'Suresh Patel', storeName: 'Patel Kirana Store',
-    city: 'Ahmedabad', registeredAt: new Date(Date.now() - 8 * 86400000).toISOString(),
-    lastLogin: new Date(Date.now() - 2 * 86400000).toISOString(), status: 'trial',
-    trialEndsAt: new Date(Date.now() + 6 * 86400000).toISOString(),
-    paidUntil: null, plan: 'trial', notes: '', monthlyFee: 999,
-  },
-  {
-    phone: '9900112233', ownerName: 'Ramesh Babu', storeName: 'Sri Venkateshwara Medicals',
-    city: 'Hyderabad', registeredAt: new Date(Date.now() - 5 * 86400000).toISOString(),
-    lastLogin: new Date(Date.now() - 1 * 86400000).toISOString(), status: 'trial',
-    trialEndsAt: new Date(Date.now() + 9 * 86400000).toISOString(),
-    paidUntil: null, plan: 'trial', notes: '', monthlyFee: 999,
-  },
+  { phone: '9876543200', ownerName: 'Rajesh Kumar', storeName: 'Shree Ram Medical Store', city: 'Bangalore', registeredAt: new Date(Date.now() - 5 * 24 * 3600000).toISOString(), lastLogin: new Date().toISOString(), status: 'trial', trialEndsAt: new Date(Date.now() + 9 * 24 * 3600000).toISOString(), paidUntil: null, plan: 'trial', notes: '', monthlyFee: 999 },
+  { phone: '9845001234', ownerName: 'Priya Sharma', storeName: 'Patel Kirana Store', city: 'Mumbai', registeredAt: new Date(Date.now() - 20 * 24 * 3600000).toISOString(), lastLogin: new Date(Date.now() - 2 * 3600000).toISOString(), status: 'active', trialEndsAt: new Date(Date.now() - 6 * 24 * 3600000).toISOString(), paidUntil: new Date(Date.now() + 25 * 24 * 3600000).toISOString(), plan: 'basic', notes: 'Paid via UPI on Aug 1', monthlyFee: 999 },
+  { phone: '9900112233', ownerName: 'Suresh Patel', storeName: 'Sri Venkateshwara Electronics', city: 'Hyderabad', registeredAt: new Date(Date.now() - 45 * 24 * 3600000).toISOString(), lastLogin: new Date(Date.now() - 5 * 24 * 3600000).toISOString(), status: 'suspended', trialEndsAt: new Date(Date.now() - 31 * 24 * 3600000).toISOString(), paidUntil: null, plan: 'trial', notes: 'Trial expired, awaiting payment', monthlyFee: 0 },
 ];
 
-function LoginForm({ onLogin }: { onLogin: () => void }) {
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [show, setShow] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    await new Promise(r => setTimeout(r, 800));
-    if (adminLogin(password)) { onLogin(); }
-    else { setError('Invalid master password. Access denied.'); setLoading(false); }
-  };
-
-  return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#0f1a2e' }}>
-      <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-sm mx-4">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
-            style={{ background: 'linear-gradient(135deg, #1a56db, #7c3aed)' }}>
-            <Crown size={32} className="text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-white">RetailOS Admin</h1>
-          <p className="text-sm mt-1 text-white/50">Master Control Panel</p>
-        </div>
-
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-sm">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="text-xs font-semibold text-white/60 block mb-1.5">Master Password</label>
-              <div className="relative">
-                <input
-                  type={show ? 'text' : 'password'}
-                  value={password}
-                  onChange={e => { setPassword(e.target.value); setError(''); }}
-                  placeholder="Enter admin password"
-                  className="w-full px-4 py-3 pr-11 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/30 text-sm focus:outline-none focus:border-blue-400"
-                  autoFocus
-                />
-                <button type="button" onClick={() => setShow(!show)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70">
-                  {show ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-            </div>
-
-            {error && (
-              <p className="text-red-400 text-xs flex items-center gap-1.5">
-                <AlertTriangle size={12} /> {error}
-              </p>
-            )}
-
-            <button type="submit" disabled={loading || !password}
-              className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition-all flex items-center justify-center gap-2"
-              style={{ background: password ? 'linear-gradient(135deg, #1a56db, #7c3aed)' : 'rgba(255,255,255,0.1)' }}>
-              {loading ? <RefreshCw size={15} className="animate-spin" /> : <Shield size={15} />}
-              {loading ? 'Authenticating...' : 'Access Admin Panel'}
-            </button>
-          </form>
-          <p className="text-center text-xs mt-4 text-white/30">
-            This panel is restricted to RetailOS administrators only
-          </p>
-        </div>
-      </motion.div>
-    </div>
-  );
-}
-
-function StoreCard({ store, onUpdate }: { store: StoreRecord; onUpdate: () => void }) {
-  const [loading, setLoading] = useState(false);
-  const [showEdit, setShowEdit] = useState(false);
-  const [months, setMonths] = useState(1);
-  const [fee, setFee] = useState(store.monthlyFee.toString());
-  const [notes, setNotes] = useState(store.notes);
-
-  const statusCfg = STATUS_CONFIG[store.status];
-  const daysLeft = getDaysRemaining(store.phone);
-
-  const handleAction = async (action: 'activate' | 'suspend' | 'unsuspend') => {
-    setLoading(true);
-    await new Promise(r => setTimeout(r, 400));
-    if (action === 'activate')  activateStore(store.phone, months, Number(fee));
-    if (action === 'suspend')   suspendStore(store.phone, notes);
-    if (action === 'unsuspend') unsuspendStore(store.phone);
-    onUpdate(); setLoading(false); setShowEdit(false);
-  };
-
-  const sendWhatsApp = () => {
-    const msg = store.status === 'suspended'
-      ? `Dear ${store.ownerName}, your RetailOS AI subscription has been suspended. Please renew at ₹${store.monthlyFee}/month to restore access. Reply to this message to pay.`
-      : `Dear ${store.ownerName}, your RetailOS AI trial ends in ${daysLeft} days. Upgrade to ₹${store.monthlyFee}/month for uninterrupted access. Reply to renew!`;
-    window.open(`https://wa.me/91${store.phone}?text=${encodeURIComponent(msg)}`, '_blank');
-  };
-
-  return (
-    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-3 flex-1 min-w-0">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0"
-            style={{ background: 'linear-gradient(135deg, #1a56db, #7c3aed)' }}>
-            {store.ownerName.charAt(0)}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{store.ownerName}</p>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                style={{ background: statusCfg.bg, color: statusCfg.color }}>
-                {statusCfg.label}
-              </span>
-              <span className="text-[10px] font-semibold" style={{ color: PLAN_CONFIG[store.plan].color }}>
-                {PLAN_CONFIG[store.plan].label}
-              </span>
-            </div>
-            <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>{store.storeName}</p>
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{store.city} · +91 {store.phone}</p>
-            <div className="flex items-center gap-3 mt-1.5 flex-wrap">
-              <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
-                Joined {new Date(store.registeredAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
-              </span>
-              {daysLeft > 0 && (
-                <span className={`text-xs font-semibold ${daysLeft <= 5 ? 'text-red-500' : daysLeft <= 10 ? 'text-amber-600' : 'text-green-600'}`}>
-                  {daysLeft}d remaining
-                </span>
-              )}
-              {store.notes && (
-                <span className="text-xs italic" style={{ color: 'var(--text-muted)' }}>{store.notes}</span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Action buttons */}
-        <div className="flex gap-1.5 flex-shrink-0">
-          <button onClick={sendWhatsApp}
-            className="w-8 h-8 rounded-xl flex items-center justify-center hover:opacity-80"
-            style={{ background: '#25D366' }} title="Send WhatsApp">
-            <MessageCircle size={15} className="text-white" />
-          </button>
-          <button onClick={() => setShowEdit(!showEdit)}
-            className="w-8 h-8 rounded-xl flex items-center justify-center hover:bg-blue-50 border"
-            style={{ borderColor: 'var(--border)', color: 'var(--primary)' }}>
-            <Edit2 size={13} />
-          </button>
-        </div>
-      </div>
-
-      {/* Expanded actions */}
-      <AnimatePresence>
-        {showEdit && (
-          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden">
-            <div className="pt-3 mt-3 border-t space-y-3" style={{ borderColor: 'var(--border)' }}>
-              {/* Activate with months */}
-              <div className="flex gap-2 items-center">
-                <div className="flex-1">
-                  <label className="text-[10px] font-semibold block mb-1" style={{ color: 'var(--text-muted)' }}>Months</label>
-                  <select value={months} onChange={e => setMonths(Number(e.target.value))}
-                    className="w-full px-2 py-1.5 text-xs rounded-lg border" style={{ borderColor: 'var(--border)' }}>
-                    {[1, 3, 6, 12].map(m => <option key={m} value={m}>{m} month{m > 1 ? 's' : ''}</option>)}
-                  </select>
-                </div>
-                <div className="flex-1">
-                  <label className="text-[10px] font-semibold block mb-1" style={{ color: 'var(--text-muted)' }}>Fee ₹/mo</label>
-                  <input type="number" value={fee} onChange={e => setFee(e.target.value)}
-                    className="w-full px-2 py-1.5 text-xs rounded-lg border" style={{ borderColor: 'var(--border)' }} />
-                </div>
-                <motion.button whileTap={{ scale: 0.95 }} onClick={() => handleAction('activate')} disabled={loading}
-                  className="px-3 py-2 rounded-xl text-xs font-bold text-white flex-shrink-0 mt-4"
-                  style={{ background: '#059669' }}>
-                  {loading ? '...' : 'Activate'}
-                </motion.button>
-              </div>
-
-              {/* Notes */}
-              <div>
-                <label className="text-[10px] font-semibold block mb-1" style={{ color: 'var(--text-muted)' }}>Notes</label>
-                <input value={notes} onChange={e => setNotes(e.target.value)}
-                  placeholder="Optional note..." className="w-full px-2 py-1.5 text-xs rounded-lg border" style={{ borderColor: 'var(--border)' }} />
-              </div>
-
-              {/* Suspend / Unsuspend */}
-              <div className="flex gap-2">
-                {store.status !== 'suspended' ? (
-                  <motion.button whileTap={{ scale: 0.95 }} onClick={() => handleAction('suspend')} disabled={loading}
-                    className="flex-1 py-2 rounded-xl text-xs font-bold text-white"
-                    style={{ background: '#dc2626' }}>
-                    <PauseCircle size={12} className="inline mr-1" /> Suspend Access
-                  </motion.button>
-                ) : (
-                  <motion.button whileTap={{ scale: 0.95 }} onClick={() => handleAction('unsuspend')} disabled={loading}
-                    className="flex-1 py-2 rounded-xl text-xs font-bold text-white"
-                    style={{ background: '#059669' }}>
-                    <PlayCircle size={12} className="inline mr-1" /> Restore Access
-                  </motion.button>
-                )}
-                <button onClick={() => setShowEdit(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold border" style={{ borderColor: 'var(--border)' }}>
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-}
-
 export default function AdminPage() {
-  const [authed, setAuthed] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  
   const [stores, setStores] = useState<StoreRecord[]>([]);
-  const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<'all' | 'active' | 'trial' | 'suspended'>('all');
-
-  const loadStores = useCallback(() => {
-    // Seed demo stores if empty
-    let all = getAllStores();
-    if (all.length === 0) {
-      saveAllStores(DEMO_STORES);
-      all = [...DEMO_STORES];
-    }
-    setStores([...all].sort((a, b) => new Date(b.lastLogin).getTime() - new Date(a.lastLogin).getTime()));
-  }, []);
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
-    setAuthed(isAdminLoggedIn());
-    if (isAdminLoggedIn()) loadStores();
-  }, [loadStores]);
-
-  const onLogin = () => { setAuthed(true); loadStores(); };
-
-  const filtered = stores.filter(s => {
-    const matchSearch = s.ownerName.toLowerCase().includes(search.toLowerCase()) ||
-      s.storeName.toLowerCase().includes(search.toLowerCase()) ||
-      s.phone.includes(search);
-    const matchFilter = filter === 'all' || s.status === filter;
-    return matchSearch && matchFilter;
-  });
-
-  const stats = {
-    total: stores.length,
-    active: stores.filter(s => s.status === 'active').length,
-    trial: stores.filter(s => s.status === 'trial').length,
-    suspended: stores.filter(s => s.status === 'suspended').length,
-    mrr: stores.filter(s => s.status === 'active').reduce((s, x) => s + x.monthlyFee, 0),
+    // Check if logged in
+    const loggedIn = isAdminLoggedIn();
+    setIsLoggedIn(loggedIn);
+    
+    if (loggedIn) {
+      loadStores();
+    }
+    
+    setIsInitializing(false);
+  }, []);
+  
+  const loadStores = () => {
+    let allStores = getAllStores();
+    if (allStores.length === 0) {
+      // Load demo data if empty
+      saveAllStores(DEMO_STORES);
+      allStores = DEMO_STORES;
+    }
+    setStores(allStores);
   };
 
-  if (!authed) return <LoginForm onLogin={onLogin} />;
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (adminLogin(password)) {
+      setIsLoggedIn(true);
+      setError('');
+      loadStores();
+    } else {
+      setError('Invalid master password.');
+    }
+  };
+
+  const handleLogout = () => {
+    adminLogout();
+    setIsLoggedIn(false);
+    setPassword('');
+  };
+
+  const handleSuspend = (phone: string) => {
+    if (!window.confirm('Are you sure you want to suspend this store?')) return;
+    const all = getAllStores();
+    const updated = all.map(s => s.phone === phone ? { ...s, status: 'suspended' as const } : s);
+    saveAllStores(updated);
+    setStores([...updated]);
+  };
+
+  const handleReactivate = (phone: string) => {
+    if (!window.confirm('Reactivate this store?')) return;
+    const all = getAllStores();
+    const paidUntil = new Date(Date.now() + 30 * 24 * 3600000).toISOString();
+    const updated = all.map(s => s.phone === phone ? { ...s, status: 'active' as const, plan: 'basic' as const, paidUntil, monthlyFee: 999 } : s);
+    saveAllStores(updated);
+    setStores([...updated]);
+  };
+  
+  const handleUpdatePlan = (phone: string, plan: 'trial' | 'basic' | 'pro') => {
+    const all = getAllStores();
+    const fee = plan === 'basic' ? 999 : plan === 'pro' ? 1999 : 0;
+    const updated = all.map(s => s.phone === phone ? { ...s, plan, monthlyFee: fee } : s);
+    saveAllStores(updated);
+    setStores([...updated]);
+  };
+
+  if (isInitializing) return null;
+
+  if (!isLoggedIn) {
+    return (
+      <div style={{ background: 'linear-gradient(135deg, #0f172a, #1e1b4b)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          style={{ 
+            background: 'rgba(255, 255, 255, 0.05)', 
+            backdropFilter: 'blur(10px)', 
+            borderRadius: 24, 
+            padding: 32, 
+            width: '100%', 
+            maxWidth: 400,
+            border: '1px solid rgba(255,255,255,0.1)',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+          }}
+        >
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <div style={{ display: 'inline-flex', background: 'rgba(251, 191, 36, 0.2)', padding: 12, borderRadius: '50%', marginBottom: 16 }}>
+              <Crown color="#fbbf24" size={32} />
+            </div>
+            <h1 style={{ color: 'white', fontSize: 24, fontWeight: 800 }}>RetailOS Master Panel</h1>
+            <p style={{ color: '#94a3b8', fontSize: 14, marginTop: 8 }}>Manthan's Control Center</p>
+          </div>
+          
+          <form onSubmit={handleLogin}>
+            <div style={{ marginBottom: 20, position: 'relative' }}>
+              <input 
+                type={showPassword ? 'text' : 'password'} 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter Master Password"
+                style={{ 
+                  width: '100%', 
+                  padding: '14px 16px', 
+                  borderRadius: 12, 
+                  background: 'rgba(0,0,0,0.2)', 
+                  border: '1px solid rgba(255,255,255,0.1)', 
+                  color: 'white',
+                  fontSize: 16,
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+              />
+              <button 
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{ position: 'absolute', right: 12, top: 14, background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+            
+            {error && <p style={{ color: '#ef4444', fontSize: 14, marginBottom: 16, textAlign: 'center' }}>{error}</p>}
+            
+            <button 
+              type="submit"
+              style={{ 
+                width: '100%', 
+                padding: '14px', 
+                background: 'linear-gradient(135deg, #fbbf24, #d97706)', 
+                color: '#451a03', 
+                border: 'none', 
+                borderRadius: 12, 
+                fontSize: 16, 
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                boxShadow: '0 4px 14px rgba(217, 119, 6, 0.4)'
+              }}
+            >
+              Enter Control Room <Shield size={18} />
+            </button>
+          </form>
+          
+          <div style={{ textAlign: 'center', marginTop: 32 }}>
+            <span style={{ background: 'rgba(255,255,255,0.1)', color: '#94a3b8', padding: '4px 12px', borderRadius: 999, fontSize: 11, fontWeight: 600 }}>
+              v2.0 • Restricted Access
+            </span>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  const filteredStores = stores.filter(s => 
+    s.storeName.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    s.phone.includes(searchQuery) ||
+    s.ownerName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
+  const totalStores = stores.length;
+  const activeStores = stores.filter(s => s.status === 'active' || s.status === 'trial').length;
+  const suspendedStores = stores.filter(s => s.status === 'suspended').length;
+  
+  const mrr = stores
+    .filter(s => s.status === 'active' && s.plan !== 'trial')
+    .reduce((sum, s) => sum + (s.monthlyFee || 0), 0);
+    
+  const paidCount = stores.filter(s => s.status === 'active' && s.plan !== 'trial').length;
 
   return (
-    <div className="min-h-screen" style={{ background: '#f0f4ff' }}>
-      {/* Top bar */}
-      <div className="sticky top-0 z-10 border-b bg-white/90 backdrop-blur-md" style={{ borderColor: '#e2e8f0' }}>
-        <div style={{ maxWidth: 800, margin: '0 auto', padding: '0 16px' }}>
-          <div className="flex items-center justify-between h-14">
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center"
-                style={{ background: 'linear-gradient(135deg, #1a56db, #7c3aed)' }}>
-                <Crown size={14} className="text-white" />
-              </div>
-              <div>
-                <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>RetailOS Admin</p>
-                <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Master Control Panel</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <button onClick={loadStores}
-                className="w-8 h-8 rounded-lg border flex items-center justify-center hover:bg-gray-50"
-                style={{ borderColor: 'var(--border)' }}>
-                <RefreshCw size={13} style={{ color: 'var(--text-muted)' }} />
-              </button>
-              <button onClick={() => { adminLogout(); setAuthed(false); }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-red-50 transition-colors text-red-600 border border-red-100">
-                <LogOut size={12} /> Logout
-              </button>
-            </div>
+    <div style={{ background: '#F4F6FA', minHeight: '100vh' }}>
+      {/* Dark header */}
+      <div style={{ background: 'linear-gradient(135deg, #0f172a, #1e1b4b)', padding: '24px 20px 48px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', maxWidth: 800, margin: '0 auto' }}>
+          <div>
+            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>Master Control Panel</p>
+            <h1 style={{ color: 'white', fontSize: 22, fontWeight: 800, marginTop: 4 }}>RetailOS Admin</h1>
+            <p style={{ color: '#fbbf24', fontSize: 13, marginTop: 2 }}>👑 Manthan's Dashboard</p>
           </div>
+          <button 
+            onClick={handleLogout} 
+            style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'white', padding: '8px 16px', borderRadius: 8, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+          >
+            <LogOut size={14} /> Logout
+          </button>
         </div>
       </div>
-
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '20px 16px' }}>
-        {/* Stats */}
-        <div className="grid grid-cols-4 gap-3 mb-6">
-          {[
-            { label: 'Total Stores', value: stats.total, color: 'var(--primary)', bg: '#e8f0fe' },
-            { label: 'Active Paid', value: stats.active, color: '#059669', bg: '#d1fae5' },
-            { label: 'On Trial', value: stats.trial, color: '#d97706', bg: '#fef3c7' },
-            { label: 'MRR', value: `₹${stats.mrr.toLocaleString()}`, color: '#7c3aed', bg: '#ede9fe', isText: true },
-          ].map((s, i) => (
-            <div key={i} className="bg-white rounded-2xl p-3.5 border text-center" style={{ borderColor: 'var(--border)' }}>
-              <p className="text-xl font-bold" style={{ color: s.color }}>{s.value}</p>
-              <p className="text-[11px] mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
+      
+      {/* Content pulled up */}
+      <div style={{ padding: '0 16px', marginTop: -24, paddingBottom: 40, maxWidth: 800, margin: '-24px auto 0' }}>
+        
+        {/* KPI Cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 20 }}>
+          <div style={{ background: 'white', borderRadius: 16, padding: '16px', border: '1px solid #E5E7EB', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <p style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 600 }}>TOTAL STORES</p>
+              <Store size={14} color="#9CA3AF" />
             </div>
-          ))}
+            <p style={{ fontSize: 28, fontWeight: 800, color: '#111827', marginTop: 4 }}>{totalStores}</p>
+          </div>
+          
+          <div style={{ background: 'white', borderRadius: 16, padding: '16px', border: '1px solid #E5E7EB', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <p style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 600 }}>ACTIVE</p>
+              <CheckCircle size={14} color="#10b981" />
+            </div>
+            <p style={{ fontSize: 28, fontWeight: 800, color: '#111827', marginTop: 4 }}>{activeStores}</p>
+          </div>
+          
+          <div style={{ background: 'white', borderRadius: 16, padding: '16px', border: '1px solid #E5E7EB', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <p style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 600 }}>MONTHLY REV</p>
+              <DollarSign size={14} color="#10b981" />
+            </div>
+            <p style={{ fontSize: 28, fontWeight: 800, color: '#111827', marginTop: 4 }}>₹{(mrr/1000).toFixed(1)}k</p>
+          </div>
+          
+          <div style={{ background: 'white', borderRadius: 16, padding: '16px', border: '1px solid #E5E7EB', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <p style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 600 }}>SUSPENDED</p>
+              <AlertTriangle size={14} color="#ef4444" />
+            </div>
+            <p style={{ fontSize: 28, fontWeight: 800, color: '#111827', marginTop: 4 }}>{suspendedStores}</p>
+          </div>
         </div>
 
-        {/* Revenue banner */}
-        <div className="bg-white rounded-2xl border p-4 mb-5 flex items-center gap-4" style={{ borderColor: 'var(--border)' }}>
-          <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
-            style={{ background: 'linear-gradient(135deg, #1a56db, #7c3aed)' }}>
-            <BarChart3 size={22} className="text-white" />
+        {/* MRR Banner */}
+        <div style={{ background: 'linear-gradient(135deg, #1a56db, #7c3aed)', borderRadius: 16, padding: '20px', marginBottom: 20, color: 'white', boxShadow: '0 4px 12px rgba(124, 58, 237, 0.3)' }}>
+          <p style={{ opacity: 0.8, fontSize: 12, fontWeight: 600 }}>MONTHLY RECURRING REVENUE</p>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <p style={{ fontSize: 36, fontWeight: 800, marginTop: 4 }}>₹{mrr.toLocaleString('en-IN')}</p>
+            <span style={{ background: 'rgba(255,255,255,0.2)', padding: '2px 8px', borderRadius: 12, fontSize: 12, fontWeight: 600 }}>/ month</span>
           </div>
-          <div className="flex-1">
-            <p className="text-base font-bold" style={{ color: 'var(--text-primary)' }}>
-              Monthly Recurring Revenue: ₹{stats.mrr.toLocaleString('en-IN')}
-            </p>
-            <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-              {stats.trial} stores on trial · Potential: ₹{(stats.trial * 999 + stats.mrr).toLocaleString('en-IN')}/month if all convert
-            </p>
-          </div>
-          <div className="text-right flex-shrink-0">
-            <p className="text-2xl font-black" style={{ color: '#059669' }}>
-              +{stats.active > 0 ? Math.round((stats.active / Math.max(stats.total, 1)) * 100) : 0}%
-            </p>
-            <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>conversion</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, opacity: 0.9, fontSize: 13, marginTop: 8 }}>
+            <TrendingUp size={14} />
+            <span>{paidCount} active paying stores</span>
           </div>
         </div>
 
-        {/* Expiring trial alert */}
-        {stores.filter(s => s.status === 'trial' && getDaysRemaining(s.phone) <= 3).length > 0 && (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 mb-4 flex items-center gap-2.5">
-            <AlertTriangle size={16} className="text-amber-600 flex-shrink-0" />
-            <p className="text-sm font-semibold text-amber-800">
-              {stores.filter(s => s.status === 'trial' && getDaysRemaining(s.phone) <= 3).length} trial store(s) expiring in ≤3 days — Send payment reminders!
-            </p>
+        {/* Search */}
+        <div style={{ position: 'relative', marginBottom: 20 }}>
+          <div style={{ position: 'absolute', left: 14, top: 14, color: '#9CA3AF' }}>
+            <Search size={18} />
+          </div>
+          <input 
+            type="text" 
+            placeholder="Search store name or phone..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ 
+              width: '100%', 
+              padding: '14px 14px 14px 42px', 
+              borderRadius: 12, 
+              border: '1px solid #E5E7EB', 
+              background: 'white',
+              fontSize: 15,
+              outline: 'none',
+              boxSizing: 'border-box',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+            }}
+          />
+        </div>
+
+        {/* Store List */}
+        <h2 style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Store size={18} /> Store Directory
+        </h2>
+        
+        {filteredStores.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '40px 20px', background: 'white', borderRadius: 16, border: '1px dashed #D1D5DB' }}>
+            <Search size={32} color="#9CA3AF" style={{ margin: '0 auto 12px' }} />
+            <p style={{ color: '#6B7280', fontSize: 14 }}>No stores found.</p>
+          </div>
+        ) : (
+          <div>
+            <AnimatePresence>
+              {filteredStores.map((store) => (
+                <motion.div 
+                  key={store.phone}
+                  layout
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  whileHover={{ y: -2 }} 
+                  style={{ background: 'white', borderRadius: 16, padding: '16px', border: '1px solid #E5E7EB', marginBottom: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                        <p style={{ fontWeight: 700, fontSize: 16, color: '#111827' }}>{store.storeName}</p>
+                        <span style={{ 
+                          background: store.status === 'suspended' ? '#fee2e2' : store.status === 'trial' ? '#fef3c7' : '#d1fae5', 
+                          color: store.status === 'suspended' ? '#dc2626' : store.status === 'trial' ? '#d97706' : '#059669', 
+                          padding: '2px 8px', 
+                          borderRadius: 999, 
+                          fontSize: 11, 
+                          fontWeight: 700 
+                        }}>
+                          {store.status.toUpperCase()}
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}>
+                        <Users size={12} color="#6B7280" />
+                        <p style={{ fontSize: 13, color: '#4B5563', fontWeight: 500 }}>{store.ownerName}</p>
+                        <span style={{ color: '#D1D5DB' }}>•</span>
+                        <p style={{ fontSize: 13, color: '#4B5563', fontFamily: 'monospace' }}>{store.phone}</p>
+                      </div>
+                      
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                        <Clock size={12} color="#9CA3AF" />
+                        <p style={{ fontSize: 12, color: '#6B7280' }}>
+                          Joined {new Date(store.registeredAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Plan Selection */}
+                  <div style={{ marginTop: 16, padding: '12px', background: '#F9FAFB', borderRadius: 12, border: '1px solid #F3F4F6' }}>
+                    <p style={{ fontSize: 11, fontWeight: 600, color: '#6B7280', marginBottom: 8 }}>CURRENT PLAN</p>
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                      {(['trial', 'basic', 'pro'] as const).map(p => (
+                        <button
+                          key={p}
+                          onClick={() => handleUpdatePlan(store.phone, p)}
+                          style={{
+                            padding: '6px 12px',
+                            borderRadius: 8,
+                            fontSize: 12,
+                            fontWeight: 600,
+                            border: `1px solid ${store.plan === p ? '#3B82F6' : '#E5E7EB'}`,
+                            background: store.plan === p ? '#EFF6FF' : 'white',
+                            color: store.plan === p ? '#2563EB' : '#4B5563',
+                            cursor: 'pointer',
+                            textTransform: 'capitalize'
+                          }}
+                        >
+                          {p} {p === 'basic' ? '(₹999)' : p === 'pro' ? '(₹1999)' : ''}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Action buttons */}
+                  <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                    {store.status !== 'suspended' ? (
+                      <button 
+                        onClick={() => handleSuspend(store.phone)} 
+                        style={{ flex: 1, padding: '10px', background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                      >
+                        <PauseCircle size={15} /> Suspend
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => handleReactivate(store.phone)} 
+                        style={{ flex: 1, padding: '10px', background: '#d1fae5', color: '#059669', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                      >
+                        <PlayCircle size={15} /> Reactivate
+                      </button>
+                    )}
+                    <button 
+                      onClick={() => window.open(`https://wa.me/91${store.phone}?text=${encodeURIComponent(`Hi ${store.ownerName}, regarding your RetailOS subscription...`)}`, '_blank')} 
+                      style={{ flex: 1, padding: '10px', background: '#d1fae5', color: '#065f46', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                    >
+                      <MessageCircle size={15} /> WhatsApp
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
         )}
-
-        {/* Search + filter */}
-        <div className="flex gap-2 mb-4">
-          <div className="relative flex-1">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
-            <input className="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border bg-white" placeholder="Search stores..."
-              value={search} onChange={e => setSearch(e.target.value)} style={{ borderColor: 'var(--border)' }} />
-          </div>
-          {(['all', 'active', 'trial', 'suspended'] as const).map(f => (
-            <button key={f} onClick={() => setFilter(f)}
-              className="px-3 py-2.5 rounded-xl text-xs font-semibold border transition-all capitalize"
-              style={{
-                background: filter === f ? 'var(--primary)' : 'white',
-                color: filter === f ? 'white' : 'var(--text-secondary)',
-                borderColor: filter === f ? 'var(--primary)' : 'var(--border)',
-              }}>
-              {f}
-            </button>
-          ))}
-        </div>
-
-        {/* Store list */}
-        <div className="space-y-3">
-          {filtered.length === 0 ? (
-            <div className="text-center py-12 bg-white rounded-2xl border" style={{ borderColor: 'var(--border)' }}>
-              <Store size={36} className="mx-auto mb-2" style={{ color: 'var(--text-muted)' }} />
-              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>No stores found</p>
-            </div>
-          ) : (
-            filtered.map(store => (
-              <StoreCard key={store.phone} store={store} onUpdate={loadStores} />
-            ))
-          )}
-        </div>
-
-        <p className="text-center text-xs mt-8" style={{ color: 'var(--text-muted)' }}>
-          RetailOS Admin v1.0 · Secured · Only for authorized personnel
-        </p>
       </div>
     </div>
   );
