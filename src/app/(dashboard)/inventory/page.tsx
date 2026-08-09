@@ -371,7 +371,7 @@ export default function InventoryPage() {
         <InvoiceScanner 
           onClose={() => setShowScanner(false)} 
           onImport={(scannedProducts) => {
-            scannedProducts.forEach(p => addProduct(p));
+            scannedProducts.forEach(p => addProduct(p as Product));
             setShowScanner(false);
           }} 
         />
