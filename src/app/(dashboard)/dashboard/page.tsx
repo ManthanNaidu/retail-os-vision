@@ -282,7 +282,7 @@ export default function DashboardPage() {
                                                     </div>
                                                 </div>
                                                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                                                    <p style={{ fontSize: 14, fontWeight: 700, color: '#111827', margin: 0 }}>{formatCurrency ? formatCurrency(sale.total || sale.amount || 0) : `₹${sale.total || sale.amount || 0}`}</p>
+                                                    <p style={{ fontSize: 14, fontWeight: 700, color: '#111827', margin: 0, textAlign: 'right' }}>{typeof formatCurrency === 'function' ? formatCurrency(sale.total || 0) : `₹${sale.total || 0}`}</p>
                                                     <span style={{ fontSize: 10, padding: '2px 6px', background: '#F3F4F6', color: '#4B5563', borderRadius: 4, fontWeight: 500, marginTop: 4, display: 'inline-block', textTransform: 'capitalize' }}>
                                                         {sale.paymentMethod || 'Cash'}
                                                     </span>
