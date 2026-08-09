@@ -11,7 +11,7 @@ import { InvoiceScanner } from '@/components/shared/InvoiceScanner';
 import { getStoreType } from '@/lib/storeTypes';
 
 export default function InventoryPage() {
-  const { products, addProduct, updateProduct, deleteProduct, profile } = useAppStore();
+  const { products, addProduct, updateProduct, deleteProduct } = useAppStore();
   
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -38,7 +38,8 @@ export default function InventoryPage() {
   const [formData, setFormData] = useState<Partial<Product>>(initialFormState);
 
   // Derived data
-  const storeConfig = getStoreType(profile?.storeType || 'general');
+  const storeType = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('retailos_auth') || '{}').storeType || 'general' : 'general';
+  const storeConfig = getStoreType(storeType);
   const availableCategories = storeConfig?.categories || ['General', 'Groceries', 'Electronics', 'Clothing', 'Pharmacy'];
   
   const allCategories = ['All', ...availableCategories];
