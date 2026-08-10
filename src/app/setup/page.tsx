@@ -263,15 +263,15 @@ export default function SetupPage() {
                 Back
               </button>
               <button
-                onClick={handleNext}
-                disabled={!storeDetails.storeName || !storeDetails.ownerName}
+                onClick={handleComplete}
+                disabled={loading || !storeDetails.storeName || !storeDetails.ownerName}
                 className={`flex-1 py-3.5 rounded-xl font-medium text-white shadow-sm flex items-center justify-center transition-all ${
-                  storeDetails.storeName && storeDetails.ownerName 
+                  storeDetails.storeName && storeDetails.ownerName && !loading
                     ? 'bg-blue-600 hover:bg-blue-700 active:scale-[0.98]' 
                     : 'bg-slate-300 cursor-not-allowed'
                 }`}
               >
-                Continue <ArrowRight className="ml-2 w-4 h-4" />
+                {loading ? 'Setting up...' : 'Finish Setup'} {!loading && <Check className="ml-2 w-4 h-4" />}
               </button>
             </div>
           </motion.div>
@@ -333,7 +333,7 @@ export default function SetupPage() {
             
             {/* Progress Dots */}
             <div className="flex justify-center gap-2">
-              {[1, 2, 3].map(i => (
+              {[1, 2].map(i => (
                 <div 
                   key={i} 
                   className={`h-1.5 rounded-full transition-all ${
