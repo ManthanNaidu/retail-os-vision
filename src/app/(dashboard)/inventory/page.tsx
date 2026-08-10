@@ -109,7 +109,7 @@ export default function InventoryPage() {
     <div className="has-bottom-nav" style={{ minHeight: '100vh', background: '#F4F6FA', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       
       {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg, #1a56db, #7c3aed)', padding: '20px 20px 32px' }}>
+      <div style={{ background: 'linear-gradient(135deg, #F59E0B, #F97316)', padding: '20px 20px 32px' }}>
         <h1 style={{ color: 'white', fontSize: 22, fontWeight: 700, margin: 0 }}>Inventory</h1>
         <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, marginTop: 4, marginBottom: 0 }}>
           {products.length} products in stock
@@ -123,7 +123,7 @@ export default function InventoryPage() {
           </button>
           <button 
             onClick={handleOpenAdd} 
-            style={{ background: 'white', color: '#1a56db', border: 'none', padding: '8px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, flex: 1, justifyContent: 'center' }}
+            style={{ background: 'white', color: '#F97316', border: 'none', padding: '8px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, flex: 1, justifyContent: 'center' }}
           >
             <Plus size={15} /> Add Product
           </button>
@@ -174,7 +174,7 @@ export default function InventoryPage() {
                   fontWeight: 600,
                   whiteSpace: 'nowrap',
                   border: 'none',
-                  background: selectedCategory === cat ? '#1a56db' : '#E5E7EB',
+                  background: selectedCategory === cat ? '#F97316' : '#E5E7EB',
                   color: selectedCategory === cat ? 'white' : '#4B5563',
                   cursor: 'pointer',
                   transition: 'all 0.2s'
@@ -193,10 +193,10 @@ export default function InventoryPage() {
             <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 8px' }}>No Products Yet</h3>
             <p style={{ color: '#6B7280', margin: 0, fontSize: 14, lineHeight: 1.5 }}>Add your first product or scan a distributor invoice to get started.</p>
             <div style={{ display: 'flex', gap: 10, marginTop: 20, justifyContent: 'center' }}>
-              <button onClick={handleOpenAdd} style={{ background: '#1a56db', color: 'white', border: 'none', padding: '10px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <button onClick={handleOpenAdd} style={{ background: '#F97316', color: 'white', border: 'none', padding: '10px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
                 <Plus size={15} /> Add Product
               </button>
-              <button onClick={() => setShowScanner(true)} style={{ background: 'white', color: '#1a56db', border: '1px solid #1a56db', padding: '10px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <button onClick={() => setShowScanner(true)} style={{ background: 'white', color: '#F97316', border: '1px solid #F97316', padding: '10px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
                 <FileImage size={15} /> Scan Invoice
               </button>
             </div>
@@ -356,7 +356,7 @@ export default function InventoryPage() {
                   <input type="date" value={formData.expiryDate || ''} onChange={e => setFormData({...formData, expiryDate: e.target.value})} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 14, outline: 'none' }} />
                 </div>
 
-                <button type="submit" style={{ background: '#1a56db', color: 'white', border: 'none', padding: '14px', borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: 'pointer', marginTop: 10, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8 }}>
+                <button type="submit" style={{ background: '#F97316', color: 'white', border: 'none', padding: '14px', borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: 'pointer', marginTop: 10, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8 }}>
                   <Check size={18} />
                   {editingProduct ? 'Update Product' : 'Save Product'}
                 </button>

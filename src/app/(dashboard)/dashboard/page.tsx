@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { ShoppingCart, Package, Users, BarChart3, Bell, TrendingUp, AlertTriangle, CheckCircle, ArrowRight, Store, Zap, CreditCard, DollarSign, Clock, Sun, Menu, Grid } from 'lucide-react';
+import { ShoppingCart, Package, Users, BarChart3, Bell, TrendingUp, AlertTriangle, CheckCircle, ArrowRight, Store, Zap, CreditCard, DollarSign, Clock, Sun, Menu, Grid, MessageCircle } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { formatCurrency } from '@/lib/utils';
 
@@ -394,6 +394,13 @@ export default function DashboardPage() {
                         )}
                     </>
                 )}
+                
+                {/* Made in India Tag */}
+                <div style={{ textAlign: 'center', marginTop: 30, paddingBottom: 20 }}>
+                    <p style={{ color: '#9CA3AF', fontSize: 12, fontWeight: 600, letterSpacing: 0.5 }}>
+                        Made in India 🇮🇳
+                    </p>
+                </div>
             </div>
 
             {/* Services Modal for Desktop top-left button */}
@@ -417,6 +424,10 @@ export default function DashboardPage() {
                             <button onClick={() => { setShowServicesMenu(false); router.push('/settings'); }} style={{ padding: 16, border: '1px solid #E5E7EB', borderRadius: 12, background: 'white', cursor: 'pointer', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 8 }}>
                                 <Zap size={20} color="#059669" />
                                 <span style={{ fontWeight: 600 }}>Settings</span>
+                            </button>
+                            <button onClick={() => { setShowServicesMenu(false); window.location.href = 'mailto:support@retailos.in'; }} style={{ padding: 16, border: '1px solid #E5E7EB', borderRadius: 12, background: 'white', cursor: 'pointer', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                <MessageCircle size={20} color="#3B82F6" />
+                                <span style={{ fontWeight: 600 }}>Contact Us</span>
                             </button>
                         </div>
                     </motion.div>

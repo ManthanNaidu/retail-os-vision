@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { Eye, EyeOff, Store, ArrowRight } from 'lucide-react';
 import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '@/lib/firebase';
+import { isStoreActive } from '@/lib/licenseManager';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,7 +22,14 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
+      
+      const isActive = await isStoreActive(email);
+      if (!isActive) {
+        setError('Your account has been suspended. Please contact admin.');
+        return;
+      }
+      
       router.push('/setup');
     } catch (err: any) {
       setError(err.message || 'Failed to login. Please check your credentials.');
@@ -34,7 +42,17 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
     try {
-      await signInWithPopup(auth, googleProvider);
+      const userCred = await signInWithPopup(auth, googleProvider);
+      
+      const email = userCred.user.email;
+      if (email) {
+        const isActive = await isStoreActive(email);
+        if (!isActive) {
+          setError('Your account has been suspended. Please contact admin.');
+          return;
+        }
+      }
+
       router.push('/setup');
     } catch (err: any) {
       setError(err.message || 'Failed to authenticate with Google.');
