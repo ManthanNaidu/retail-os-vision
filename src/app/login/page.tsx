@@ -1,317 +1,155 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Phone, ArrowRight, RefreshCw, AlertTriangle, Shield, Check, Zap, Sparkles } from 'lucide-react';
-import { registerStore, isStoreActive } from '@/lib/licenseManager';
-import { auth, setupRecaptcha } from '@/lib/firebase';
-import { signInWithPhoneNumber } from 'firebase/auth';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Eye, EyeOff, Store, ArrowRight } from 'lucide-react';
+import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider } from '@/lib/firebase';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [step, setStep] = useState<'phone' | 'otp'>('phone');
-  const [phone, setPhone] = useState('');
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [confirmationResult, setConfirmationResult] = useState<any>(null);
 
-  const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-  useEffect(() => {
-    setupRecaptcha('recaptcha-container');
-  }, []);
-
-  useEffect(() => {
-    if (step === 'otp') {
-      const firstInput = otpRefs.current[0];
-      if (firstInput) firstInput.focus();
-    }
-  }, [step]);
-
-  const handlePhoneSubmit = async (e: React.FormEvent) => {
+  const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    
-    if (phone.length !== 10 || !/^\d+$/.test(phone)) {
-      setError('Please enter a valid 10-digit phone number');
-      return;
-    }
-
     setLoading(true);
+    setError('');
     try {
-      const appVerifier = (window as any).recaptchaVerifier;
-      const formattedPhone = `+91${phone}`;
-      
-      const confResult = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
-      setConfirmationResult(confResult);
-      setStep('otp');
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push('/setup');
     } catch (err: any) {
-      console.error("OTP Send Error:", err);
-      
-      // Fallback to demo mode if Firebase API key is missing or invalid
-      if (err.code === 'auth/invalid-api-key' || err.message?.includes('api-key-not-valid') || err.message?.includes('dummy-api-key')) {
-        console.warn("Using Firebase Demo Mode due to missing API Key");
-        setConfirmationResult(null);
-        setStep('otp');
-        setLoading(false);
-        return;
-      }
-
-      setError(err.message || 'Failed to send OTP. Try again.');
-      
-      // Reset reCAPTCHA so the user can try again
-      if ((window as any).recaptchaVerifier) {
-        (window as any).recaptchaVerifier.render().then(function(widgetId: any) {
-          (window as any).grecaptcha.reset(widgetId);
-        });
-      }
+      setError(err.message || 'Failed to login. Please check your credentials.');
     } finally {
       setLoading(false);
     }
   };
 
-  const verifySuccess = async (code: string) => {
+  const handleGoogleLogin = async () => {
     setLoading(true);
+    setError('');
     try {
-      if (confirmationResult) {
-        await confirmationResult.confirm(code);
-      } else if (code !== '123456') { // Fallback demo
-        throw new Error('Invalid OTP');
-      }
-
-      const active = await isStoreActive(phone);
-      if (!active) {
-        setError('Access suspended. Contact RetailOS support.');
-        setLoading(false);
-        return;
-      }
-
-      await registerStore(phone, "", "");
-
-      sessionStorage.setItem('retailos_auth', JSON.stringify({
-        phone,
-        name: 'Demo Owner',
-        store: 'Demo Store',
-        role: 'owner',
-        loggedIn: true
-      }));
-
-      const hasProfile = localStorage.getItem('retailos_profile');
-      if (!hasProfile) {
-        router.push('/setup');
-      } else {
-        router.push('/dashboard');
-      }
+      await signInWithPopup(auth, googleProvider);
+      router.push('/setup');
     } catch (err: any) {
-      console.error("OTP Verify Error:", err);
-      setError('Invalid OTP. Please try again.');
+      setError(err.message || 'Failed to authenticate with Google.');
+    } finally {
       setLoading(false);
     }
   };
 
-  const handleOtpChange = (index: number, val: string) => {
-    if (!/^\d*$/.test(val)) return;
-    const newOtp = [...otp];
-    newOtp[index] = val.slice(-1);
-    setOtp(newOtp);
-    setError('');
-
-    if (val && index < 5) {
-      otpRefs.current[index + 1]?.focus();
-    }
-
-    if (newOtp.every(d => d !== '')) {
-      verifySuccess(newOtp.join(''));
-    }
-  };
-
-  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace' && !otp[index] && index > 0) {
-      otpRefs.current[index - 1]?.focus();
-    }
-  };
-
   return (
-    <div 
-      className="min-h-screen w-full flex items-center justify-center relative overflow-hidden"
-      style={{ background: 'linear-gradient(135deg, #0f172a 0%, #3b2c6e 50%, #0f172a 100%)' }}
-    >
-      <div id="recaptcha-container" className="fixed bottom-0 right-0 opacity-0 pointer-events-none z-[-1]"></div>
-
-      {/* Abstract Animated Shapes */}
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-pearl)] p-4">
       <motion.div 
-        animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-blue-600/20 blur-[100px] mix-blend-screen pointer-events-none"
-      />
-      <motion.div 
-        animate={{ scale: [1, 1.5, 1], rotate: [0, -90, 0] }}
-        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-        className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-purple-600/20 blur-[120px] mix-blend-screen pointer-events-none"
-      />
-
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-4 md:px-8 flex flex-col md:flex-row items-center gap-12 lg:gap-24">
-        
-        {/* Left Side: Branding & Typography */}
-        <div className="flex-1 text-center md:text-left pt-10 md:pt-0">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-blue-300 text-sm font-medium mb-6 shadow-xl backdrop-blur-md">
-              <Sparkles className="w-4 h-4" /> Next Generation POS
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md"
+      >
+        <div className="card p-8 rounded-2xl shadow-xl bg-white border border-[var(--border)]">
+          <div className="flex justify-center mb-8">
+            <div className="w-12 h-12 rounded-xl bg-[var(--primary-light)] flex items-center justify-center">
+              <Store className="w-6 h-6 text-[var(--primary)]" />
             </div>
-            <h1 className="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-6 leading-tight">
-              Retail<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">OS</span>
-            </h1>
-            <p className="text-lg md:text-xl text-slate-300 font-light max-w-xl mx-auto md:mx-0 mb-10 leading-relaxed">
-              Experience the future of retail management. Powerful, intuitive, and designed to scale your business with intelligent AI automation.
-            </p>
-            
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
-              <div className="flex items-center gap-2 text-slate-300 bg-white/5 px-4 py-2 rounded-xl backdrop-blur-sm border border-white/5">
-                <Shield className="w-5 h-5 text-emerald-400" /> Secure Login
-              </div>
-              <div className="flex items-center gap-2 text-slate-300 bg-white/5 px-4 py-2 rounded-xl backdrop-blur-sm border border-white/5">
-                <Zap className="w-5 h-5 text-amber-400" /> Instant Access
-              </div>
+          </div>
+          
+          <h1 className="text-2xl font-bold text-center text-[var(--text-primary)] mb-2">Welcome Back</h1>
+          <p className="text-center text-[var(--text-secondary)] mb-8">Enter your details to access your dashboard</p>
+          
+          {error && (
+            <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
+              {error}
             </div>
-          </motion.div>
-        </div>
+          )}
 
-        {/* Right Side: Glassmorphic Auth Card */}
-        <div className="w-full max-w-md">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="rounded-[2rem] p-8 sm:p-10 shadow-2xl relative overflow-hidden bg-white/10 backdrop-blur-xl border border-white/20"
-          >
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" />
+          <form onSubmit={handleEmailLogin} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Email</label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="input-premium w-full px-4 py-2 border border-[var(--border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                placeholder="name@company.com"
+              />
+            </div>
             
-            <AnimatePresence mode="wait">
-              {step === 'phone' ? (
-                <motion.div
-                  key="phone"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  className="space-y-8"
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <label className="block text-sm font-medium text-[var(--text-secondary)]">Password</label>
+                <Link href="/forgot-password" className="text-sm text-[var(--primary)] hover:underline">
+                  Forgot password?
+                </Link>
+              </div>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="input-premium w-full px-4 py-2 border border-[var(--border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                 >
-                  <div>
-                    <h2 className="text-3xl font-bold text-white mb-2">Welcome Back</h2>
-                    <p className="text-slate-400">Enter your phone number to sign in securely.</p>
-                  </div>
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
 
-                  <form onSubmit={handlePhoneSubmit} className="space-y-6">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">Phone Number</label>
-                      <div className="relative flex items-center group">
-                        <div className="absolute left-0 top-0 bottom-0 px-4 flex items-center bg-white/5 border-r border-white/10 rounded-l-2xl z-10 transition-colors group-focus-within:bg-white/10">
-                          <span className="text-slate-300 font-medium">+91</span>
-                        </div>
-                        <input
-                          type="tel"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                          placeholder="Enter 10 digit number"
-                          className="w-full bg-black/20 border border-white/10 rounded-2xl py-4 pr-4 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all text-lg tracking-wide relative z-0"
-                          style={{ paddingLeft: '5rem' }}
-                        />
-                      </div>
-                    </div>
-
-                    {error && (
-                      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start gap-3 text-red-300 text-sm bg-red-500/10 p-4 rounded-xl border border-red-500/20">
-                        <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
-                        <span className="break-words flex-1 leading-snug">{error}</span>
-                      </motion.div>
-                    )}
-
-                    <button
-                      type="submit"
-                      disabled={loading || phone.length !== 10}
-                      className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-white text-slate-900 hover:bg-slate-100 font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-[0_0_40px_rgba(255,255,255,0.1)] hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] transform hover:-translate-y-0.5 active:translate-y-0"
-                    >
-                      {loading ? (
-                        <RefreshCw className="w-6 h-6 animate-spin" />
-                      ) : (
-                        <>
-                          Continue to Dashboard <ArrowRight className="w-5 h-5" />
-                        </>
-                      )}
-                    </button>
-                  </form>
-                </motion.div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full py-2.5 rounded-lg flex items-center justify-center gap-2 bg-[var(--primary)] text-white hover:opacity-90 disabled:opacity-50 transition-opacity"
+            >
+              {loading ? (
+                'Signing in...'
               ) : (
-                <motion.div
-                  key="otp"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  className="space-y-8"
-                >
-                  <div>
-                    <h2 className="text-3xl font-bold text-white mb-2">Verify Phone</h2>
-                    <p className="text-slate-400">
-                      We sent a code to <span className="font-semibold text-white">+91 {phone}</span>
-                    </p>
-                    <button
-                      onClick={() => { setStep('phone'); setOtp(['','','','','','']); setError(''); }}
-                      className="text-blue-400 text-sm mt-2 hover:text-blue-300 transition-colors font-medium"
-                    >
-                      Wrong number? Edit here
-                    </button>
-                  </div>
-
-                  <div className="flex justify-between gap-2">
-                    {otp.map((digit, idx) => (
-                      <input
-                        key={idx}
-                        ref={(el) => {
-                          if (el) otpRefs.current[idx] = el;
-                        }}
-                        type="text"
-                        inputMode="numeric"
-                        maxLength={1}
-                        value={digit}
-                        onChange={(e) => handleOtpChange(idx, e.target.value)}
-                        onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                        className="w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold bg-black/20 border border-white/10 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all shadow-inner"
-                      />
-                    ))}
-                  </div>
-
-                  {error && (
-                    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 text-red-300 text-sm bg-red-500/10 p-3 rounded-xl border border-red-500/20">
-                      <AlertTriangle className="w-4 h-4 shrink-0" />
-                      <span>{error}</span>
-                    </motion.div>
-                  )}
-
-                  <div className="pt-4 text-center">
-                    {loading ? (
-                      <div className="flex justify-center">
-                        <RefreshCw className="w-6 h-6 text-white animate-spin" />
-                      </div>
-                    ) : (
-                      <p className="text-sm text-slate-400">
-                        Didn't receive the code?{' '}
-                        <button onClick={() => setStep('phone')} className="text-white hover:text-blue-300 font-medium transition-colors">
-                          Resend
-                        </button>
-                      </p>
-                    )}
-                  </div>
-                </motion.div>
+                <>
+                  Sign in <ArrowRight className="w-4 h-4" />
+                </>
               )}
-            </AnimatePresence>
-          </motion.div>
+            </button>
+          </form>
+
+          <div className="my-6 flex items-center">
+            <div className="flex-1 border-t border-[var(--border)]"></div>
+            <span className="px-4 text-sm text-[var(--text-muted)]">Or continue with</span>
+            <div className="flex-1 border-t border-[var(--border)]"></div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={loading}
+            className="w-full py-2.5 rounded-lg border border-[var(--border)] flex items-center justify-center gap-2 text-[var(--text-primary)] hover:bg-gray-50 transition-colors"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            Google
+          </button>
+
+          <p className="mt-8 text-center text-sm text-[var(--text-secondary)]">
+            Don't have an account?{' '}
+            <Link href="/register" className="font-medium text-[var(--primary)] hover:underline">
+              Create an account
+            </Link>
+          </p>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

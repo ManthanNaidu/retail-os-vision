@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/components/providers/AuthProvider';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, Check, Store, Phone, MapPin, Eye, EyeOff, ChevronRight, ArrowRight, Shield } from 'lucide-react';
 import { getStoreTypeList, StoreType } from '@/lib/storeTypes';
 
 export default function SetupPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [storeTypes, setStoreTypes] = useState<StoreType[]>([]);
@@ -17,16 +19,14 @@ export default function SetupPage() {
   const [storeDetails, setStoreDetails] = useState({
     storeName: '',
     ownerName: '',
-    phone: '',
+    email: '',
     city: '',
     address: '',
     gstNumber: '',
     upiId: ''
   });
   
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  // Password removed since it's handled in Register flow
   
   useEffect(() => {
     // Load store types
@@ -37,19 +37,15 @@ export default function SetupPage() {
       console.error("Failed to load store types", error);
     }
 
-    // Pre-fill phone from auth
-    try {
-      const authStr = sessionStorage.getItem('retailos_auth');
-      if (authStr) {
-        const auth = JSON.parse(authStr);
-        if (auth.phone) {
-          setStoreDetails(prev => ({ ...prev, phone: auth.phone }));
-        }
-      }
-    } catch (error) {
-      console.error("Failed to parse auth", error);
+    // Pre-fill email and name from Firebase auth
+    if (user) {
+      setStoreDetails(prev => ({ 
+        ...prev, 
+        email: user.email || '',
+        ownerName: user.displayName || ''
+      }));
     }
-  }, []);
+  }, [user]);
   
   const handleNext = () => {
     if (step === 1 && !selectedType) return;
@@ -64,35 +60,26 @@ export default function SetupPage() {
   const handleComplete = async () => {
     setLoading(true);
     try {
-      // Setup completion logic
-      const authStr = sessionStorage.getItem('retailos_auth');
-      const auth = authStr ? JSON.parse(authStr) : {};
-      
+      if (!user) throw new Error("No authenticated user");
+
       const profile = {
+        uid: user.uid,
         storeType: selectedType?.id,
         storeName: storeDetails.storeName,
         ownerName: storeDetails.ownerName,
-        phone: storeDetails.phone,
+        email: storeDetails.email,
         city: storeDetails.city,
         address: storeDetails.address,
         gstNumber: storeDetails.gstNumber,
         upiId: storeDetails.upiId,
+        role: 'owner',
         setupComplete: true,
         createdAt: new Date().toISOString(),
       };
       
+      // In a real app, this would be an API call to Firestore:
+      // await setDoc(doc(db, 'users', user.uid), profile);
       localStorage.setItem('retailos_profile', JSON.stringify(profile));
-      
-      if (password) {
-        localStorage.setItem(`retailos_pwd_${storeDetails.phone}`, password);
-      }
-      
-      sessionStorage.setItem('retailos_auth', JSON.stringify({
-        ...auth,
-        name: storeDetails.ownerName,
-        store: storeDetails.storeName,
-        loggedIn: true
-      }));
       
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 800));
@@ -202,14 +189,14 @@ export default function SetupPage() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Phone Number</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                    <Phone className="w-5 h-5" />
+                    <MapPin className="w-5 h-5" />
                   </div>
                   <input
-                    type="text"
-                    value={storeDetails.phone}
+                    type="email"
+                    value={storeDetails.email}
                     readOnly
                     className="w-full pl-10 pr-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-slate-500 cursor-not-allowed outline-none"
                   />
@@ -285,90 +272,6 @@ export default function SetupPage() {
                 }`}
               >
                 Continue <ArrowRight className="ml-2 w-4 h-4" />
-              </button>
-            </div>
-          </motion.div>
-        );
-        
-      case 3:
-        return (
-          <motion.div
-            key="step3"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="flex flex-col h-full"
-          >
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8 text-blue-600" />
-              </div>
-              <h1 className="text-2xl font-bold text-slate-800 mb-2">Set a password for easy login</h1>
-              <p className="text-slate-500 text-sm px-4">Create a password so you don't have to wait for an OTP every time.</p>
-            </div>
-            
-            <div className="space-y-4 mb-8 flex-1">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Create Password</label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Min 4 characters"
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-slate-800"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Confirm Password</label>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Repeat password"
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-slate-800"
-                />
-              </div>
-              
-              {password && confirmPassword && password !== confirmPassword && (
-                <p className="text-red-500 text-sm">Passwords do not match.</p>
-              )}
-            </div>
-            
-            <div className="flex flex-col gap-3 mt-auto">
-              <button
-                onClick={handleComplete}
-                disabled={loading || (password.length > 0 && (password.length < 4 || password !== confirmPassword))}
-                className="w-full py-3.5 rounded-xl font-medium text-white bg-blue-600 shadow-sm hover:bg-blue-700 active:scale-[0.98] transition-all flex items-center justify-center disabled:bg-blue-400 disabled:cursor-not-allowed"
-              >
-                {loading ? 'Setting up...' : (password ? 'Save & Finish' : 'Finish Setup')}
-              </button>
-              
-              {!password && (
-                <button
-                  onClick={handleComplete}
-                  disabled={loading}
-                  className="w-full py-3 rounded-xl font-medium text-slate-500 hover:text-slate-700 transition-colors"
-                >
-                  Skip, I'll use OTP instead
-                </button>
-              )}
-              
-              <button
-                onClick={handleBack}
-                disabled={loading}
-                className="mt-2 text-slate-400 text-sm hover:text-slate-600"
-              >
-                Go back
               </button>
             </div>
           </motion.div>

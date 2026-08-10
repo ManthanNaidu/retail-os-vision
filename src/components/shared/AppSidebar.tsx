@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, ShoppingCart, Package, Users, BarChart3,
   Truck, Users2, Sparkles, Settings, X, Zap, LogOut, Store
@@ -11,6 +11,7 @@ import {
 import { useAppStore } from '@/stores/appStore';
 import { cn } from '@/lib/utils';
 import { getStoreType } from '@/lib/storeTypes';
+import { useAuth } from '@/components/providers/AuthProvider';
 
 const navItems = [
   { href: '/dashboard',    icon: LayoutDashboard, label: 'Dashboard' },
@@ -26,7 +27,7 @@ const navItems = [
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
+  const { logout } = useAuth();
   const { sidebarOpen, toggleSidebar } = useAppStore();
   const [storeName, setStoreName] = useState('Your Store');
   const [storeType, setStoreType] = useState('');
@@ -44,9 +45,8 @@ export function AppSidebar() {
     } catch {}
   }, []);
 
-  const handleLogout = () => {
-    sessionStorage.removeItem('retailos_auth');
-    router.push('/login');
+  const handleLogout = async () => {
+    await logout();
   };
 
   return (
