@@ -100,6 +100,14 @@ export default function InventoryPage() {
     }
   };
 
+  const handleQuickAddStock = (product: Product) => {
+    const qty = window.prompt(`How much stock to add for ${product.name}?`, '10');
+    const parsed = parseInt(qty || '0', 10);
+    if (!isNaN(parsed) && parsed > 0) {
+      updateProduct(product.id, { stock: product.stock + parsed });
+    }
+  };
+
   const calculateMargin = (sell: number = 0, purchase: number = 0) => {
     if (!purchase || !sell) return 0;
     return (((sell - purchase) / purchase) * 100).toFixed(1);
@@ -237,9 +245,14 @@ export default function InventoryPage() {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginTop: 16, paddingTop: 16, borderTop: '1px dashed #E5E7EB' }}>
                     <div>
                       <p style={{ fontSize: 11, color: '#6B7280', margin: '0 0 2px' }}>Stock</p>
-                      <p style={{ fontSize: 14, fontWeight: 700, margin: 0, color: isOutOfStock ? '#EF4444' : isLowStock ? '#F59E0B' : '#10B981' }}>
-                        {product.stock} {product.unit || 'pcs'}
-                      </p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <p style={{ fontSize: 14, fontWeight: 700, margin: 0, color: isOutOfStock ? '#EF4444' : isLowStock ? '#F59E0B' : '#10B981' }}>
+                          {product.stock} {product.unit || 'pcs'}
+                        </p>
+                        <button onClick={() => handleQuickAddStock(product)} style={{ background: '#F3F4F6', border: 'none', width: 22, height: 22, borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F97316', cursor: 'pointer', outline: 'none' }} title="Add Stock">
+                          <Plus size={12} />
+                        </button>
+                      </div>
                     </div>
                     <div>
                       <p style={{ fontSize: 11, color: '#6B7280', margin: '0 0 2px' }}>Sell Price</p>
