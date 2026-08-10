@@ -130,3 +130,4 @@ Add environment variable `NEXT_PUBLIC_GEMINI_API_KEY` in Vercel dashboard.
 ---
 
 *Built for Indian retailers — Supports GST, UPI, Hindi business names, local categories*
+
