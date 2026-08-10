@@ -3,13 +3,13 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Home, ShoppingCart, Package, Users, BarChart3 } from 'lucide-react';
+import { Home, ShoppingCart, Package, Users, BarChart3, Sparkles } from 'lucide-react';
 
 const navItems = [
   { href: '/dashboard', icon: Home, label: 'Home' },
   { href: '/billing', icon: ShoppingCart, label: 'Billing' },
+  { href: '/ai-assistant', icon: Sparkles, label: 'AI' },
   { href: '/inventory', icon: Package, label: 'Stock' },
-  { href: '/customers', icon: Users, label: 'Customers' },
   { href: '/reports', icon: BarChart3, label: 'More' },
 ];
 
@@ -33,16 +33,18 @@ export function BottomNav() {
             {isActive && (
               <motion.div 
                 layoutId="nav-indicator"
-                className="absolute top-0 w-8 h-[3px] bg-[#1a56db] rounded-b-[4px]"
+                className="absolute top-0 w-8 h-[3px] rounded-b-[4px]"
+                style={{ background: 'var(--primary)' }}
               />
             )}
             <item.icon 
               size={22} 
               strokeWidth={isActive ? 2.5 : 1.8}
-              color={isActive ? '#1a56db' : '#9CA3AF'}
+              color={isActive ? 'var(--primary)' : '#9CA3AF'}
             />
             <span 
-              className={`text-[10px] ${isActive ? 'font-bold text-[#1a56db]' : 'font-medium text-[#9CA3AF]'}`}
+              className={`text-[10px] ${isActive ? 'font-bold' : 'font-medium text-[#9CA3AF]'}`}
+              style={{ color: isActive ? 'var(--primary)' : '#9CA3AF' }}
             >
               {item.label}
             </span>

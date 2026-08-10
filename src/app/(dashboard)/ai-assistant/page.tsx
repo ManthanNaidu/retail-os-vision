@@ -8,6 +8,7 @@ import {
   ChevronRight, MessageSquare
 } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
+import { useAuth } from '@/components/providers/AuthProvider';
 import { formatCurrency, getDaysUntilExpiry } from '@/lib/utils';
 
 export interface AIMessage {
@@ -90,7 +91,7 @@ function TypingDots() {
   );
 }
 
-function MessageBubble({ msg }: { msg: AIMessage }) {
+function MessageBubble({ msg, initial }: { msg: AIMessage, initial: string }) {
   const parts = msg.content.split(/(\*\*[^*]+\*\*)/g);
   const isUser = msg.role === 'user';
   return (
@@ -100,7 +101,7 @@ function MessageBubble({ msg }: { msg: AIMessage }) {
       {/* Avatar */}
       <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 font-bold text-sm ${isUser ? 'gradient-primary text-white' : ''}`}
         style={!isUser ? { background: 'var(--primary-light)' } : {}}>
-        {isUser ? 'R' : <Cpu size={16} style={{ color: 'var(--primary)' }} />}
+        {isUser ? initial : <Cpu size={16} style={{ color: 'var(--primary)' }} />}
       </div>
       <div className="max-w-[80%]">
         <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-line ${isUser ? 'rounded-br-sm text-white' : 'rounded-bl-sm'}`}
@@ -128,6 +129,9 @@ function MessageBubble({ msg }: { msg: AIMessage }) {
 
 export default function AIAssistantPage() {
   const { products, customers, sales } = useAppStore();
+  const { user } = useAuth();
+  const initial = user?.displayName ? user.displayName.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'U');
+  
   const [messages, setMessages] = useState<AIMessage[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -149,7 +153,7 @@ LIVE DATA (${new Date().toLocaleDateString('en-IN')}):
 - Expiring products: ${expiring.map(p => `${p.name} (${getDaysUntilExpiry(p.expiryDate!)}d)`).join(', ') || 'None'}
 - Customers: ${customers.length} | Credit outstanding: ₹${totalCredit.toFixed(0)} from ${pendingCredit.length} customers
 - Recent sales: ${sales.slice(0, 3).map(s => `${s.customerName} ₹${s.total}`).join(', ')}
-Rules: Respond in simple, friendly English or Hindi. Use ₹ for currency. Be specific and actionable. Max 5 lines per response. Do NOT use emojis in your response. Use ** for bold text.`;
+Rules: You are an expert retail business advisor. Respond in clear, professional English or Hindi. Always provide complete, well-reasoned, and detailed answers. Use bullet points and formatting to make information digestible. Never use emojis. Use ₹ for currency. Use ** for bold text. Do not artificially truncate your response.`;
   }, [products, customers, sales]);
 
   useEffect(() => {
@@ -246,7 +250,7 @@ Rules: Respond in simple, friendly English or Hindi. Use ₹ for currency. Be sp
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 space-y-4 py-4" style={{ overscrollBehavior: 'contain' }}>
         <AnimatePresence>
-          {messages.map((msg, i) => <MessageBubble key={i} msg={msg} />)}
+          {messages.map((msg, i) => <MessageBubble key={i} msg={msg} initial={initial} />)}
         </AnimatePresence>
 
         {isTyping && (

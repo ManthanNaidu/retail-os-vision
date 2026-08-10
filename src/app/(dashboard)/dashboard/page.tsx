@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { ShoppingCart, Package, Users, BarChart3, Bell, TrendingUp, AlertTriangle, CheckCircle, ArrowRight, Store, Zap, CreditCard, DollarSign, Clock } from 'lucide-react';
+import { ShoppingCart, Package, Users, BarChart3, Bell, TrendingUp, AlertTriangle, CheckCircle, ArrowRight, Store, Zap, CreditCard, DollarSign, Clock, Sun } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { formatCurrency } from '@/lib/utils';
 
@@ -117,17 +117,17 @@ export default function DashboardPage() {
     return (
         <div className="has-bottom-nav" style={{ background: '#F4F6FA', minHeight: '100vh', maxWidth: '480px', margin: '0 auto', position: 'relative' }}>
             {/* Header */}
-            <div style={{ background: 'linear-gradient(135deg, #1a56db, #7c3aed)', padding: '20px 20px 60px' }}>
+            <div className="gradient-primary" style={{ padding: '20px 20px 60px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div>
-                        <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, marginBottom: 4, margin: 0 }}>Good morning 👋</p>
+                        <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 13, marginBottom: 4, margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>Good morning <Sun size={14} /></p>
                         <h1 style={{ color: 'white', fontSize: 22, fontWeight: 700, margin: '4px 0' }}>{ownerName}</h1>
                         <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, margin: 0 }}>{storeName}</p>
                     </div>
                     <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                         <Bell size={20} color="white" />
                         {alerts.length > 0 && (
-                            <div style={{ position: 'absolute', top: 8, right: 10, width: 8, height: 8, background: '#EF4444', borderRadius: '50%', border: '2px solid #1a56db' }} />
+                            <div style={{ position: 'absolute', top: 8, right: 10, width: 8, height: 8, background: '#EF4444', borderRadius: '50%', border: '2px solid #f59e0b' }} />
                         )}
                     </div>
                 </div>
@@ -137,12 +137,12 @@ export default function DashboardPage() {
             <div style={{ padding: '0 16px', marginTop: -40, paddingBottom: 100 }}>
                 {isCompletelyEmpty ? (
                     <div style={{ background: 'white', borderRadius: 20, padding: '40px 20px', textAlign: 'center', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)' }}>
-                        <div style={{ width: 80, height: 80, borderRadius: 24, background: '#EBF0FD', margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <Store size={38} style={{ color: '#1a56db' }} />
+                        <div style={{ width: 80, height: 80, borderRadius: 24, background: '#fef3c7', margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Store size={38} style={{ color: '#f59e0b' }} />
                         </div>
                         <h2 style={{ fontSize: 20, fontWeight: 700, color: '#111827', margin: 0 }}>Welcome to RetailOS!</h2>
                         <p style={{ color: '#6B7280', marginTop: 8, lineHeight: 1.6, fontSize: 14 }}>Set up your store to get started. Add your products and make your first sale.</p>
-                        <button onClick={() => router.push('/inventory')} style={{ marginTop: 24, background: '#1a56db', color: 'white', padding: '14px 32px', borderRadius: 12, fontWeight: 600, border: 'none', cursor: 'pointer', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                        <button onClick={() => router.push('/inventory')} style={{ marginTop: 24, background: '#f59e0b', color: 'white', padding: '14px 32px', borderRadius: 12, fontWeight: 600, border: 'none', cursor: 'pointer', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                             Add First Product
                             <ArrowRight size={18} />
                         </button>
@@ -152,8 +152,8 @@ export default function DashboardPage() {
                         {/* Quick Actions Grid */}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
                             <motion.div whileTap={{ scale: 0.97 }} onClick={() => router.push('/billing')} style={{ background: 'white', borderRadius: 16, padding: 20, border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: 12, cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                                <div style={{ width: 44, height: 44, borderRadius: 12, background: '#EBF0FD', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <ShoppingCart size={22} style={{ color: '#1a56db' }} />
+                                <div style={{ width: 44, height: 44, borderRadius: 12, background: '#fef3c7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <ShoppingCart size={22} style={{ color: '#f59e0b' }} />
                                 </div>
                                 <div>
                                     <p style={{ fontWeight: 700, fontSize: 15, color: '#111827', margin: 0 }}>New Sale</p>
@@ -196,8 +196,8 @@ export default function DashboardPage() {
                         <div style={{ display: 'flex', gap: 12, marginBottom: 24, overflowX: 'auto', paddingBottom: 4, msOverflowStyle: 'none', scrollbarWidth: 'none' }} className="hide-scrollbar">
                             <div style={{ flex: '1 0 calc(33.33% - 8px)', background: 'white', borderRadius: 16, padding: '16px 12px', border: '1px solid #E5E7EB', minWidth: 100 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                                    <div style={{ background: '#EBF0FD', padding: 4, borderRadius: 6 }}>
-                                        <DollarSign size={14} color="#1a56db" />
+                                    <div style={{ background: '#fef3c7', padding: 4, borderRadius: 6 }}>
+                                        <DollarSign size={14} color="#f59e0b" />
                                     </div>
                                     <span style={{ fontSize: 12, color: '#6B7280', fontWeight: 500 }}>Revenue</span>
                                 </div>
@@ -244,7 +244,7 @@ export default function DashboardPage() {
                                                     <p style={{ fontSize: 12, color: alert.type === 'danger' ? '#EF4444' : '#D97706', margin: 0, marginTop: 2 }}>{alert.subtitle}</p>
                                                 </div>
                                             </div>
-                                            <button onClick={() => router.push(`/inventory/${alert.id}`)} style={{ background: 'transparent', border: 'none', color: '#1a56db', fontSize: 13, fontWeight: 600, cursor: 'pointer', padding: '4px 8px', flexShrink: 0 }}>
+                                            <button onClick={() => router.push(`/inventory/${alert.id}`)} style={{ background: 'transparent', border: 'none', color: '#f59e0b', fontSize: 13, fontWeight: 600, cursor: 'pointer', padding: '4px 8px', flexShrink: 0 }}>
                                                 Fix →
                                             </button>
                                         </div>

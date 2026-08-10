@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, Menu, AlertTriangle, Info, CheckCircle, Clock } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
+import { useAuth } from '@/components/providers/AuthProvider';
 import { formatTime } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 
@@ -13,7 +14,10 @@ interface TopBarProps {
 
 export function TopBar({ title }: TopBarProps) {
   const { notifications, unreadCount, toggleSidebar, markNotificationRead, markAllRead } = useAppStore();
+  const { user } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
+  
+  const initial = user?.displayName ? user.displayName.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'U');
 
   // Trial days remaining
   const [trialDays, setTrialDays] = useState<number | null>(null);
@@ -119,7 +123,7 @@ export function TopBar({ title }: TopBarProps) {
 
           {/* Avatar */}
           <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center text-white font-bold text-sm">
-            R
+            {initial}
           </div>
         </div>
       </div>

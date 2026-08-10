@@ -3,16 +3,16 @@
 
 :root {
   /* Colors */
-  --primary: #1a56db;          /* Blue */
-  --primary-dark: #1240a0;
-  --primary-light: #EBF0FD;
-  --accent: #f59e0b;           /* Amber accent for highlights */
+  --primary: #f59e0b;          /* Amber/Yellow-Orange */
+  --primary-dark: #d97706;     /* Amber 600 */
+  --primary-light: #fef3c7;    /* Amber 100 */
+  --accent: #f97316;           /* Orange */
   --success: #10b981;
   --warning: #f59e0b;
   --danger: #ef4444;
-  --bg-app: #F4F6FA;           /* App background: very light blue-gray */
+  --bg-app: #fffbeb;           /* Cream/amber-50 */
   --bg-card: #ffffff;
-  --bg-header: #1a56db;        /* Solid blue for page headers */
+  --bg-header: #f59e0b;        /* Amber */
   --text-primary: #111827;
   --text-secondary: #4B5563;
   --text-muted: #9CA3AF;
@@ -30,9 +30,9 @@
   --header-height: 56px;
   
   /* Backwards compatibility */
-  --bg-pearl: #F4F6FA;
-  --bg-warm: #F4F6FA;
-  --bg-sidebar: #0f172a;
+  --bg-pearl: #fffbeb;         /* Cream */
+  --bg-warm: #fffbeb;          /* Cream */
+  --bg-sidebar: #451a03;       /* Dark brown/orange for sidebar */
 }
 
 /* CSS Reset */
@@ -163,7 +163,7 @@ body {
 }
 
 /* Gradient utils */
-.gradient-primary { background: linear-gradient(135deg, #1a56db, #7c3aed); }
+.gradient-primary { background: linear-gradient(135deg, #f59e0b, #f97316); }
 .gradient-success { background: linear-gradient(135deg, #10b981, #059669); }
 .gradient-warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
 .gradient-danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
