@@ -5,7 +5,7 @@ export const ADMIN_PASSWORD = 'RETAILOS@MASTER2024';
 export const ADMIN_KEY = 'retailos_admin_auth';
 
 export interface StoreRecord {
-  phone: string;
+  email: string; // The primary ID
   ownerName: string;
   storeName: string;
   city: string;
@@ -33,16 +33,16 @@ export async function getAllStores(): Promise<StoreRecord[]> {
 // Save a single store to Firestore (used by admin dashboard)
 export async function saveStoreRecord(store: StoreRecord): Promise<void> {
   try {
-    await setDoc(doc(db, 'stores', store.phone), store);
+    await setDoc(doc(db, 'stores', store.email.toLowerCase()), store);
   } catch (err) {
     console.error("Error saving store:", err);
   }
 }
 
-// Get single store by phone
-export async function getStoreByPhone(phone: string): Promise<StoreRecord | null> {
+// Get single store by email
+export async function getStoreByEmail(email: string): Promise<StoreRecord | null> {
   try {
-    const docRef = doc(db, 'stores', phone);
+    const docRef = doc(db, 'stores', email.toLowerCase());
     const snap = await getDoc(docRef);
     if (snap.exists()) {
       return snap.data() as StoreRecord;
@@ -55,13 +55,14 @@ export async function getStoreByPhone(phone: string): Promise<StoreRecord | null
 }
 
 // Register or update store on login
-export async function registerStore(phone: string, ownerName: string, storeName: string): Promise<StoreRecord> {
-  const existing = await getStoreByPhone(phone);
+export async function registerStore(email: string, ownerName: string, storeName: string, city: string = 'India'): Promise<StoreRecord> {
+  const existing = await getStoreByEmail(email);
   
   if (existing) {
     existing.lastLogin = new Date().toISOString();
     if (ownerName) existing.ownerName = ownerName;
     if (storeName) existing.storeName = storeName;
+    if (city && city !== 'India') existing.city = city;
     await saveStoreRecord(existing);
     return existing;
   }
@@ -70,10 +71,10 @@ export async function registerStore(phone: string, ownerName: string, storeName:
   const trialEnd = new Date();
   trialEnd.setDate(trialEnd.getDate() + 14);
   const record: StoreRecord = {
-    phone, 
+    email, 
     ownerName, 
     storeName,
-    city: 'India',
+    city,
     registeredAt: new Date().toISOString(),
     lastLogin: new Date().toISOString(),
     status: 'trial',
@@ -88,8 +89,8 @@ export async function registerStore(phone: string, ownerName: string, storeName:
   return record;
 }
 
-export async function isStoreActive(phone: string): Promise<boolean> {
-  const store = await getStoreByPhone(phone);
+export async function isStoreActive(email: string): Promise<boolean> {
+  const store = await getStoreByEmail(email);
   if (!store) return true; // New store — allow first login
   if (store.status === 'suspended' || store.status === 'expired') return false;
   return true;

@@ -6,6 +6,7 @@ import { useAuth } from '@/components/providers/AuthProvider';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, Check, Store, Phone, MapPin, Eye, EyeOff, ChevronRight, ArrowRight, Shield } from 'lucide-react';
 import { getStoreTypeList, StoreType } from '@/lib/storeTypes';
+import { registerStore } from '@/lib/licenseManager';
 
 export default function SetupPage() {
   const router = useRouter();
@@ -80,6 +81,9 @@ export default function SetupPage() {
       // In a real app, this would be an API call to Firestore:
       // await setDoc(doc(db, 'users', user.uid), profile);
       localStorage.setItem('retailos_profile', JSON.stringify(profile));
+      
+      // Register in the master dashboard collection
+      await registerStore(storeDetails.email, storeDetails.ownerName, storeDetails.storeName, storeDetails.city);
       
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 800));

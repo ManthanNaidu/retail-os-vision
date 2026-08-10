@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { Eye, EyeOff, Store, ArrowRight } from 'lucide-react';
 import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '@/lib/firebase';
-import { isStoreActive } from '@/lib/licenseManager';
+import { isStoreActive, adminLogin, ADMIN_PASSWORD } from '@/lib/licenseManager';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,6 +21,15 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    
+    // Intercept Master Admin Login
+    if (email === 'admin@retailos.in' || email === 'admin') {
+      if (adminLogin(password)) {
+        router.push('/admin');
+        return;
+      }
+    }
+
     try {
       const userCred = await signInWithEmailAndPassword(auth, email, password);
       

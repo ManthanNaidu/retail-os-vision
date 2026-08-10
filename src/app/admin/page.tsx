@@ -1,354 +1,377 @@
-'use client';
+'use client'
 
 import React, { useState, useEffect } from 'react';
-import { 
-  Store, Users, CreditCard, Zap, Search, Settings, 
-  Menu, CheckCircle, X, Clock, ChevronRight,
-  TrendingUp, TrendingDown, RefreshCw, Lock, Shield, MessageCircle, Bell,
-  LogOut, Plus
-} from 'lucide-react';
-import { getAllStores, saveStoreRecord, StoreRecord } from '@/lib/licenseManager';
+import { StoreRecord, getAllStores, saveStoreRecord, registerStore, adminLogin, isAdminLoggedIn } from '@/lib/licenseManager';
+import { Search, Filter, Plus, Store, Users, IndianRupee, ShieldCheck, Play, Ban, KeyRound } from 'lucide-react';
 
 export default function AdminDashboard() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loginPassword, setLoginPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
-
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  const [password, setPassword] = useState('');
+  
+  // Data
   const [stores, setStores] = useState<StoreRecord[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  
+  // Add Store Dialog
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [newStore, setNewStore] = useState({ email: '', ownerName: '', storeName: '', city: '' });
+  
+  useEffect(() => {
+    // Client-side check
+    const auth = isAdminLoggedIn();
+    setIsLoggedIn(auth);
+    if (auth) {
+      loadStores();
+    }
+  }, []);
+  
+  async function loadStores() {
+    const data = await getAllStores();
+    setStores(data);
+  }
+  
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simple hardcoded admin password for demo purposes
-    if (loginPassword === 'admin123') {
+    if (adminLogin(password)) {
       setIsLoggedIn(true);
-      fetchStores();
+      loadStores();
     } else {
-      setLoginError('Invalid admin password');
+      alert("Invalid admin password");
     }
   };
-
-  const fetchStores = async () => {
-    setIsLoading(true);
-    try {
-      const data = await getAllStores();
-      // Ensure data is array
-      setStores(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error('Error fetching stores:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleStatusChange = async (store: StoreRecord, newStatus: StoreRecord['status']) => {
+  
+  const handleStatusChange = async (store: StoreRecord, newStatus: 'suspended' | 'active') => {
     try {
       const updatedStore = { ...store, status: newStatus };
       await saveStoreRecord(updatedStore);
-      // Update locally
-      setStores(prev => prev.map(s => s.phone === store.phone ? updatedStore : s));
-    } catch (error) {
-      console.error('Error updating status:', error);
+      setStores(stores.map(s => s.email === store.email ? updatedStore : s));
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update status");
     }
   };
-
-  const filteredStores = stores.filter(store => {
-    const matchesSearch = 
-      store.storeName?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      store.phone?.includes(searchQuery) ||
-      store.ownerName?.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' || store.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
-  });
-
-  const totalRevenue = stores.reduce((acc, store) => {
-    if (store.plan === 'pro') return acc + 1999;
-    return acc + 999; // basic and trial
-  }, 0);
-
-  const activeStores = stores.filter(s => s.status === 'active').length;
-
+  
+  const handleAddStore = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newStore.email || !newStore.ownerName || !newStore.storeName) {
+      alert("Please fill all required fields");
+      return;
+    }
+    try {
+      const added = await registerStore(newStore.email, newStore.ownerName, newStore.storeName, newStore.city || 'India');
+      setStores(prev => {
+         const exists = prev.find(s => s.email === added.email);
+         if (exists) return prev.map(s => s.email === added.email ? added : s);
+         return [...prev, added];
+      });
+      setIsAddOpen(false);
+      setNewStore({ email: '', ownerName: '', storeName: '', city: '' });
+    } catch (err) {
+      console.error(err);
+      alert("Error adding store");
+    }
+  };
+  
+  if (isLoggedIn === null) {
+    return <div className="min-h-screen bg-amber-50 flex items-center justify-center text-amber-900 font-medium">Loading...</div>;
+  }
+  
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center">
-              <Shield className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-            </div>
+      <div className="min-h-screen bg-amber-50 flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full border border-amber-100 transition-all">
+          <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-orange-200">
+            <ShieldCheck className="text-white" size={40} />
           </div>
-          <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-2">Admin Access</h1>
-          <p className="text-gray-500 dark:text-gray-400 text-center mb-8">Enter your credentials to access the master dashboard.</p>
+          <h1 className="text-3xl font-bold text-center text-slate-800 mb-2">Master Admin</h1>
+          <p className="text-slate-500 text-center mb-8">Login to access the RetailOS control panel</p>
           
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Master Password</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Admin Password</label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-amber-500">
+                  <KeyRound className="h-5 w-5 text-slate-400 group-focus-within:text-amber-500 transition-colors" />
                 </div>
                 <input
                   type="password"
-                  value={loginPassword}
-                  onChange={(e) => {
-                    setLoginPassword(e.target.value);
-                    setLoginError('');
-                  }}
-                  className="input-premium pl-10 w-full"
-                  placeholder="••••••••"
-                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-11 w-full px-4 py-3.5 bg-slate-50/50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 transition-all outline-none font-medium text-slate-800"
+                  placeholder="Enter master password"
+                  autoFocus
                 />
               </div>
-              {loginError && <p className="text-red-500 text-sm mt-2">{loginError}</p>}
             </div>
-            <button type="submit" className="btn-primary w-full py-3 flex justify-center items-center gap-2">
-              <Lock className="w-4 h-4" /> Secure Login
+            
+            <button
+              type="submit"
+              className="w-full bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-orange-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+            >
+              Access Dashboard
             </button>
           </form>
         </div>
       </div>
     );
   }
+  
+  const activeStoresCount = stores.filter(s => s.status === 'active' || s.status === 'trial').length;
+  const totalRevenue = stores.reduce((sum, s) => (s.status === 'active' ? sum + (s.monthlyFee || 0) : sum), 0);
+  
+  const filteredStores = stores.filter(s => {
+    const matchesSearch = s.storeName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          s.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          s.ownerName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filterStatus === 'all' || s.status === filterStatus;
+    return matchesSearch && matchesFilter;
+  });
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
-      {/* Sidebar */}
-      <div className="w-full md:w-64 bg-gray-900 text-white flex flex-col shadow-xl z-10 hidden md:flex">
-        <div className="p-6 flex items-center gap-3 border-b border-gray-800">
-          <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
-            <Shield className="w-5 h-5 text-white" />
+    <div className="min-h-screen bg-[#fffbeb] text-slate-800">
+      {/* Header */}
+      <header className="bg-gradient-to-br from-amber-400 via-orange-400 to-orange-500 pb-28 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex items-center gap-4">
+              <div className="bg-white/20 p-3 rounded-2xl backdrop-blur-md shadow-inner border border-white/20">
+                <ShieldCheck className="text-white h-8 w-8" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-white tracking-tight">RetailOS Admin</h1>
+                <p className="text-orange-50 font-medium opacity-90">Manage master records and licenses</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => setIsAddOpen(true)}
+              className="bg-white text-orange-500 hover:bg-orange-50 px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-xl shadow-orange-500/20 active:scale-95"
+            >
+              <Plus size={20} className="stroke-[3]" />
+              Add Store Manually
+            </button>
           </div>
-          <span className="font-bold text-xl tracking-tight">Vision Admin</span>
+        </div>
+      </header>
+      
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 pb-16">
+        {/* Stats Row */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/40 border border-amber-100/50 flex items-center gap-5 hover:border-amber-200 transition-colors">
+            <div className="bg-blue-50 p-4 rounded-2xl text-blue-500 shadow-sm border border-blue-100">
+              <Store className="h-8 w-8" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Total Stores</p>
+              <p className="text-3xl font-black text-slate-800">{stores.length}</p>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/40 border border-amber-100/50 flex items-center gap-5 hover:border-amber-200 transition-colors">
+            <div className="bg-emerald-50 p-4 rounded-2xl text-emerald-500 shadow-sm border border-emerald-100">
+              <Users className="h-8 w-8" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Active Stores</p>
+              <p className="text-3xl font-black text-slate-800">{activeStoresCount}</p>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/40 border border-amber-100/50 flex items-center gap-5 hover:border-amber-200 transition-colors">
+            <div className="bg-amber-50 p-4 rounded-2xl text-amber-500 shadow-sm border border-amber-100">
+              <IndianRupee className="h-8 w-8" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Est. Revenue</p>
+              <p className="text-3xl font-black text-slate-800">₹{totalRevenue.toLocaleString('en-IN')}</p>
+            </div>
+          </div>
         </div>
         
-        <div className="flex-1 py-6 px-4 space-y-1">
-          <button className="w-full flex items-center gap-3 px-4 py-3 bg-blue-600/10 text-blue-400 rounded-xl font-medium transition-colors">
-            <Store className="w-5 h-5" /> All Stores
-          </button>
-          <button className="w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl font-medium transition-colors">
-            <Users className="w-5 h-5" /> Customers
-          </button>
-          <button className="w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl font-medium transition-colors">
-            <CreditCard className="w-5 h-5" /> Billing
-          </button>
-          <button className="w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl font-medium transition-colors">
-            <Settings className="w-5 h-5" /> Platform Settings
-          </button>
-        </div>
-
-        <div className="p-4 border-t border-gray-800">
-          <button 
-            onClick={() => setIsLoggedIn(false)}
-            className="w-full flex items-center gap-3 px-4 py-2 text-gray-400 hover:text-red-400 transition-colors"
-          >
-            <LogOut className="w-5 h-5" /> Sign Out
-          </button>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col h-screen overflow-hidden bg-gray-50">
-        {/* Header */}
-        <header className="bg-white border-b border-gray-200 py-4 px-6 md:px-8 flex items-center justify-between z-10 shrink-0">
-          <div className="flex items-center gap-4">
-            <button className="md:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
-              <Menu className="w-6 h-6" />
-            </button>
-            <h1 className="text-xl font-bold text-gray-800">Dashboard Overview</h1>
-          </div>
-          <div className="flex items-center gap-4">
-            <button onClick={fetchStores} className="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors" title="Refresh">
-              <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
-            </button>
-            <button className="relative p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-            </button>
-            <div className="w-9 h-9 bg-gray-900 rounded-full border-2 border-white shadow-sm flex items-center justify-center text-white font-medium text-sm">
-              AD
+        {/* Table Section */}
+        <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-amber-100/60 overflow-hidden flex flex-col">
+          <div className="p-6 border-b border-slate-100 flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-50/30">
+            <div className="relative w-full md:w-[400px]">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
+              <input
+                type="text"
+                placeholder="Search stores, owners, or emails..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-400 outline-none transition-all shadow-sm font-medium"
+              />
             </div>
-          </div>
-        </header>
-
-        {/* Scrollable Content */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-8">
-          <div className="max-w-7xl mx-auto space-y-8">
             
-            {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="card p-5 bg-white border border-gray-200 rounded-2xl shadow-sm flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shrink-0">
-                  <Store className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Total Stores</p>
-                  <h3 className="text-2xl font-bold text-gray-900">{stores.length}</h3>
-                </div>
-              </div>
-              
-              <div className="card p-5 bg-white border border-gray-200 rounded-2xl shadow-sm flex items-center gap-4">
-                <div className="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center shrink-0">
-                  <CheckCircle className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Active Stores</p>
-                  <h3 className="text-2xl font-bold text-gray-900">{activeStores}</h3>
-                </div>
-              </div>
-
-              <div className="card p-5 bg-white border border-gray-200 rounded-2xl shadow-sm flex items-center gap-4">
-                <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center shrink-0">
-                  <CreditCard className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Total Revenue</p>
-                  <h3 className="text-2xl font-bold text-gray-900">₹{totalRevenue.toLocaleString()}</h3>
-                </div>
-              </div>
-
-              <div className="card p-5 bg-white border border-gray-200 rounded-2xl shadow-sm flex items-center gap-4">
-                <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center shrink-0">
-                  <TrendingUp className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Growth</p>
-                  <h3 className="text-2xl font-bold text-gray-900">+12%</h3>
-                </div>
+            <div className="flex items-center gap-3 w-full md:w-auto">
+              <div className="bg-white border border-slate-200 rounded-2xl px-4 py-3 flex items-center gap-2 shadow-sm focus-within:ring-4 focus-within:ring-amber-500/20 focus-within:border-amber-400 transition-all">
+                <Filter className="text-slate-400 h-5 w-5" />
+                <select
+                  value={filterStatus}
+                  onChange={e => setFilterStatus(e.target.value)}
+                  className="bg-transparent outline-none min-w-[140px] font-medium text-slate-700 cursor-pointer"
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="active">Active</option>
+                  <option value="trial">Trial</option>
+                  <option value="suspended">Suspended</option>
+                  <option value="expired">Expired</option>
+                </select>
               </div>
             </div>
-
-            {/* Main Table Section */}
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
-              <div className="p-5 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white">
-                <h2 className="text-lg font-bold text-gray-900">Registered Stores</h2>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50/50 border-b border-slate-100 text-slate-500 text-sm">
+                  <th className="px-6 py-5 font-bold uppercase tracking-wider">Store & Location</th>
+                  <th className="px-6 py-5 font-bold uppercase tracking-wider">Owner</th>
+                  <th className="px-6 py-5 font-bold uppercase tracking-wider">Email (ID)</th>
+                  <th className="px-6 py-5 font-bold uppercase tracking-wider">Plan</th>
+                  <th className="px-6 py-5 font-bold uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-5 font-bold uppercase tracking-wider text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {filteredStores.map(store => (
+                  <tr key={store.email} className="hover:bg-amber-50/30 transition-colors group">
+                    <td className="px-6 py-5">
+                      <div className="font-bold text-slate-800 text-base">{store.storeName}</div>
+                      <div className="text-sm text-slate-500 font-medium mt-0.5">{store.city || 'India'}</div>
+                    </td>
+                    <td className="px-6 py-5 text-slate-700 font-medium">{store.ownerName}</td>
+                    <td className="px-6 py-5 text-slate-500 text-sm font-medium">{store.email}</td>
+                    <td className="px-6 py-5">
+                      <span className="capitalize px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                        {store.plan || 'Trial'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-5">
+                      <span className={`capitalize px-3 py-1.5 rounded-lg text-xs font-bold border ${
+                        store.status === 'active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                        store.status === 'trial' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                        'bg-red-50 text-red-700 border-red-200'
+                      }`}>
+                        {store.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-5 text-right">
+                      {store.status === 'suspended' ? (
+                        <button
+                          onClick={() => handleStatusChange(store, 'active')}
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 hover:bg-emerald-500 hover:text-white text-emerald-600 rounded-xl text-sm font-bold transition-all border border-emerald-200 hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-500/20 active:scale-95"
+                        >
+                          <Play size={16} /> Activate
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleStatusChange(store, 'suspended')}
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-500 hover:text-white text-red-600 rounded-xl text-sm font-bold transition-all border border-red-200 hover:border-red-500 hover:shadow-lg hover:shadow-red-500/20 active:scale-95"
+                        >
+                          <Ban size={16} /> Suspend
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
                 
-                <div className="flex flex-col sm:flex-row items-center gap-3">
-                  <div className="relative w-full sm:w-64">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Search className="h-4 w-4 text-gray-400" />
-                    </div>
-                    <input
-                      type="text"
-                      className="input-premium pl-9 py-2 text-sm w-full bg-gray-50 border-gray-200"
-                      placeholder="Search stores..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
-                  
-                  <select 
-                    className="input-premium py-2 text-sm bg-gray-50 border-gray-200 w-full sm:w-auto"
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                  >
-                    <option value="all">All Status</option>
-                    <option value="active">Active</option>
-                    <option value="suspended">Suspended</option>
-                    <option value="trial">Trial</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div className="overflow-x-auto">
-                {isLoading ? (
-                  <div className="p-12 flex flex-col items-center justify-center text-gray-400">
-                    <RefreshCw className="w-8 h-8 animate-spin text-blue-500 mb-4" />
-                    <p>Loading stores from database...</p>
-                  </div>
-                ) : filteredStores.length === 0 ? (
-                  <div className="p-12 flex flex-col items-center justify-center text-gray-400 text-center">
-                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                      <Store className="w-8 h-8 text-gray-300" />
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-1">No stores found</h3>
-                    <p className="text-sm">We couldn't find any stores matching your criteria.</p>
-                  </div>
-                ) : (
-                  <table className="w-full text-sm text-left">
-                    <thead className="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-200">
-                      <tr>
-                        <th className="px-6 py-4 font-medium">Store Info</th>
-                        <th className="px-6 py-4 font-medium">Plan</th>
-                        <th className="px-6 py-4 font-medium">Status</th>
-                        <th className="px-6 py-4 font-medium">Created</th>
-                        <th className="px-6 py-4 font-medium text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {filteredStores.map((store) => (
-                        <tr key={store.phone} className="hover:bg-gray-50/50 transition-colors">
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold uppercase shrink-0">
-                                {store.storeName?.substring(0,2) || 'ST'}
-                              </div>
-                              <div>
-                                <div className="font-semibold text-gray-900">{store.storeName}</div>
-                                <div className="text-gray-500 text-xs flex items-center gap-1 mt-0.5">
-                                  <Users className="w-3 h-3" /> {store.ownerName} &bull; {store.phone}
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border
-                              ${store.plan === 'pro' ? 'bg-purple-50 text-purple-700 border-purple-200' : 
-                                store.plan === 'basic' ? 'bg-blue-50 text-blue-700 border-blue-200' : 
-                                'bg-gray-100 text-gray-700 border-gray-200'}`}>
-                              {store.plan?.toUpperCase() || 'TRIAL'}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium border
-                              ${store.status === 'active' ? 'bg-green-50 text-green-700 border-green-200' : 
-                                store.status === 'suspended' ? 'bg-red-50 text-red-700 border-red-200' : 
-                                'bg-amber-50 text-amber-700 border-amber-200'}`}>
-                              {store.status === 'active' && <CheckCircle className="w-3.5 h-3.5" />}
-                              {store.status === 'suspended' && <X className="w-3.5 h-3.5" />}
-                              {store.status === 'trial' && <Clock className="w-3.5 h-3.5" />}
-                              {store.status?.charAt(0).toUpperCase() + store.status?.slice(1)}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 text-gray-500 whitespace-nowrap">
-                            {new Date(store.registeredAt).toLocaleDateString()}
-                          </td>
-                          <td className="px-6 py-4 text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              {store.status === 'active' ? (
-                                <button 
-                                  onClick={() => handleStatusChange(store, 'suspended')}
-                                  className="px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-md transition-colors border border-red-100"
-                                >
-                                  Suspend
-                                </button>
-                              ) : (
-                                <button 
-                                  onClick={() => handleStatusChange(store, 'active')}
-                                  className="px-3 py-1.5 text-xs font-medium text-green-600 bg-green-50 hover:bg-green-100 rounded-md transition-colors border border-green-100"
-                                >
-                                  Activate
-                                </button>
-                              )}
-                              <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors">
-                                <ChevronRight className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                {filteredStores.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-16 text-center text-slate-500">
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="bg-slate-50 p-4 rounded-full mb-4">
+                          <Store className="h-10 w-10 text-slate-300" />
+                        </div>
+                        <p className="text-xl font-bold text-slate-700 mb-1">No stores found</p>
+                        <p className="text-sm font-medium text-slate-400">Try adjusting your search terms or filters</p>
+                      </div>
+                    </td>
+                  </tr>
                 )}
-              </div>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+
+      {/* Add Store Dialog */}
+      {isAddOpen && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-white/20">
+            <div className="bg-gradient-to-br from-amber-400 to-orange-500 p-8 text-white relative overflow-hidden">
+              <div className="absolute -right-6 -top-6 bg-white/10 w-32 h-32 rounded-full blur-2xl"></div>
+              <h2 className="text-2xl font-bold mb-1 relative z-10">Add New Store</h2>
+              <p className="text-orange-50 text-sm font-medium relative z-10 opacity-90">Register a new store manually to the platform</p>
             </div>
             
+            <form onSubmit={handleAddStore} className="p-8 space-y-5">
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1.5">Store Name</label>
+                <input
+                  type="text"
+                  required
+                  value={newStore.storeName}
+                  onChange={e => setNewStore({...newStore, storeName: e.target.value})}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-400 outline-none transition-all font-medium"
+                  placeholder="e.g. SuperMart"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1.5">Owner Name</label>
+                <input
+                  type="text"
+                  required
+                  value={newStore.ownerName}
+                  onChange={e => setNewStore({...newStore, ownerName: e.target.value})}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-400 outline-none transition-all font-medium"
+                  placeholder="e.g. John Doe"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1.5">Email (Login ID)</label>
+                <input
+                  type="email"
+                  required
+                  value={newStore.email}
+                  onChange={e => setNewStore({...newStore, email: e.target.value})}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-400 outline-none transition-all font-medium"
+                  placeholder="john@supermart.com"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1.5">City</label>
+                <input
+                  type="text"
+                  value={newStore.city}
+                  onChange={e => setNewStore({...newStore, city: e.target.value})}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-400 outline-none transition-all font-medium"
+                  placeholder="e.g. Mumbai (Optional)"
+                />
+              </div>
+              
+              <div className="pt-4 flex gap-4">
+                <button
+                  type="button"
+                  onClick={() => setIsAddOpen(false)}
+                  className="flex-1 px-4 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-3.5 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-bold rounded-2xl shadow-lg shadow-orange-500/20 transition-all active:scale-[0.98]"
+                >
+                  Register Store
+                </button>
+              </div>
+            </form>
           </div>
-        </main>
-      </div>
+        </div>
+      )}
     </div>
   );
 }
