@@ -130,13 +130,13 @@ function MessageBubble({ msg, initial }: { msg: AIMessage, initial: string }) {
 export default function AIAssistantPage() {
   const { products, customers, sales } = useAppStore();
   const { user } = useAuth();
-  const initial = user?.displayName ? user.displayName.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'U');
-  const ownerName = user?.displayName ? user.displayName.split(' ')[0] : 'Owner';
   
   const [messages, setMessages] = useState<AIMessage[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [usingGemini, setUsingGemini] = useState(!!GEMINI_API_KEY);
+  const [ownerName, setOwnerName] = useState('Owner');
+  const [initial, setInitial] = useState('O');
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const storeContext = useMemo(() => {
@@ -158,16 +158,33 @@ Rules: You are an expert retail business advisor. Respond in clear, professional
   }, [products, customers, sales]);
 
   useEffect(() => {
+    let currentOwnerName = user?.displayName ? user.displayName.split(' ')[0] : '';
+    let currentInitial = user?.displayName ? user.displayName.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'U');
+
+    if (!currentOwnerName && typeof window !== 'undefined') {
+        try {
+            const profile = JSON.parse(localStorage.getItem('retailos_profile') || '{}');
+            if (profile.ownerName) {
+                currentOwnerName = profile.ownerName.split(' ')[0];
+                currentInitial = currentOwnerName.charAt(0).toUpperCase();
+            }
+        } catch (e) {}
+    }
+
+    const finalOwnerName = currentOwnerName || 'Owner';
+    setOwnerName(finalOwnerName);
+    setInitial(currentInitial || 'O');
+
     const hour = new Date().getHours();
     const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
     const totalCredit = customers.reduce((s, c) => s + c.creditBalance, 0);
     const lowStockCount = products.filter(p => p.stock > 0 && p.stock < p.minStock).length;
     setMessages([{
       role: 'assistant',
-      content: `${greeting}, ${ownerName} ji!\n\nI'm your AI business partner. Here's what needs attention today:\n\n**Today's sales target:** ₹20,000\n**${lowStockCount} items** are running low on stock\n**Pending credit:** ${formatCurrency(totalCredit)} from ${customers.filter(c => c.creditBalance > 0).length} customers\n\nWhat would you like help with? ${GEMINI_API_KEY ? 'Real Gemini AI is active.' : 'Smart offline mode — add Gemini key for real AI.'}`,
+      content: `${greeting}, ${finalOwnerName} ji!\n\nI'm your AI business partner. Here's what needs attention today:\n\n**Today's sales target:** ₹20,000\n**${lowStockCount} items** are running low on stock\n**Pending credit:** ${formatCurrency(totalCredit)} from ${customers.filter(c => c.creditBalance > 0).length} customers\n\nWhat would you like help with? ${GEMINI_API_KEY ? 'Real Gemini AI is active.' : 'Smart offline mode — add Gemini key for real AI.'}`,
       timestamp: new Date(),
     }]);
-  }, [ownerName]);
+  }, [user, products, customers]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });

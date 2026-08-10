@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { ShoppingCart, Package, Users, BarChart3, Bell, TrendingUp, AlertTriangle, CheckCircle, ArrowRight, Store, Zap, CreditCard, DollarSign, Clock, Sun, Menu, Grid } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { formatCurrency } from '@/lib/utils';
@@ -241,24 +242,49 @@ export default function DashboardPage() {
                         {/* Analytical Insights */}
                         <div style={{ marginBottom: 24 }}>
                             <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 12 }}>Analytical Insights</h3>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12 }}>
-                                <div style={{ background: 'white', borderRadius: 16, padding: 16, border: '1px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            
+                            <div style={{ background: 'white', borderRadius: 16, padding: '20px 16px', border: '1px solid #E5E7EB', marginBottom: 12 }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                                     <div>
-                                        <p style={{ fontSize: 12, color: '#6B7280', fontWeight: 500, margin: '0 0 4px 0' }}>Top Selling Item</p>
-                                        <p style={{ fontSize: 15, fontWeight: 600, color: '#111827', margin: 0 }}>Tata Salt 1kg</p>
+                                        <p style={{ fontSize: 13, color: '#6B7280', fontWeight: 500, margin: '0 0 4px 0' }}>Today's Revenue Trend</p>
+                                        <p style={{ fontSize: 20, fontWeight: 700, color: '#111827', margin: 0 }}>₹16,700</p>
                                     </div>
                                     <div style={{ background: '#ECFDF5', padding: '6px 10px', borderRadius: 8 }}>
-                                        <span style={{ color: '#059669', fontSize: 13, fontWeight: 700 }}>+24%</span>
+                                        <span style={{ color: '#059669', fontSize: 13, fontWeight: 700 }}>+12% vs Yesterday</span>
                                     </div>
                                 </div>
-                                <div style={{ background: 'white', borderRadius: 16, padding: 16, border: '1px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                    <div>
-                                        <p style={{ fontSize: 12, color: '#6B7280', fontWeight: 500, margin: '0 0 4px 0' }}>Peak Business Hours</p>
-                                        <p style={{ fontSize: 15, fontWeight: 600, color: '#111827', margin: 0 }}>6:00 PM - 8:00 PM</p>
-                                    </div>
-                                    <div style={{ background: '#F5F3FF', padding: '6px 10px', borderRadius: 8 }}>
-                                        <span style={{ color: '#7C3AED', fontSize: 13, fontWeight: 700 }}>Peak</span>
-                                    </div>
+                                <div style={{ height: 160, width: '100%' }}>
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <AreaChart data={[
+                                            { time: '9 AM', sales: 2100 },
+                                            { time: '12 PM', sales: 4500 },
+                                            { time: '3 PM', sales: 3200 },
+                                            { time: '6 PM', sales: 8800 },
+                                            { time: '9 PM', sales: 6100 },
+                                        ]} margin={{ top: 5, right: 0, left: -25, bottom: 0 }}>
+                                            <defs>
+                                                <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.3}/>
+                                                    <stop offset="95%" stopColor="#7C3AED" stopOpacity={0}/>
+                                                </linearGradient>
+                                            </defs>
+                                            <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#9CA3AF' }} />
+                                            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#9CA3AF' }} tickFormatter={(val) => `₹${val}`} />
+                                            <Tooltip contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
+                                            <Area type="monotone" dataKey="sales" stroke="#7C3AED" strokeWidth={3} fillOpacity={1} fill="url(#colorSales)" />
+                                        </AreaChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                                <div style={{ background: 'white', borderRadius: 16, padding: 16, border: '1px solid #E5E7EB' }}>
+                                    <p style={{ fontSize: 12, color: '#6B7280', fontWeight: 500, margin: '0 0 4px 0' }}>Top Selling Item</p>
+                                    <p style={{ fontSize: 14, fontWeight: 600, color: '#111827', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Tata Salt 1kg</p>
+                                </div>
+                                <div style={{ background: 'white', borderRadius: 16, padding: 16, border: '1px solid #E5E7EB' }}>
+                                    <p style={{ fontSize: 12, color: '#6B7280', fontWeight: 500, margin: '0 0 4px 0' }}>Peak Business Hours</p>
+                                    <p style={{ fontSize: 14, fontWeight: 600, color: '#111827', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>6 PM - 8 PM</p>
                                 </div>
                             </div>
                         </div>
