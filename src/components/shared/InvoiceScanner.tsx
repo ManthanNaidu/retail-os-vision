@@ -412,8 +412,6 @@ export function InvoiceScanner({ onClose, onImport }: InvoiceScannerProps) {
                   </motion.div>
                 ))}
               </div>
-
-              </div>
               <div className="sticky bottom-0 bg-white pt-2 pb-4 mt-2 border-t" style={{ borderColor: 'var(--border)' }}>
                 <button onClick={addEmptyProduct}
                   className="w-full py-2.5 rounded-2xl text-sm font-semibold border-2 border-dashed flex items-center justify-center gap-2 mb-3 hover:bg-gray-50 transition-colors"
