@@ -134,13 +134,16 @@ export function AppSidebar() {
           })}
         </nav>
 
-        {/* Bottom: logout */}
-        <div className="p-4 border-t border-white/10 flex-shrink-0">
+        {/* Bottom: logout & tag */}
+        <div className="p-4 border-t border-white/10 flex-shrink-0 flex flex-col gap-3">
           <button onClick={handleLogout}
             className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-white/50 hover:text-red-400 hover:bg-red-500/10 transition-all text-sm font-medium">
             <LogOut size={16} />
             Logout
           </button>
+          <div className="text-center text-[11px] text-white/40 font-medium tracking-wide">
+            Made in India 🇮🇳
+          </div>
         </div>
       </motion.aside>
     </>

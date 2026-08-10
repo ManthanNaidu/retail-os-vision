@@ -11,6 +11,8 @@ import { useBillingStore, useAppStore } from '@/stores/appStore';
 import { formatCurrency, formatDate, generateInvoiceNumber } from '@/lib/utils';
 import { Product, Sale } from '@/types';
 import { cn } from '@/lib/utils';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export default function BillingPage() {
   const {
@@ -110,6 +112,64 @@ export default function BillingPage() {
 
     const phone = selectedCustomer?.phone || '';
     window.open(`https://wa.me/${phone ? '91' + phone : ''}?text=${encodeURIComponent(lines)}`, '_blank');
+  };
+
+  const sharePDF = (sale: Sale) => {
+    const doc = new jsPDF();
+    
+    // Header
+    doc.setFontSize(20);
+    doc.text(storeName, 105, 20, { align: 'center' });
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(storeAddress, 105, 28, { align: 'center' });
+    
+    // Invoice details
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+    doc.text(`Invoice: ${sale.invoiceNumber}`, 14, 45);
+    doc.text(`Date: ${new Date(sale.createdAt).toLocaleDateString('en-IN')}`, 14, 52);
+    doc.text(`Customer: ${sale.customerName}`, 14, 59);
+
+    // Items table
+    const tableData = sale.items.map(item => [
+      item.productName,
+      item.quantity.toString(),
+      `Rs. ${item.sellingPrice}`,
+      `Rs. ${item.total}`
+    ]);
+
+    autoTable(doc, {
+      startY: 65,
+      head: [['Item', 'Qty', 'Price', 'Total']],
+      body: tableData,
+      theme: 'grid',
+      headStyles: { fillColor: [26, 86, 219] }
+    });
+
+    // Totals
+    const finalY = (doc as any).lastAutoTable.finalY + 10;
+    doc.text(`Subtotal: Rs. ${sale.subtotal.toFixed(0)}`, 140, finalY);
+    if (sale.discount > 0) doc.text(`Discount: -Rs. ${sale.discount}`, 140, finalY + 7);
+    doc.text(`GST: Rs. ${sale.gstAmount.toFixed(0)}`, 140, finalY + (sale.discount > 0 ? 14 : 7));
+    doc.setFontSize(14);
+    doc.text(`Total: Rs. ${sale.total.toFixed(0)}`, 140, finalY + (sale.discount > 0 ? 24 : 17));
+
+    // Convert to Blob
+    const pdfBlob = doc.output('blob');
+    const fileName = `Invoice_${sale.invoiceNumber}.pdf`;
+    const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+    // Try Web Share API (mobile), fallback to download
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({
+        files: [file],
+        title: 'Invoice',
+        text: `Here is your invoice ${sale.invoiceNumber} from ${storeName}`,
+      }).catch(err => console.log('Share failed', err));
+    } else {
+      doc.save(fileName);
+    }
   };
 
   const categoryIcon: Record<string, string> = {
@@ -461,22 +521,29 @@ export default function BillingPage() {
               </div>
 
               {/* Action buttons */}
-              <div className="px-5 pb-5 grid grid-cols-2 gap-2.5">
                 <motion.button
                   whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                   onClick={() => shareWhatsApp(completedSale)}
-                  className="flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-bold"
+                  className="flex flex-col items-center justify-center gap-1 py-2 rounded-2xl text-[11px] font-bold"
                   style={{ background: '#dcfce7', color: '#16a34a' }}
                 >
-                  <MessageCircle size={16} /> WhatsApp
+                  <MessageCircle size={18} /> Send Msg
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                  onClick={() => sharePDF(completedSale)}
+                  className="flex flex-col items-center justify-center gap-1 py-2 rounded-2xl text-[11px] font-bold"
+                  style={{ background: '#fce7f3', color: '#db2777' }}
+                >
+                  <Share2 size={18} /> Share PDF
                 </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                   onClick={() => window.print()}
-                  className="flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-bold"
+                  className="flex flex-col items-center justify-center gap-1 py-2 rounded-2xl text-[11px] font-bold col-span-2"
                   style={{ background: 'var(--primary-light)', color: 'var(--primary)' }}
                 >
-                  <Printer size={16} /> Print
+                  <Printer size={18} /> Print Receipt
                 </motion.button>
               </div>
 
