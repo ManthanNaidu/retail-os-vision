@@ -521,6 +521,7 @@ export default function BillingPage() {
               </div>
 
               {/* Action buttons */}
+              <div className="px-5 pb-5 grid grid-cols-2 gap-2.5">
                 <motion.button
                   whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                   onClick={() => shareWhatsApp(completedSale)}
