@@ -23,8 +23,9 @@ export default function LoginPage() {
     setError('');
     
     // Intercept Master Admin Login
-    if (email === 'admin@retailos.in' || email === 'admin') {
-      if (adminLogin(password)) {
+    const cleanEmail = email.trim().toLowerCase();
+    if (cleanEmail === 'admin@retailos.in' || cleanEmail === 'admin') {
+      if (adminLogin(password.trim())) {
         router.push('/admin');
         return;
       }
