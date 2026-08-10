@@ -21,22 +21,42 @@ const SEGMENT_CONFIG: Record<string, { bg: string; color: string }> = {
   New:      { bg: '#e8f0fe', color: 'var(--primary)' },
 };
 
-const OFFER_TEMPLATES = [
-  { label: 'Weekend Sale',   text: 'Dear {name}, Weekend Special at Shree Ram Stores! Get 10% off on all Grocery items this Saturday & Sunday. Visit us or call to order. Valid 2 days only!' },
-  { label: 'New Stock',      text: 'Hi {name}! Fresh stock arrived at Shree Ram Stores — Amul products, Aashirvaad Atta, Maggi & more. Come early for best availability. See you soon!' },
-  { label: 'Festive Offer',  text: 'Wishing you a happy festive season, {name}! Special offers at Shree Ram Stores — flat 15% off on sweets & snacks. Celebrate with us!' },
-  { label: 'Credit Reminder', text: 'Dear {name}, a gentle reminder that your account has a pending balance at Shree Ram Stores. Please settle at your earliest convenience. Thank you!' },
-  { label: 'Birthday',       text: 'Happy Birthday {name}! As a special birthday gift from Shree Ram Stores, enjoy 20% off your next purchase. Valid this week. Have a wonderful day!' },
+const getDefaultTemplates = (storeName: string) => [
+  { label: 'Weekend Sale',   text: `Dear {name}, Weekend Special at ${storeName}! Get 10% off on all items this Saturday & Sunday. Visit us or call to order. Valid 2 days only!` },
+  { label: 'New Stock',      text: `Hi {name}! Fresh stock arrived at ${storeName}. Come early for best availability. See you soon!` },
+  { label: 'Festive Offer',  text: `Wishing you a happy festive season, {name}! Special offers at ${storeName} — flat 15% off. Celebrate with us!` },
+  { label: 'Credit Reminder', text: `Dear {name}, a gentle reminder that your account has a pending balance at ${storeName}. Please settle at your earliest convenience. Thank you!` },
+  { label: 'Birthday',       text: `Happy Birthday {name}! As a special birthday gift from ${storeName}, enjoy 20% off your next purchase. Valid this week. Have a wonderful day!` },
 ];
 
 // ── WhatsApp Broadcast Modal ────────────────────────────────────
 function WhatsAppBroadcastModal({ customers, onClose }: {
   customers: Customer[]; onClose: () => void;
 }) {
-  const [message, setMessage] = useState(OFFER_TEMPLATES[0].text);
+  const [storeName, setStoreName] = useState('Our Store');
+  const [templates, setTemplates] = useState(() => getDefaultTemplates('Our Store'));
+  const [message, setMessage] = useState(templates[0].text);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [step, setStep] = useState<'compose' | 'send' | 'done'>('compose');
   const [sendIndex, setSendIndex] = useState(0);
+
+  // Fetch actual store name on mount
+  useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const profileStr = localStorage.getItem('retailos_profile');
+        if (profileStr) {
+          const profile = JSON.parse(profileStr);
+          if (profile.storeName) {
+            setStoreName(profile.storeName);
+            const newTemplates = getDefaultTemplates(profile.storeName);
+            setTemplates(newTemplates);
+            setMessage(newTemplates[0].text);
+          }
+        }
+      } catch (e) {}
+    }
+  });
 
   const toggle = (id: string) => setSelected(prev => {
     const s = new Set(prev);
@@ -152,7 +172,7 @@ function WhatsAppBroadcastModal({ customers, onClose }: {
             <div className="px-5 pt-4 pb-3">
               <p className="text-xs font-semibold mb-2" style={{ color: 'var(--text-secondary)' }}>Quick Templates</p>
               <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-                {OFFER_TEMPLATES.map((t, i) => (
+                {templates.map((t, i) => (
                   <button key={i} onClick={() => setMessage(t.text)}
                     className="flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all"
                     style={{
@@ -444,7 +464,12 @@ export default function CustomersPage() {
   };
 
   const sendDirectWhatsApp = (customer: Customer) => {
-    const msg = `Hi ${customer.name.split(' ')[0]}! Welcome to Shree Ram Medical & General Stores. How can we help you today?`;
+    let storeName = 'Our Store';
+    try {
+      const profile = localStorage.getItem('retailos_profile');
+      if (profile) storeName = JSON.parse(profile).storeName || storeName;
+    } catch(e){}
+    const msg = `Hi ${customer.name.split(' ')[0]}! Welcome to ${storeName}. How can we help you today?`;
     window.open(`https://wa.me/91${customer.phone}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
