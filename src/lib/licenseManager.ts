@@ -9,6 +9,7 @@ export interface StoreRecord {
   ownerName: string;
   storeName: string;
   city: string;
+  phone?: string;
   registeredAt: string;
   lastLogin: string;
   status: 'active' | 'trial' | 'suspended' | 'expired';
@@ -54,8 +55,17 @@ export async function getStoreByEmail(email: string): Promise<StoreRecord | null
   }
 }
 
+export function getTrialDaysRemaining(trialEndsAt: string): number {
+  if (!trialEndsAt) return 0;
+  const end = new Date(trialEndsAt).getTime();
+  const now = new Date().getTime();
+  const diff = end - now;
+  if (diff <= 0) return 0;
+  return Math.ceil(diff / (1000 * 3600 * 24));
+}
+
 // Register or update store on login
-export async function registerStore(email: string, ownerName: string, storeName: string, city: string = 'India'): Promise<StoreRecord> {
+export async function registerStore(email: string, ownerName: string, storeName: string, city: string = 'India', phone: string = ''): Promise<StoreRecord> {
   const existing = await getStoreByEmail(email);
   
   if (existing) {
@@ -63,6 +73,7 @@ export async function registerStore(email: string, ownerName: string, storeName:
     if (ownerName) existing.ownerName = ownerName;
     if (storeName) existing.storeName = storeName;
     if (city && city !== 'India') existing.city = city;
+    if (phone) existing.phone = phone;
     await saveStoreRecord(existing);
     return existing;
   }
@@ -75,6 +86,7 @@ export async function registerStore(email: string, ownerName: string, storeName:
     ownerName, 
     storeName,
     city,
+    phone,
     registeredAt: new Date().toISOString(),
     lastLogin: new Date().toISOString(),
     status: 'trial',
