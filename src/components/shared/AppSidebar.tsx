@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, ShoppingCart, Package, Users, BarChart3,
-  Truck, Users2, Sparkles, Settings, X, Zap, LogOut, Store
+  Truck, Users2, Sparkles, Settings, X, Zap, LogOut, Store, MessageCircle
 } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { cn } from '@/lib/utils';
@@ -23,6 +23,7 @@ const navItems = [
   { href: '/employees',    icon: Users2,          label: 'Team' },
   { href: '/ai-assistant', icon: Sparkles,        label: 'AI Assistant', badge: 'AI' },
   { href: '/settings',     icon: Settings,        label: 'Settings' },
+  { href: 'mailto:support@retailos.in', icon: MessageCircle, label: 'Contact Us' },
 ];
 
 export function AppSidebar() {

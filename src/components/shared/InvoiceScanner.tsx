@@ -413,23 +413,26 @@ export function InvoiceScanner({ onClose, onImport }: InvoiceScannerProps) {
                 ))}
               </div>
 
-              <button onClick={addEmptyProduct}
-                className="w-full py-2.5 rounded-2xl text-sm font-semibold border-2 border-dashed flex items-center justify-center gap-2 mb-4 hover:bg-gray-50 transition-colors"
-                style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}>
-                <Plus size={15} /> Add Another Product
-              </button>
+              </div>
+              <div className="sticky bottom-0 bg-white pt-2 pb-4 mt-2 border-t" style={{ borderColor: 'var(--border)' }}>
+                <button onClick={addEmptyProduct}
+                  className="w-full py-2.5 rounded-2xl text-sm font-semibold border-2 border-dashed flex items-center justify-center gap-2 mb-3 hover:bg-gray-50 transition-colors"
+                  style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}>
+                  <Plus size={15} /> Add Another Product
+                </button>
 
-              <motion.button whileTap={{ scale: 0.97 }}
-                disabled={selectedCount === 0}
-                onClick={handleAddToInventory}
-                className="w-full py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all"
-                style={{
-                  background: selectedCount > 0 ? 'var(--primary)' : '#e2e8f0',
-                  color: selectedCount > 0 ? 'white' : 'var(--text-muted)',
-                }}>
-                <Package size={17} />
-                Add {selectedCount} Product{selectedCount !== 1 ? 's' : ''} to Inventory
-              </motion.button>
+                <motion.button whileTap={{ scale: 0.97 }}
+                  disabled={selectedCount === 0}
+                  onClick={handleAddToInventory}
+                  className="w-full py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-lg"
+                  style={{
+                    background: selectedCount > 0 ? 'var(--primary)' : '#e2e8f0',
+                    color: selectedCount > 0 ? 'white' : 'var(--text-muted)',
+                  }}>
+                  <Package size={17} />
+                  Add {selectedCount} Product{selectedCount !== 1 ? 's' : ''} to Inventory
+                </motion.button>
+              </div>
             </div>
           )}
 
