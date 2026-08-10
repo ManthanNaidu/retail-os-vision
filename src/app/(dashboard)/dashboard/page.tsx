@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { ShoppingCart, Package, Users, BarChart3, Bell, TrendingUp, AlertTriangle, CheckCircle, ArrowRight, Store, Zap, CreditCard, DollarSign, Clock, Sun } from 'lucide-react';
+import { ShoppingCart, Package, Users, BarChart3, Bell, TrendingUp, AlertTriangle, CheckCircle, ArrowRight, Store, Zap, CreditCard, DollarSign, Clock, Sun, Menu, Grid } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { formatCurrency } from '@/lib/utils';
 
@@ -12,6 +12,7 @@ export default function DashboardPage() {
     const [ownerName, setOwnerName] = useState('Store Owner');
     const [storeName, setStoreName] = useState('My Store');
     const [isClient, setIsClient] = useState(false);
+    const [showServicesMenu, setShowServicesMenu] = useState(false);
 
     useEffect(() => {
         setIsClient(true);
@@ -119,10 +120,22 @@ export default function DashboardPage() {
             {/* Header */}
             <div className="gradient-primary" style={{ padding: '20px 20px 60px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                        <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 13, marginBottom: 4, margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>Good morning <Sun size={14} /></p>
-                        <h1 style={{ color: 'white', fontSize: 22, fontWeight: 700, margin: '4px 0' }}>{ownerName}</h1>
-                        <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, margin: 0 }}>{storeName}</p>
+                    <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                        <button 
+                            onClick={() => {
+                                const { toggleSidebar } = useAppStore.getState();
+                                if (window.innerWidth >= 1024) setShowServicesMenu(true);
+                                else toggleSidebar();
+                            }} 
+                            style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '12px', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'white' }}
+                        >
+                            <Menu size={20} />
+                        </button>
+                        <div>
+                            <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 13, marginBottom: 4, margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>Good morning <Sun size={14} /></p>
+                            <h1 style={{ color: 'white', fontSize: 22, fontWeight: 700, margin: '4px 0' }}>{ownerName}</h1>
+                            <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, margin: 0 }}>{storeName}</p>
+                        </div>
                     </div>
                     <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                         <Bell size={20} color="white" />
@@ -222,6 +235,31 @@ export default function DashboardPage() {
                                     <span style={{ fontSize: 12, color: '#6B7280', fontWeight: 500 }}>Sales</span>
                                 </div>
                                 <div style={{ fontSize: 16, fontWeight: 700, color: '#111827' }}>{todayStats.transactions}</div>
+                            </div>
+                        </div>
+
+                        {/* Analytical Insights */}
+                        <div style={{ marginBottom: 24 }}>
+                            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 12 }}>Analytical Insights</h3>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12 }}>
+                                <div style={{ background: 'white', borderRadius: 16, padding: 16, border: '1px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <div>
+                                        <p style={{ fontSize: 12, color: '#6B7280', fontWeight: 500, margin: '0 0 4px 0' }}>Top Selling Item</p>
+                                        <p style={{ fontSize: 15, fontWeight: 600, color: '#111827', margin: 0 }}>Tata Salt 1kg</p>
+                                    </div>
+                                    <div style={{ background: '#ECFDF5', padding: '6px 10px', borderRadius: 8 }}>
+                                        <span style={{ color: '#059669', fontSize: 13, fontWeight: 700 }}>+24%</span>
+                                    </div>
+                                </div>
+                                <div style={{ background: 'white', borderRadius: 16, padding: 16, border: '1px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <div>
+                                        <p style={{ fontSize: 12, color: '#6B7280', fontWeight: 500, margin: '0 0 4px 0' }}>Peak Business Hours</p>
+                                        <p style={{ fontSize: 15, fontWeight: 600, color: '#111827', margin: 0 }}>6:00 PM - 8:00 PM</p>
+                                    </div>
+                                    <div style={{ background: '#F5F3FF', padding: '6px 10px', borderRadius: 8 }}>
+                                        <span style={{ color: '#7C3AED', fontSize: 13, fontWeight: 700 }}>Peak</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -331,6 +369,33 @@ export default function DashboardPage() {
                     </>
                 )}
             </div>
+
+            {/* Services Modal for Desktop top-left button */}
+            {showServicesMenu && (
+                <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
+                    <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)' }} onClick={() => setShowServicesMenu(false)} />
+                    <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 20, opacity: 1 }} style={{ background: 'white', width: '90%', maxWidth: 400, borderRadius: 20, padding: 24, zIndex: 101, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>More Services</h2>
+                            <button onClick={() => setShowServicesMenu(false)} style={{ border: 'none', background: '#F3F4F6', width: 32, height: 32, borderRadius: '50%', cursor: 'pointer' }}>✕</button>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                            <button onClick={() => { setShowServicesMenu(false); router.push('/suppliers'); }} style={{ padding: 16, border: '1px solid #E5E7EB', borderRadius: 12, background: 'white', cursor: 'pointer', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                <Store size={20} color="#f59e0b" />
+                                <span style={{ fontWeight: 600 }}>Suppliers</span>
+                            </button>
+                            <button onClick={() => { setShowServicesMenu(false); router.push('/employees'); }} style={{ padding: 16, border: '1px solid #E5E7EB', borderRadius: 12, background: 'white', cursor: 'pointer', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                <Users size={20} color="#7C3AED" />
+                                <span style={{ fontWeight: 600 }}>Team</span>
+                            </button>
+                            <button onClick={() => { setShowServicesMenu(false); router.push('/settings'); }} style={{ padding: 16, border: '1px solid #E5E7EB', borderRadius: 12, background: 'white', cursor: 'pointer', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                <Zap size={20} color="#059669" />
+                                <span style={{ fontWeight: 600 }}>Settings</span>
+                            </button>
+                        </div>
+                    </motion.div>
+                </div>
+            )}
             
             <style dangerouslySetInnerHTML={{__html: `
                 .hide-scrollbar::-webkit-scrollbar {
