@@ -3,14 +3,14 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Home, ShoppingCart, Package, Users, BarChart3, Sparkles } from 'lucide-react';
+import { Home, ShoppingCart, Package, Users, Sparkles } from 'lucide-react';
 
 const navItems = [
   { href: '/dashboard', icon: Home, label: 'Home' },
   { href: '/billing', icon: ShoppingCart, label: 'Billing' },
   { href: '/ai-assistant', icon: Sparkles, label: 'AI' },
   { href: '/inventory', icon: Package, label: 'Stock' },
-  { href: '/reports', icon: BarChart3, label: 'More' },
+  { href: '/customers', icon: Users, label: 'Customers' },
 ];
 
 export function BottomNav() {

@@ -60,7 +60,7 @@ async function callGemini(messages: AIMessage[], systemContext: string): Promise
     body: JSON.stringify({
       system_instruction: { parts: [{ text: systemContext }] },
       contents: conversation,
-      generationConfig: { temperature: 0.75, maxOutputTokens: 400 },
+      generationConfig: { temperature: 0.75, maxOutputTokens: 2000 },
     }),
   });
   if (!res.ok) throw new Error('API error');
