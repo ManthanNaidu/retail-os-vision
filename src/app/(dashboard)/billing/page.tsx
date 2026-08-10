@@ -26,6 +26,19 @@ export default function BillingPage() {
   const [showCustomerSearch, setShowCustomerSearch] = useState(false);
   const [customerQuery, setCustomerQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
+  const [storeName, setStoreName] = useState('My Store');
+  const [storeAddress, setStoreAddress] = useState('Store Address');
+
+  // Load store details
+  useMemo(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const profile = JSON.parse(localStorage.getItem('retailos_profile') || '{}');
+        if (profile.storeName) setStoreName(profile.storeName);
+        if (profile.location) setStoreAddress(profile.location);
+      } catch (e) {}
+    }
+  }, []);
 
   const categories = ['All', ...Array.from(new Set(products.map(p => p.category)))];
 
@@ -79,8 +92,8 @@ export default function BillingPage() {
       `🧾 *Invoice: ${sale.invoiceNumber}*`,
       `📅 ${new Date(sale.createdAt).toLocaleDateString('en-IN')}`,
       ``,
-      `*Shree Ram Medical & General Stores*`,
-      `15, Brigade Road, Bangalore`,
+      `*${storeName}*`,
+      `${storeAddress}`,
       ``,
       `*Items:*`,
       ...sale.items.map(i => `• ${i.productName} x${i.quantity} = ₹${i.total}`),
@@ -407,8 +420,8 @@ export default function BillingPage() {
               {/* Invoice body */}
               <div className="p-5">
                 <div className="text-center mb-4">
-                  <p className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>Shree Ram Medical & General Stores</p>
-                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>15, Brigade Road, Bangalore · GST: 29ABCDE1234F1Z5</p>
+                  <p className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>{storeName}</p>
+                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{storeAddress} · GST: 29ABCDE1234F1Z5</p>
                 </div>
 
                 {/* Items */}

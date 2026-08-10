@@ -131,6 +131,7 @@ export default function AIAssistantPage() {
   const { products, customers, sales } = useAppStore();
   const { user } = useAuth();
   const initial = user?.displayName ? user.displayName.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'U');
+  const ownerName = user?.displayName ? user.displayName.split(' ')[0] : 'Owner';
   
   const [messages, setMessages] = useState<AIMessage[]>([]);
   const [input, setInput] = useState('');
@@ -163,10 +164,10 @@ Rules: You are an expert retail business advisor. Respond in clear, professional
     const lowStockCount = products.filter(p => p.stock > 0 && p.stock < p.minStock).length;
     setMessages([{
       role: 'assistant',
-      content: `${greeting}, Rajesh ji!\n\nI'm your AI business partner. Here's what needs attention today:\n\n**Today's sales target:** ₹20,000\n**${lowStockCount} items** are running low on stock\n**Pending credit:** ${formatCurrency(totalCredit)} from ${customers.filter(c => c.creditBalance > 0).length} customers\n\nWhat would you like help with? ${GEMINI_API_KEY ? 'Real Gemini AI is active.' : 'Smart offline mode — add Gemini key for real AI.'}`,
+      content: `${greeting}, ${ownerName} ji!\n\nI'm your AI business partner. Here's what needs attention today:\n\n**Today's sales target:** ₹20,000\n**${lowStockCount} items** are running low on stock\n**Pending credit:** ${formatCurrency(totalCredit)} from ${customers.filter(c => c.creditBalance > 0).length} customers\n\nWhat would you like help with? ${GEMINI_API_KEY ? 'Real Gemini AI is active.' : 'Smart offline mode — add Gemini key for real AI.'}`,
       timestamp: new Date(),
     }]);
-  }, []);
+  }, [ownerName]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -200,7 +201,7 @@ Rules: You are an expert retail business advisor. Respond in clear, professional
   };
 
   const clearChat = () => {
-    setMessages([{ role: 'assistant', content: 'Chat cleared. What can I help you with today, Rajesh ji?', timestamp: new Date() }]);
+    setMessages([{ role: 'assistant', content: `Chat cleared. What can I help you with today, ${ownerName} ji?`, timestamp: new Date() }]);
   };
 
   return (
