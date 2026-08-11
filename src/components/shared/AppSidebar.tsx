@@ -19,12 +19,12 @@ const navItems = [
   { href: '/billing',      image: '/images/icons/billing.jpg', label: 'New Sale' },
   { href: '/inventory',    image: '/images/icons/stock.jpg', label: 'Inventory' },
   { href: '/customers',    image: '/images/icons/customers.jpg', label: 'Customers' },
-  { href: '/reports',      icon: BarChart3, label: 'Reports' },
+  { href: '/reports',      image: '/images/icons/icon_reports.jpg', label: 'Reports' },
   { href: '/suppliers',    image: '/images/icons/suppliers.jpg', label: 'Suppliers' },
   { href: '/employees',    image: '/images/icons/team.jpg', label: 'Team' },
   { href: '/ai-assistant', image: '/images/retailbot.jpg', label: 'AI Assistant', badge: 'AI' },
   { href: '/settings',     image: '/images/icons/settings.jpg', label: 'Settings' },
-  { href: 'mailto:support@retailos.in', icon: MessageCircle, label: 'Contact Us' },
+  { href: 'mailto:support@retailos.in', image: '/images/icons/icon_contact.jpg', label: 'Contact Us' },
 ];
 
 export function AppSidebar() {
@@ -121,10 +121,10 @@ export function AppSidebar() {
                 <motion.div
                   whileTap={{ scale: 0.98 }}
                   className={cn(
-                    'relative flex items-center gap-3.5 px-4 py-3.5 rounded-2xl transition-all duration-200 group overflow-hidden',
+                    'relative flex items-center gap-3.5 px-4 py-3 mb-2 rounded-xl transition-all duration-200 group overflow-hidden border',
                     isActive
-                      ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-lg shadow-orange-500/20'
-                      : 'text-slate-600 hover:bg-amber-50 hover:text-orange-600'
+                      ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-md shadow-orange-500/20 border-transparent'
+                      : 'bg-white text-slate-600 border-slate-100 shadow-sm hover:border-orange-200 hover:shadow-md'
                   )}
                 >
                   {isActive && (
