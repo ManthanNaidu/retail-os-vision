@@ -300,42 +300,65 @@ export default function SetupPage() {
             key="step4"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center justify-center h-full text-center"
+            className="flex flex-col h-full text-center relative pt-10"
           >
+            {/* Attractive Background Header */}
+            <div className="absolute top-[-32px] left-[-32px] right-[-32px] h-[240px] bg-gradient-to-b from-amber-100/80 via-orange-50/50 to-transparent -z-10 rounded-t-[2rem]">
+              <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #f59e0b 0%, transparent 70%)' }}></div>
+              <motion.div 
+                animate={{ y: [0, -10, 0], rotate: [0, 5, -5, 0] }} 
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute top-10 left-10 w-16 h-16 opacity-30 rounded-2xl shadow-lg overflow-hidden"
+              >
+                <img src="/images/icons/icon_home.jpg" alt="Decor" className="w-full h-full object-cover blur-[1px]" />
+              </motion.div>
+              <motion.div 
+                animate={{ y: [0, 15, 0], rotate: [0, -10, 10, 0] }} 
+                transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                className="absolute top-16 right-10 w-12 h-12 opacity-30 rounded-2xl shadow-lg overflow-hidden"
+              >
+                <img src="/images/icons/icon_setup.jpg" alt="Decor" className="w-full h-full object-cover blur-[1px]" />
+              </motion.div>
+            </div>
+
             <motion.div 
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-              className="w-24 h-24 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mb-6 shadow-xl shadow-orange-500/30 border-4 border-white"
+              className="w-28 h-28 mx-auto bg-gradient-to-br from-amber-400 to-orange-500 rounded-[2rem] flex items-center justify-center mb-6 shadow-2xl shadow-orange-500/30 border-4 border-white rotate-3"
             >
-              <Check className="w-12 h-12 text-white" strokeWidth={3} />
+              <Check className="w-14 h-14 text-white drop-shadow-md" strokeWidth={3} />
             </motion.div>
             
-            <h1 className="text-3xl font-extrabold text-slate-800 mb-3 tracking-tight">All Set!</h1>
+            <h1 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">All Set!</h1>
+            <p className="text-slate-500 font-medium mb-8">Your smart store is ready to go.</p>
             
-            <div className="bg-[#fffdf8] rounded-3xl p-8 w-full mb-8 border-2 border-amber-100 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-orange-500"></div>
-              <div className="w-16 h-16 rounded-3xl bg-orange-100 text-orange-600 flex items-center justify-center mx-auto mb-4 overflow-hidden shadow-lg shadow-orange-500/20">
+            <div className="bg-[#fffdf8] rounded-3xl p-8 w-full mb-auto border border-amber-100 shadow-xl shadow-amber-500/5 relative overflow-hidden group hover:border-orange-200 transition-colors">
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-amber-400 via-orange-500 to-amber-400"></div>
+              
+              <div className="w-20 h-20 rounded-[2rem] bg-orange-100 text-orange-600 flex items-center justify-center mx-auto mb-5 overflow-hidden shadow-lg shadow-orange-500/20 group-hover:scale-110 transition-transform duration-500">
                  {selectedType?.image ? (
                    <img src={selectedType.image} alt="Store type" className="w-full h-full object-cover" />
                  ) : (
-                   <FinalIconComp size={32} strokeWidth={2} />
+                   <FinalIconComp size={36} strokeWidth={2} />
                  )}
               </div>
-              <h2 className="text-xl font-bold text-slate-800">{storeDetails.storeName}</h2>
-              <p className="text-orange-600 font-semibold text-sm mt-1">{selectedType?.name} • {storeDetails.city || 'Ready for business'}</p>
+              <h2 className="text-2xl font-black text-slate-800 mb-1">{storeDetails.storeName}</h2>
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 rounded-full">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <p className="text-orange-700 font-bold text-xs tracking-wide uppercase">{selectedType?.name}</p>
+              </div>
             </div>
             
-            <p className="text-slate-600 mb-8 max-w-[280px] font-medium">
-              Welcome to RetailOS. Your smart store management system is ready.
-            </p>
-            
-            <button
-              onClick={finishSetup}
-              className="w-full py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-amber-500 to-orange-500 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 active:scale-[0.98] transition-all flex items-center justify-center text-lg"
-            >
-              Launch Dashboard <Zap className="ml-2 w-5 h-5 fill-white" />
-            </button>
+            <div className="mt-8 pt-4 bg-white">
+              <button
+                onClick={finishSetup}
+                className="w-full py-4 rounded-2xl font-black text-white bg-gradient-to-r from-amber-500 to-orange-500 shadow-xl shadow-orange-500/25 hover:shadow-orange-500/40 active:scale-[0.98] hover:-translate-y-1 transition-all flex items-center justify-center text-lg overflow-hidden relative group"
+              >
+                <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full skew-x-12 transition-transform duration-700 ease-out"></div>
+                <span className="relative z-10 flex items-center">Launch Dashboard <Zap className="ml-2 w-6 h-6 fill-white drop-shadow-md" /></span>
+              </button>
+            </div>
           </motion.div>
         );
     }

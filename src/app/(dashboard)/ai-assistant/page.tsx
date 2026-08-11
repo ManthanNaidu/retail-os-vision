@@ -10,6 +10,7 @@ import {
 import { useAppStore } from '@/stores/appStore';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { formatCurrency, getDaysUntilExpiry } from '@/lib/utils';
+import { Product, Customer, Sale } from '@/types';
 
 export interface AIMessage {
   role: 'user' | 'assistant';
@@ -20,32 +21,46 @@ export interface AIMessage {
 const GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent';
 
-const localResponses: Record<string, string> = {
-  sales:    "Today's sales: **₹16,700** across 47 orders.\nProfit margin is **26.9%**. Saturday is your best day — consider extra stock for weekends!",
-  profit:   "Today's profit: **₹4,500** — up **14%** from yesterday!\nYour best margin items are Paracetamol (50%) and Dettol Soap (26%).",
-  stock:    "**4 items need attention:**\n• Maggi Noodles — only 5 packs left\n• Aashirvaad Atta — 8 bags (order today!)\n• Amul Butter — 3 units\n• Amoxicillin — expiring in 20 days\n\nShall I create a purchase order?",
-  expiry:   "**Expiring soon:**\n• Amoxicillin 250mg — 20 days (9 strips)\n• Amul Butter 500g — 15 Feb (3 units)\n\nTip: Give 10% discount on Amoxicillin to clear stock. You'll save ₹585 vs total loss.",
-  customer: "**Customer insights:**\n• Rahul Sharma owes **₹2,300** (45 days overdue)\n• Suresh Kumar inactive for **72 days**\n• Ravi Gupta inactive for **108 days**\n\nSend WhatsApp reminders to recover ₹8,550 total.",
-  payment:  "**Pending payments:**\n• Rahul Sharma — ₹2,300\n• Suresh Kumar — ₹1,800\n• Ravi Gupta — ₹3,200\n• Others — ₹1,250\n\n**Total: ₹8,550** — Should I send WhatsApp reminders to all?",
-  forecast: "**Tomorrow's forecast:**\n• Expected sales: **₹18,200 – ₹21,500**\n• It's Sunday, typically your 2nd best day\n• Stock up: Fortune Oil, Maggi, Tata Salt tend to sell more on weekends",
-  gst:      "**GST Summary (this month):**\n• Total sales: ₹4,56,000\n• GST collected: ₹48,320\n• Input GST: ₹32,100\n• **GST payable: ₹16,220**\n\nNext filing due: 20th. Want me to generate the full report?",
-  suggest:  "**Top 3 profit moves for today:**\n1. Raise Maggi price by ₹2 → +₹480/month\n2. Remind Rahul Sharma about ₹2,300 → immediate cash\n3. Order Aashirvaad Atta before stockout → avoid ₹3,000 lost sales",
-  best:     "**Top selling products this month:**\n1. Tata Salt 1kg — 420 units — ₹9,240\n2. Aashirvaad Atta 5kg — 185 units — ₹38,850\n3. Maggi 70g — 312 units — ₹4,680\n4. Fortune Oil 1L — 94 units — ₹15,510\n\nFocus reorder on items 2 and 3 — both running low!",
-};
-
-function findLocalResponse(query: string): string {
+function findLocalResponse(query: string, products: Product[], sales: Sale[], customers: Customer[]): string {
   const q = query.toLowerCase();
-  if (q.includes('sale') || q.includes('today') || q.includes('aaj')) return localResponses.sales;
-  if (q.includes('profit') || q.includes('munafa'))                    return localResponses.profit;
-  if (q.includes('stock') || q.includes('inventory') || q.includes('low')) return localResponses.stock;
-  if (q.includes('expir') || q.includes('khatam'))                    return localResponses.expiry;
-  if (q.includes('payment') || q.includes('pending') || q.includes('credit') || q.includes('baki')) return localResponses.payment;
-  if (q.includes('customer') || q.includes('grahak'))                 return localResponses.customer;
-  if (q.includes('forecast') || q.includes('tomorrow') || q.includes('kal')) return localResponses.forecast;
-  if (q.includes('gst') || q.includes('tax'))                         return localResponses.gst;
-  if (q.includes('suggest') || q.includes('advice') || q.includes('improve') || q.includes('tip')) return localResponses.suggest;
-  if (q.includes('best') || q.includes('top') || q.includes('popular')) return localResponses.best;
-  return "Based on your store data, I can see **4 low-stock items** and **₹8,550** in pending credit.\n\nAsk me anything specific about sales, stock, customers, or profits!";
+  
+  // Calculate dynamic stats
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todaySales = sales.filter(s => new Date(s.createdAt) >= today);
+  const todayRevenue = todaySales.reduce((sum, s) => sum + s.total, 0);
+  const todayProfit = todaySales.reduce((sum, s) => sum + (s.total * 0.2), 0); // Estimating 20% margin
+  
+  const lowStock = products.filter(p => p.stock > 0 && p.stock < (p.minStock || 5));
+  const outOfStock = products.filter(p => p.stock === 0);
+  const expiring = products.filter(p => p.expiryDate && getDaysUntilExpiry(p.expiryDate) <= 30 && getDaysUntilExpiry(p.expiryDate) > 0);
+  
+  const pendingCreditCustomers = customers.filter(c => c.creditBalance > 0);
+  const totalCredit = pendingCreditCustomers.reduce((s, c) => s + c.creditBalance, 0);
+  
+  if (q.includes('sale') || q.includes('today') || q.includes('aaj')) {
+    return `Today's sales: **₹${todayRevenue}** across ${todaySales.length} orders.\nKeep it up!`;
+  }
+  if (q.includes('profit') || q.includes('munafa')) {
+    return `Today's estimated profit: **₹${todayProfit}**.\nFocus on high margin items to boost this further!`;
+  }
+  if (q.includes('stock') || q.includes('inventory') || q.includes('low')) {
+    if (lowStock.length === 0 && outOfStock.length === 0) return "**Great news!** All your products are well stocked.";
+    let res = `**Stock Alert:**\n`;
+    if (outOfStock.length > 0) res += `Out of stock: ${outOfStock.slice(0,3).map(p => p.name).join(', ')}\n`;
+    if (lowStock.length > 0) res += `Running low: ${lowStock.slice(0,3).map(p => `${p.name} (${p.stock} left)`).join(', ')}\n`;
+    return res + `\nShall I prepare a reorder list?`;
+  }
+  if (q.includes('expir') || q.includes('khatam')) {
+    if (expiring.length === 0) return "You have no products expiring in the next 30 days.";
+    return `**Expiring soon:**\n` + expiring.slice(0,3).map(p => `• ${p.name} — ${getDaysUntilExpiry(p.expiryDate as string)} days`).join('\n') + `\n\nTip: Consider giving a discount on these to clear stock.`;
+  }
+  if (q.includes('payment') || q.includes('pending') || q.includes('credit') || q.includes('baki') || q.includes('customer')) {
+    if (pendingCreditCustomers.length === 0) return "You have no pending payments. Great cash flow!";
+    return `**Pending payments:**\n` + pendingCreditCustomers.slice(0,3).map(c => `• ${c.name} — ₹${c.creditBalance}`).join('\n') + `\n\n**Total: ₹${totalCredit}** — Should I send WhatsApp reminders?`;
+  }
+  
+  return `Based on your store data, I can see **${lowStock.length + outOfStock.length} low-stock items** and **₹${totalCredit}** in pending credit.\n\nAsk me anything specific about sales, stock, customers, or profits!`;
 }
 
 async function callGemini(messages: AIMessage[], systemContext: string): Promise<string> {
@@ -170,17 +185,18 @@ export default function AIAssistantPage() {
   const [isTyping, setIsTyping] = useState(false);
   const [usingGemini, setUsingGemini] = useState(!!GEMINI_API_KEY);
   const [ownerName, setOwnerName] = useState('Owner');
+  const [storeName, setStoreName] = useState('My Store');
   const [initial, setInitial] = useState('O');
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const storeContext = useMemo(() => {
     const todaySales   = sales.slice(0, 10).reduce((s, sale) => s + sale.total, 0);
-    const lowStock     = products.filter(p => p.stock > 0 && p.stock < p.minStock);
+    const lowStock     = products.filter(p => p.stock > 0 && p.stock < (p.minStock || 5));
     const expiring     = products.filter(p => p.expiryDate && getDaysUntilExpiry(p.expiryDate) <= 30 && getDaysUntilExpiry(p.expiryDate) > 0);
     const pendingCredit = customers.filter(c => c.creditBalance > 0);
     const totalCredit  = customers.reduce((s, c) => s + c.creditBalance, 0);
     return `You are RetailOS AI — a smart, friendly business assistant for Indian retail stores.
-Store: Shree Ram Medical & General Stores.
+Store: ${storeName}.
 LIVE DATA (${new Date().toLocaleDateString('en-IN')}):
 - Today's sales: ₹${todaySales > 0 ? todaySales.toFixed(0) : '16,700'}
 - Total products: ${products.length} | Low stock: ${lowStock.map(p => p.name).join(', ') || 'None'}
@@ -192,12 +208,17 @@ Rules: You are an expert retail business advisor. Respond in clear, professional
     let currentOwnerName = user?.displayName ? user.displayName.split(' ')[0] : '';
     let currentInitial = user?.displayName ? user.displayName.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'U');
 
-    if (!currentOwnerName && typeof window !== 'undefined') {
+    let currentStoreName = 'My Store';
+
+    if (typeof window !== 'undefined') {
         try {
             const profile = JSON.parse(localStorage.getItem('retailos_profile') || '{}');
             if (profile.ownerName) {
                 currentOwnerName = profile.ownerName.split(' ')[0];
                 currentInitial = currentOwnerName.charAt(0).toUpperCase();
+            }
+            if (profile.storeName) {
+                currentStoreName = profile.storeName;
             }
         } catch (e) {}
     }
@@ -205,11 +226,12 @@ Rules: You are an expert retail business advisor. Respond in clear, professional
     const finalOwnerName = currentOwnerName || 'Owner';
     setOwnerName(finalOwnerName);
     setInitial(currentInitial || 'O');
+    setStoreName(currentStoreName);
 
     const hour = new Date().getHours();
     const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
     const totalCredit = customers.reduce((s, c) => s + c.creditBalance, 0);
-    const lowStockCount = products.filter(p => p.stock > 0 && p.stock < p.minStock).length;
+    const lowStockCount = products.filter(p => p.stock > 0 && p.stock < (p.minStock || 5)).length;
     
     setMessages([{
       role: 'assistant',
@@ -239,7 +261,7 @@ Rules: You are an expert retail business advisor. Respond in clear, professional
       }
       if (!response) {
         await new Promise(r => setTimeout(r, 1200 + Math.random() * 800)); // slightly longer fake delay for cute animation
-        response = findLocalResponse(text);
+        response = findLocalResponse(text, products, sales, customers);
       }
       setMessages(prev => [...prev, { role: 'assistant', content: response, timestamp: new Date() }]);
     } catch {

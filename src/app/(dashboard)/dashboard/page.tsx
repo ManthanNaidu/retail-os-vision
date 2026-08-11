@@ -6,6 +6,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import { ShoppingCart, Package, Users, BarChart3, Bell, TrendingUp, AlertTriangle, CheckCircle, ArrowRight, Store, Zap, CreditCard, DollarSign, Clock, Sun, Menu, Grid, MessageCircle } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { formatCurrency } from '@/lib/utils';
+import { Notification } from '@/types';
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -14,6 +15,9 @@ export default function DashboardPage() {
     const [storeName, setStoreName] = useState('My Store');
     const [isClient, setIsClient] = useState(false);
     const [showServicesMenu, setShowServicesMenu] = useState(false);
+    const [showNotifications, setShowNotifications] = useState(false);
+    
+    const { notifications, unreadCount, markNotificationRead, markAllRead, addNotification } = useAppStore();
 
     useEffect(() => {
         setIsClient(true);
@@ -28,6 +32,43 @@ export default function DashboardPage() {
             console.error('Error parsing profile', e);
         }
     }, []);
+
+    // Generate notifications based on alerts
+    useEffect(() => {
+        if (!isClient) return;
+        const state = useAppStore.getState();
+        const existingAlertIds = state.notifications.map(n => n.id);
+        
+        products.forEach(p => {
+            const stock = p.stock || 0;
+            const minStock = p.minStock || 5;
+            if (stock === 0) {
+                const notifId = `out-of-stock-${p.id}`;
+                if (!existingAlertIds.includes(notifId)) {
+                    addNotification({
+                        id: notifId,
+                        type: 'danger',
+                        title: 'Out of Stock',
+                        message: `${p.name} is completely out of stock.`,
+                        createdAt: new Date().toISOString(),
+                        isRead: false
+                    });
+                }
+            } else if (stock <= minStock) {
+                const notifId = `low-stock-${p.id}`;
+                if (!existingAlertIds.includes(notifId)) {
+                    addNotification({
+                        id: notifId,
+                        type: 'warning',
+                        title: 'Low Stock Alert',
+                        message: `${p.name} is running low (${stock} left).`,
+                        createdAt: new Date().toISOString(),
+                        isRead: false
+                    });
+                }
+            }
+        });
+    }, [products, isClient, addNotification]);
 
     // Stats calculations
     const todayStats = useMemo(() => {
@@ -138,10 +179,51 @@ export default function DashboardPage() {
                             <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, margin: 0 }}>{storeName}</p>
                         </div>
                     </div>
-                    <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                        <Bell size={20} color="white" />
-                        {alerts.length > 0 && (
-                            <div style={{ position: 'absolute', top: 8, right: 10, width: 8, height: 8, background: '#EF4444', borderRadius: '50%', border: '2px solid #f59e0b' }} />
+                    <div style={{ position: 'relative' }}>
+                        <div onClick={() => setShowNotifications(!showNotifications)} style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', position: 'relative' }}>
+                            <Bell size={20} color="white" />
+                            {unreadCount > 0 && (
+                                <div style={{ position: 'absolute', top: 8, right: 10, width: 10, height: 10, background: '#EF4444', borderRadius: '50%', border: '2px solid #f59e0b' }} />
+                            )}
+                        </div>
+
+                        {/* Notification Dropdown */}
+                        {showNotifications && (
+                            <>
+                                <div style={{ position: 'fixed', inset: 0, zIndex: 40 }} onClick={() => setShowNotifications(false)} />
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    style={{ position: 'absolute', top: 50, right: 0, width: 320, background: 'white', borderRadius: 20, zIndex: 50, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)', overflow: 'hidden', border: '1px solid #E5E7EB' }}
+                                >
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid #E5E7EB' }}>
+                                        <span style={{ fontWeight: 600, fontSize: 14, color: '#111827' }}>Notifications</span>
+                                        <button onClick={markAllRead} style={{ fontSize: 12, fontWeight: 500, color: '#f59e0b', background: 'none', border: 'none', cursor: 'pointer' }}>Mark all read</button>
+                                    </div>
+                                    <div style={{ maxHeight: 320, overflowY: 'auto' }}>
+                                        {notifications.length === 0 ? (
+                                            <div style={{ padding: 24, textAlign: 'center', color: '#6B7280', fontSize: 13 }}>No new notifications</div>
+                                        ) : notifications.map(n => {
+                                            const meta = n.type === 'danger' ? { bg: '#fee2e2', color: '#991b1b', icon: AlertTriangle } 
+                                                : n.type === 'warning' ? { bg: '#fef3c7', color: '#92400e', icon: AlertTriangle }
+                                                : { bg: '#d1fae5', color: '#065f46', icon: CheckCircle };
+                                            const IconComp = meta.icon;
+                                            return (
+                                                <div key={n.id} onClick={() => markNotificationRead(n.id)} style={{ padding: '12px 16px', display: 'flex', gap: 12, borderBottom: '1px solid #F3F4F6', cursor: 'pointer', background: n.isRead ? 'white' : '#FFFBEB', transition: 'background 0.2s' }}>
+                                                    <div style={{ width: 36, height: 36, borderRadius: 10, background: meta.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                                        <IconComp size={16} color={meta.color} />
+                                                    </div>
+                                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                                        <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{n.title}</p>
+                                                        <p style={{ margin: '2px 0 0', fontSize: 12, color: '#6B7280', lineHeight: 1.4 }}>{n.message}</p>
+                                                    </div>
+                                                    {!n.isRead && <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b', marginTop: 4, flexShrink: 0 }} />}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </motion.div>
+                            </>
                         )}
                     </div>
                 </div>
