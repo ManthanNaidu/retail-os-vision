@@ -186,7 +186,7 @@ export default function BillingPage() {
           <div className="relative">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
             <input
-              className="input-premium pl-10 pr-10 text-sm"
+              className="input-premium !pl-[36px] !pr-[36px] text-sm"
               placeholder="Search products or scan barcode..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
@@ -307,7 +307,7 @@ export default function BillingPage() {
           {showCustomerSearch && (
             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden border-b" style={{ borderColor: 'var(--border)' }}>
               <div className="p-3">
-                <input className="input-premium text-sm mb-2" placeholder="Search by name or phone..." value={customerQuery} onChange={e => setCustomerQuery(e.target.value)} autoFocus />
+                <input className="input-premium text-sm mb-2 !pl-10" placeholder="Search by name or phone..." value={customerQuery} onChange={e => setCustomerQuery(e.target.value)} autoFocus />
                 <div className="space-y-1">
                   <button onClick={() => { setCustomer(null); setShowCustomerSearch(false); }} className="w-full text-left px-3 py-2 rounded-xl text-xs font-medium hover:bg-gray-50" style={{ color: 'var(--text-secondary)' }}>
                     👤 Walk-in Customer

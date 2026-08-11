@@ -181,7 +181,7 @@ export default function SetupPage() {
                       value={storeDetails.storeName}
                       onChange={(e) => setStoreDetails({...storeDetails, storeName: e.target.value})}
                       placeholder="e.g. Shree Ram Medical Store"
-                      className="w-full pl-11 pr-4 py-3 bg-white border border-amber-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all text-slate-800 font-medium placeholder:text-slate-400 shadow-inner shadow-amber-500/5"
+                      className="w-full !pl-[44px] pr-4 py-3 bg-white border border-amber-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all text-slate-800 font-medium placeholder:text-slate-400 shadow-inner shadow-amber-500/5"
                     />
                   </div>
                 </div>
@@ -197,7 +197,7 @@ export default function SetupPage() {
                       value={storeDetails.ownerName}
                       onChange={(e) => setStoreDetails({...storeDetails, ownerName: e.target.value})}
                       placeholder="e.g. Rajesh Kumar"
-                      className="w-full pl-11 pr-4 py-3 bg-white border border-amber-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all text-slate-800 font-medium placeholder:text-slate-400 shadow-inner shadow-amber-500/5"
+                      className="w-full !pl-[44px] pr-4 py-3 bg-white border border-amber-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all text-slate-800 font-medium placeholder:text-slate-400 shadow-inner shadow-amber-500/5"
                     />
                   </div>
                 </div>
@@ -216,7 +216,7 @@ export default function SetupPage() {
                       value={storeDetails.city}
                       onChange={(e) => setStoreDetails({...storeDetails, city: e.target.value})}
                       placeholder="e.g. Mumbai"
-                      className="w-full pl-11 pr-4 py-3 bg-white border border-amber-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all text-slate-800 font-medium placeholder:text-slate-400 shadow-inner shadow-amber-500/5"
+                      className="w-full !pl-[44px] pr-4 py-3 bg-white border border-amber-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all text-slate-800 font-medium placeholder:text-slate-400 shadow-inner shadow-amber-500/5"
                     />
                   </div>
                 </div>
@@ -232,7 +232,7 @@ export default function SetupPage() {
                       onChange={(e) => setStoreDetails({...storeDetails, address: e.target.value})}
                       placeholder="Street, Landmark, Pincode..."
                       rows={2}
-                      className="w-full pl-11 pr-4 py-3 bg-white border border-amber-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all text-slate-800 font-medium placeholder:text-slate-400 shadow-inner shadow-amber-500/5 resize-none"
+                      className="w-full !pl-[44px] pr-4 py-3 bg-white border border-amber-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all text-slate-800 font-medium placeholder:text-slate-400 shadow-inner shadow-amber-500/5 resize-none"
                     />
                   </div>
                 </div>

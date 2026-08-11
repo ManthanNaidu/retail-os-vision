@@ -309,7 +309,7 @@ function CustomerForm({ customer, onSave, onClose }: {
             <label className="text-xs font-semibold block mb-1.5" style={{ color: 'var(--text-secondary)' }}>WhatsApp Number *</label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium" style={{ color: 'var(--text-muted)' }}>+91</span>
-              <input className="input-premium pl-10" type="tel" value={form.phone}
+              <input className="input-premium !pl-[36px]" type="tel" value={form.phone}
                 onChange={e => set('phone', e.target.value.replace(/\D/g, '').slice(0, 10))}
                 required placeholder="10-digit number" maxLength={10} />
             </div>
@@ -526,7 +526,7 @@ export default function CustomersPage() {
         {/* Search */}
         <div className="relative mb-3">
           <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
-          <input className="input-premium pl-10 text-sm" placeholder="Search by name or phone..."
+          <input className="input-premium !pl-[36px] text-sm" placeholder="Search by name or phone..."
             value={search} onChange={e => setSearch(e.target.value)} />
         </div>
 
