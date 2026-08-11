@@ -148,7 +148,7 @@ export default function EmployeesPage() {
               placeholder="Search employees..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 rounded-xl border text-sm focus:outline-none"
+              className="w-full !pl-[40px] pr-4 py-3 rounded-xl border text-sm focus:outline-none"
               style={{ background: 'var(--bg-pearl)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
             />
           </div>

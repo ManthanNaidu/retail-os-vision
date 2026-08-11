@@ -158,7 +158,7 @@ export default function SuppliersPage() {
         <div className="relative mb-6">
           <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
           <input 
-            className="input-premium pl-10 w-full h-12" 
+            className="input-premium !pl-[40px] w-full h-12" 
             placeholder="Search suppliers..." 
             value={search} 
             onChange={e => setSearch(e.target.value)} 
