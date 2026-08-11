@@ -123,10 +123,14 @@ export default function SetupPage() {
                         : 'border-amber-100 bg-[#fffdf8] hover:border-orange-300 hover:bg-amber-50'
                     }`}
                   >
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-colors ${
-                      isSelected ? 'bg-orange-500 text-white' : 'bg-amber-100 text-orange-600'
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-3 transition-colors overflow-hidden ${
+                      isSelected ? 'bg-orange-500 text-white ring-4 ring-orange-500/20' : 'bg-amber-100 text-orange-600'
                     }`}>
-                      <IconComp size={24} strokeWidth={2.5} />
+                      {type.image ? (
+                        <img src={type.image} alt={type.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <IconComp size={24} strokeWidth={2.5} />
+                      )}
                     </div>
                     <span className={`font-bold text-sm text-center ${isSelected ? 'text-orange-700' : 'text-slate-700'}`}>
                       {type.name}
@@ -311,8 +315,12 @@ export default function SetupPage() {
             
             <div className="bg-[#fffdf8] rounded-3xl p-8 w-full mb-8 border-2 border-amber-100 shadow-sm relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-orange-500"></div>
-              <div className="w-16 h-16 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center mx-auto mb-4">
-                 <FinalIconComp size={32} strokeWidth={2} />
+              <div className="w-16 h-16 rounded-3xl bg-orange-100 text-orange-600 flex items-center justify-center mx-auto mb-4 overflow-hidden shadow-lg shadow-orange-500/20">
+                 {selectedType?.image ? (
+                   <img src={selectedType.image} alt="Store type" className="w-full h-full object-cover" />
+                 ) : (
+                   <FinalIconComp size={32} strokeWidth={2} />
+                 )}
               </div>
               <h2 className="text-xl font-bold text-slate-800">{storeDetails.storeName}</h2>
               <p className="text-orange-600 font-semibold text-sm mt-1">{selectedType?.name} • {storeDetails.city || 'Ready for business'}</p>

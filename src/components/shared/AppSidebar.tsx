@@ -15,15 +15,15 @@ import { getStoreType } from '@/lib/storeTypes';
 import { useAuth } from '@/components/providers/AuthProvider';
 
 const navItems = [
-  { href: '/dashboard',    icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/billing',      icon: ShoppingCart,    label: 'New Sale' },
-  { href: '/inventory',    icon: Package,         label: 'Inventory' },
-  { href: '/customers',    icon: Users,           label: 'Customers' },
-  { href: '/reports',      icon: BarChart3,       label: 'Reports' },
-  { href: '/suppliers',    icon: Truck,           label: 'Suppliers' },
-  { href: '/employees',    icon: Users2,          label: 'Team' },
-  { href: '/ai-assistant', icon: Sparkles,        label: 'AI Assistant', badge: 'AI' },
-  { href: '/settings',     icon: Settings,        label: 'Settings' },
+  { href: '/dashboard',    image: '/images/icons/home.jpg', label: 'Dashboard' },
+  { href: '/billing',      image: '/images/icons/billing.jpg', label: 'New Sale' },
+  { href: '/inventory',    image: '/images/icons/stock.jpg', label: 'Inventory' },
+  { href: '/customers',    image: '/images/icons/customers.jpg', label: 'Customers' },
+  { href: '/reports',      icon: BarChart3, label: 'Reports' },
+  { href: '/suppliers',    image: '/images/icons/suppliers.jpg', label: 'Suppliers' },
+  { href: '/employees',    image: '/images/icons/team.jpg', label: 'Team' },
+  { href: '/ai-assistant', image: '/images/retailbot.jpg', label: 'AI Assistant', badge: 'AI' },
+  { href: '/settings',     image: '/images/icons/settings.jpg', label: 'Settings' },
   { href: 'mailto:support@retailos.in', icon: MessageCircle, label: 'Contact Us' },
 ];
 
@@ -76,9 +76,9 @@ export function AppSidebar() {
         {/* Logo */}
         <div className="flex items-center justify-between p-6 border-b border-amber-100 flex-shrink-0 bg-white/50 backdrop-blur-md">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20"
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 overflow-hidden"
               style={{ background: 'linear-gradient(135deg, #fbbf24, #f97316)' }}>
-              <Zap size={20} className="text-white" fill="white" />
+              <img src="/images/icons/setup.jpg" alt="Logo" className="w-full h-full object-cover" />
             </div>
             <div>
               <div className="text-slate-800 font-extrabold text-base tracking-tight leading-none">RetailOS</div>
@@ -93,11 +93,8 @@ export function AppSidebar() {
         {/* Store info */}
         <div className="px-6 py-5 border-b border-amber-100 flex-shrink-0 bg-white/30">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center shadow-sm">
-              {(() => {
-                const IconComponent = (LucideIcons as any)[storeIcon] || LucideIcons.Store;
-                return <IconComponent size={20} className="text-orange-600" strokeWidth={2.5} />;
-              })()}
+            <div className="w-10 h-10 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center shadow-sm overflow-hidden">
+              <img src="/images/icons/home.jpg" alt="Store" className="w-full h-full object-cover" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-slate-800 text-sm font-bold leading-tight truncate">{storeName}</p>
@@ -133,7 +130,18 @@ export function AppSidebar() {
                   {isActive && (
                     <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
                   )}
-                  <item.icon size={20} className={cn("transition-colors", isActive ? "text-white" : "text-slate-400 group-hover:text-orange-500")} />
+                  {item.image ? (
+                    <img 
+                      src={item.image} 
+                      alt={item.label} 
+                      className={cn(
+                        "w-7 h-7 object-cover rounded-lg shadow-sm transition-all",
+                        isActive ? "ring-2 ring-white/50 scale-105" : "group-hover:scale-105 opacity-90 group-hover:opacity-100"
+                      )} 
+                    />
+                  ) : (
+                    item.icon && <item.icon size={20} className={cn("transition-colors", isActive ? "text-white" : "text-slate-400 group-hover:text-orange-500")} />
+                  )}
                   <span className="text-[15px] font-bold tracking-tight z-10">{item.label}</span>
                   {item.badge && (
                     <span className={cn(

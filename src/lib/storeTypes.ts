@@ -5,6 +5,7 @@ export interface StoreType {
   id: string;
   name: string;
   iconName: string;
+  image?: string;
   description: string;
   categories: string[];
   units: string[];
@@ -21,6 +22,7 @@ export const STORE_TYPES: Record<string, StoreType> = {
     id: 'medical',
     name: 'Medical / Pharmacy',
     iconName: 'Pill',
+    image: '/images/icons/medical.jpg',
     description: 'Medicines, OTC products, surgical items',
     categories: ['Medicines (Prescription)', 'OTC / Over-the-Counter', 'Surgical & Devices', 'Cosmetics & Skincare', 'Baby & Infant Care', 'Vitamins & Supplements', 'Ayurvedic', 'Homeopathic', 'Health Equipment'],
     units: ['Strip', 'Bottle', 'Box', 'Sachet', 'Piece', 'Pack', 'Vial', 'Tube', 'Kg', 'Litre'],
@@ -36,6 +38,7 @@ export const STORE_TYPES: Record<string, StoreType> = {
     id: 'grocery',
     name: 'Grocery / Kirana',
     iconName: 'ShoppingCart',
+    image: '/images/icons/grocery.jpg',
     description: 'Grocery, FMCG, daily essentials',
     categories: ['Grains & Pulses', 'Dairy & Eggs', 'Snacks & Namkeen', 'Beverages & Drinks', 'Cleaning Supplies', 'Personal Care', 'Frozen & Chilled', 'Condiments & Spices', 'Oil & Ghee', 'Ready to Cook'],
     units: ['Kg', 'Litre', 'Packet', 'Box', 'Piece', 'Bundle', 'Dozen', 'Gram', 'Ml'],
@@ -51,6 +54,7 @@ export const STORE_TYPES: Record<string, StoreType> = {
     id: 'electronics',
     name: 'Electronics / Mobile',
     iconName: 'Smartphone',
+    image: '/images/icons/settings.jpg',
     description: 'Electronics, mobiles, accessories, repairs',
     categories: ['Smartphones', 'Mobile Accessories', 'Laptops & Computers', 'Audio & Headphones', 'Tablets', 'Cables & Chargers', 'Smart Devices', 'Batteries & Power Banks', 'Repair Parts', 'Gaming'],
     units: ['Piece', 'Box', 'Set', 'Pair', 'Unit'],
@@ -66,6 +70,7 @@ export const STORE_TYPES: Record<string, StoreType> = {
     id: 'clothing',
     name: 'Clothing / Textiles',
     iconName: 'Shirt',
+    image: '/images/icons/customers.jpg',
     description: 'Garments, fabrics, fashion accessories',
     categories: ['Men\'s Wear', 'Women\'s Wear', 'Kids\' Wear', 'Ethnic / Traditional', 'Footwear', 'Accessories & Bags', 'Fabrics & Sarees', 'Undergarments', 'Sports Wear', 'Seasonal / Festive'],
     units: ['Piece', 'Set', 'Pair', 'Meter', 'Dozen'],
@@ -81,6 +86,7 @@ export const STORE_TYPES: Record<string, StoreType> = {
     id: 'hardware',
     name: 'Hardware / Tools',
     iconName: 'Wrench',
+    image: '/images/icons/settings.jpg',
     description: 'Construction materials, tools, plumbing, electrical',
     categories: ['Hand Tools', 'Power Tools', 'Plumbing Fittings', 'Electrical Items', 'Paint & Primer', 'Safety Equipment', 'Fasteners & Adhesives', 'Pipes & Fittings', 'Tiles & Flooring', 'Wood & Timber'],
     units: ['Piece', 'Box', 'Kg', 'Litre', 'Meter', 'Set', 'Roll', 'Bundle'],
@@ -96,6 +102,7 @@ export const STORE_TYPES: Record<string, StoreType> = {
     id: 'bakery',
     name: 'Bakery / Food',
     iconName: 'Coffee',
+    image: '/images/icons/home.jpg',
     description: 'Baked goods, sweets, snacks, restaurant',
     categories: ['Breads & Buns', 'Cakes & Pastries', 'Sweets & Mithai', 'Namkeen & Savory', 'Chocolates', 'Dry Fruits', 'Ice Cream', 'Beverages', 'Fresh Produce', 'Ready-to-Eat'],
     units: ['Piece', 'Kg', 'Box', 'Packet', 'Dozen', 'Gram', 'Litre'],
@@ -111,6 +118,7 @@ export const STORE_TYPES: Record<string, StoreType> = {
     id: 'stationery',
     name: 'Stationery / Books',
     iconName: 'BookOpen',
+    image: '/images/icons/setup.jpg',
     description: 'Books, stationery, art supplies, school items',
     categories: ['Books & Textbooks', 'Notebooks & Diaries', 'Pens & Pencils', 'Art & Craft', 'Office Supplies', 'Printer & Ink', 'School Bags', 'Educational Toys', 'Exam Materials', 'Gifts & Cards'],
     units: ['Piece', 'Set', 'Box', 'Pack', 'Dozen', 'Bundle'],
@@ -126,6 +134,7 @@ export const STORE_TYPES: Record<string, StoreType> = {
     id: 'general',
     name: 'General Store',
     iconName: 'Store',
+    image: '/images/icons/home.jpg',
     description: 'Multi-category general merchandise',
     categories: ['Grocery', 'Hygiene', 'Beverages', 'Snacks', 'Cleaning', 'Electronics', 'Clothing', 'Stationery', 'Hardware', 'Other'],
     units: ['Piece', 'Kg', 'Litre', 'Box', 'Packet', 'Set'],
@@ -141,6 +150,7 @@ export const STORE_TYPES: Record<string, StoreType> = {
     id: 'wholesale',
     name: 'Wholesale / Distribution',
     iconName: 'Package',
+    image: '/images/icons/stock.jpg',
     description: 'Wholesale trading, bulk supply, distribution',
     categories: ['FMCG Goods', 'Medicines', 'Electronics', 'Clothing & Textiles', 'Food Products', 'Industrial Goods', 'Agricultural Products', 'Building Materials'],
     units: ['Case', 'Carton', 'Pallet', 'Kg', 'Litre', 'Bundle', 'Dozen'],

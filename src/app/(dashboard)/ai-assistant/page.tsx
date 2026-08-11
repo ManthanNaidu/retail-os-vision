@@ -81,89 +81,34 @@ function BotCharacter({ isTyping }: { isTyping: boolean }) {
   return (
     <motion.div 
       className="relative flex items-center justify-center mx-auto mb-2"
-      animate={{ y: [0, -8, 0] }}
+      animate={{ y: [0, -10, 0] }}
       transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
     >
       {/* Glow effect */}
       <motion.div 
         className="absolute inset-0 rounded-full blur-2xl z-0"
-        style={{ background: 'var(--primary)', opacity: 0.2 }}
-        animate={{ scale: isTyping ? [1, 1.2, 1] : 1, opacity: isTyping ? [0.2, 0.4, 0.2] : 0.2 }}
+        style={{ background: 'var(--primary)', opacity: 0.15 }}
+        animate={{ scale: isTyping ? [1, 1.2, 1] : 1, opacity: isTyping ? [0.15, 0.3, 0.15] : 0.15 }}
         transition={{ duration: 1.5, repeat: Infinity }}
       />
       
-      {/* Bot Body */}
-      <div className="relative z-10 flex flex-col items-center">
-        {/* Antenna */}
-        <motion.div className="w-1 h-3 bg-amber-300 rounded-t-full" />
-        <motion.div 
-          className="w-3 h-3 bg-orange-500 rounded-full mb-[-2px] z-20"
-          animate={isTyping ? { backgroundColor: ['#f97316', '#fcd34d', '#f97316'], scale: [1, 1.2, 1] } : {}}
-          transition={{ duration: 0.8, repeat: Infinity }}
-        />
-        
-        {/* Head */}
-        <motion.div 
-          className="w-20 h-16 rounded-3xl flex items-center justify-center shadow-lg overflow-hidden relative"
-          style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', border: '2px solid #fff' }}
-          animate={isTyping ? { rotate: [-2, 2, -2] } : { rotate: 0 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
-        >
-          {/* Shine effect */}
-          <div className="absolute top-1 left-2 w-4 h-4 rounded-full bg-white/30 blur-[2px]" />
-          
-          {/* Eyes Container */}
-          <div className="flex gap-3 relative z-10 mt-1">
-            {/* Left Eye */}
-            <motion.div 
-              className="w-3.5 h-4.5 bg-white rounded-full flex items-center justify-center overflow-hidden"
-              animate={isTyping ? { 
-                scaleY: [1, 1, 1, 0.1, 1], // Blink
-                scaleX: [1, 1.1, 1] // Thinking widen
-              } : {
-                scaleY: [1, 1, 1, 1, 1, 0.1, 1] // Random blink
-              }}
-              transition={{ duration: isTyping ? 1.5 : 4, repeat: Infinity }}
-            >
-              <motion.div 
-                className="w-1.5 h-1.5 bg-orange-800 rounded-full"
-                animate={isTyping ? { x: [-1, 1, -1] } : {}}
-                transition={{ duration: 0.5, repeat: Infinity }}
-              />
-            </motion.div>
-            
-            {/* Right Eye */}
-            <motion.div 
-              className="w-3.5 h-4.5 bg-white rounded-full flex items-center justify-center overflow-hidden"
-              animate={isTyping ? { 
-                scaleY: [1, 1, 1, 0.1, 1], 
-                scaleX: [1, 1.1, 1] 
-              } : {
-                scaleY: [1, 1, 1, 1, 1, 0.1, 1] 
-              }}
-              transition={{ duration: isTyping ? 1.5 : 4, repeat: Infinity }}
-            >
-              <motion.div 
-                className="w-1.5 h-1.5 bg-orange-800 rounded-full"
-                animate={isTyping ? { x: [-1, 1, -1] } : {}}
-                transition={{ duration: 0.5, repeat: Infinity }}
-              />
-            </motion.div>
-          </div>
-
-          {/* Mouth (only shows when happy/typing) */}
-          <AnimatePresence>
-            {isTyping && (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0 }}
-                className="absolute bottom-2 left-1/2 -translate-x-1/2 w-3 h-1.5 bg-orange-800/80 rounded-b-full"
-              />
-            )}
-          </AnimatePresence>
-        </motion.div>
-      </div>
+      {/* Character Image */}
+      <motion.img 
+        src="/images/retailbot.jpg"
+        alt="RetailBot AI"
+        className="relative z-10 w-24 h-24 object-cover rounded-full shadow-lg border-2 border-white"
+        animate={isTyping ? { 
+          scale: [1, 1.05, 1],
+          rotate: [-3, 3, -3]
+        } : {
+          rotate: [-1, 1, -1]
+        }}
+        transition={{ 
+          duration: isTyping ? 1.5 : 4, 
+          repeat: Infinity, 
+          ease: "easeInOut" 
+        }}
+      />
     </motion.div>
   );
 }

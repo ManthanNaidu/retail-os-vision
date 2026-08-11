@@ -117,7 +117,7 @@ export default function DashboardPage() {
     if (!isClient) return null; // Prevent hydration errors
 
     return (
-        <div className="has-bottom-nav" style={{ background: '#F4F6FA', minHeight: '100vh', maxWidth: '480px', margin: '0 auto', position: 'relative' }}>
+        <div className="has-bottom-nav" style={{ background: '#fffdf8', minHeight: '100vh', maxWidth: '480px', margin: '0 auto', position: 'relative' }}>
             {/* Header */}
             <div className="gradient-primary" style={{ padding: '20px 20px 60px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -166,9 +166,7 @@ export default function DashboardPage() {
                         {/* Quick Actions Grid */}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
                             <motion.div whileTap={{ scale: 0.97 }} onClick={() => router.push('/billing')} style={{ background: 'white', borderRadius: 16, padding: 20, border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: 12, cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                                <div style={{ width: 44, height: 44, borderRadius: 12, background: '#fef3c7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <ShoppingCart size={22} style={{ color: '#f59e0b' }} />
-                                </div>
+                                <img src="/images/icons/billing.jpg" alt="New Sale" style={{ width: 48, height: 48, borderRadius: 12, objectFit: 'cover' }} />
                                 <div>
                                     <p style={{ fontWeight: 700, fontSize: 15, color: '#111827', margin: 0 }}>New Sale</p>
                                     <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2, margin: 0 }}>Create invoice</p>
@@ -176,9 +174,7 @@ export default function DashboardPage() {
                             </motion.div>
                             
                             <motion.div whileTap={{ scale: 0.97 }} onClick={() => router.push('/inventory')} style={{ background: 'white', borderRadius: 16, padding: 20, border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: 12, cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                                <div style={{ width: 44, height: 44, borderRadius: 12, background: '#F5F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <Package size={22} style={{ color: '#7C3AED' }} />
-                                </div>
+                                <img src="/images/icons/stock.jpg" alt="Inventory" style={{ width: 48, height: 48, borderRadius: 12, objectFit: 'cover' }} />
                                 <div>
                                     <p style={{ fontWeight: 700, fontSize: 15, color: '#111827', margin: 0 }}>Inventory</p>
                                     <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2, margin: 0 }}>Manage stock</p>
@@ -186,9 +182,7 @@ export default function DashboardPage() {
                             </motion.div>
                             
                             <motion.div whileTap={{ scale: 0.97 }} onClick={() => router.push('/customers')} style={{ background: 'white', borderRadius: 16, padding: 20, border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: 12, cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                                <div style={{ width: 44, height: 44, borderRadius: 12, background: '#ECFDF5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <Users size={22} style={{ color: '#059669' }} />
-                                </div>
+                                <img src="/images/icons/customers.jpg" alt="Customers" style={{ width: 48, height: 48, borderRadius: 12, objectFit: 'cover' }} />
                                 <div>
                                     <p style={{ fontWeight: 700, fontSize: 15, color: '#111827', margin: 0 }}>Customers</p>
                                     <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2, margin: 0 }}>View directory</p>
@@ -196,9 +190,7 @@ export default function DashboardPage() {
                             </motion.div>
                             
                             <motion.div whileTap={{ scale: 0.97 }} onClick={() => router.push('/reports')} style={{ background: 'white', borderRadius: 16, padding: 20, border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: 12, cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                                <div style={{ width: 44, height: 44, borderRadius: 12, background: '#FFFBEB', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <BarChart3 size={22} style={{ color: '#D97706' }} />
-                                </div>
+                                <img src="/images/icons/team.jpg" alt="Reports" style={{ width: 48, height: 48, borderRadius: 12, objectFit: 'cover' }} />
                                 <div>
                                     <p style={{ fontWeight: 700, fontSize: 15, color: '#111827', margin: 0 }}>Reports</p>
                                     <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2, margin: 0 }}>Store analytics</p>
