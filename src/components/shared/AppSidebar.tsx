@@ -14,7 +14,15 @@ import { cn } from '@/lib/utils';
 import { getStoreType } from '@/lib/storeTypes';
 import { useAuth } from '@/components/providers/AuthProvider';
 
-const navItems = [
+type NavItem = {
+  href: string;
+  label: string;
+  image?: string;
+  icon?: any;
+  badge?: string;
+};
+
+const navItems: NavItem[] = [
   { href: '/dashboard',    image: '/images/icons/home.jpg', label: 'Dashboard' },
   { href: '/billing',      image: '/images/icons/billing.jpg', label: 'New Sale' },
   { href: '/inventory',    image: '/images/icons/stock.jpg', label: 'Inventory' },
