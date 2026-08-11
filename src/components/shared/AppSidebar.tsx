@@ -8,6 +8,7 @@ import {
   LayoutDashboard, ShoppingCart, Package, Users, BarChart3,
   Truck, Users2, Sparkles, Settings, X, Zap, LogOut, Store, MessageCircle
 } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { cn } from '@/lib/utils';
 import { getStoreType } from '@/lib/storeTypes';
@@ -32,7 +33,7 @@ export function AppSidebar() {
   const { sidebarOpen, toggleSidebar } = useAppStore();
   const [storeName, setStoreName] = useState('Your Store');
   const [storeType, setStoreType] = useState('');
-  const [storeEmoji, setStoreEmoji] = useState('🏪');
+  const [storeIcon, setStoreIcon] = useState('Store');
 
   useEffect(() => {
     try {
@@ -41,7 +42,7 @@ export function AppSidebar() {
       if (profile.storeType) {
         const type = getStoreType(profile.storeType);
         setStoreType(type.name);
-        setStoreEmoji(type.emoji);
+        setStoreIcon(type.iconName);
       }
     } catch {}
   }, []);
@@ -92,8 +93,11 @@ export function AppSidebar() {
         {/* Store info */}
         <div className="px-6 py-5 border-b border-amber-100 flex-shrink-0 bg-white/30">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center text-xl shadow-sm">
-              {storeEmoji}
+            <div className="w-10 h-10 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center shadow-sm">
+              {(() => {
+                const IconComponent = (LucideIcons as any)[storeIcon] || LucideIcons.Store;
+                return <IconComponent size={20} className="text-orange-600" strokeWidth={2.5} />;
+              })()}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-slate-800 text-sm font-bold leading-tight truncate">{storeName}</p>
