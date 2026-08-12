@@ -210,7 +210,7 @@ export default function DashboardPage() {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
                         {[
                             { name: 'New Sale', sub: 'Create invoice', img: '/images/icons/billing.jpg', path: '/billing' },
-                            { name: 'Inventory', sub: 'Manage stock', img: '/images/icons/stock.jpg', path: '/inventory' },
+                            { name: 'Inventory', sub: 'Manage stock', img: '/images/icons/inventory_icon.jpg', path: '/inventory' },
                             { name: 'Customers', sub: 'View directory', img: '/images/icons/customers.jpg', path: '/customers' },
                             { name: 'Reports', sub: 'Store analytics', img: '/images/icons/team.jpg', path: '/reports' }
                         ].map(item => (

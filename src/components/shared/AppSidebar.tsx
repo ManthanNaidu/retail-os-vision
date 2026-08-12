@@ -20,11 +20,11 @@ type NavItem = {
 const navItems: NavItem[] = [
   { href: '/dashboard',    image: '/images/icons/home.jpg', label: 'Dashboard' },
   { href: '/billing',      image: '/images/icons/billing.jpg', label: 'New Sale' },
-  { href: '/inventory',    image: '/images/icons/stock.jpg', label: 'Inventory' },
+  { href: '/inventory',    image: '/images/icons/inventory_icon.jpg', label: 'Inventory' },
   { href: '/customers',    image: '/images/icons/customers.jpg', label: 'Customers' },
   { href: '/reports',      image: '/images/icons/icon_reports.jpg', label: 'Reports' },
   { href: '/suppliers',    image: '/images/icons/suppliers.jpg', label: 'Suppliers' },
-  { href: '/employees',    image: '/images/icons/team.jpg', label: 'Team' },
+  { href: '/employees',    image: '/images/icons/team_icon.jpg', label: 'Team' },
   { href: '/ai-assistant', image: '/images/retailbot.jpg', label: 'AI Assistant', badge: 'AI' },
   { href: '/settings',     image: '/images/icons/settings.jpg', label: 'Settings' },
   { href: 'mailto:support@retailos.in', image: '/images/icons/icon_contact.jpg', label: 'Contact Us' },
