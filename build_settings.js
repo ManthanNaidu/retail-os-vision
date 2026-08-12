@@ -1,3 +1,6 @@
+const fs = require('fs');
+
+const code = `
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -7,9 +10,8 @@ import {
   Phone, MapPin, Edit2, Download, Trash2, MessageCircle, 
   ExternalLink, ChevronRight, Package, Users, DollarSign, Crown,
   Bell, ChevronLeft, Wallet, Box, Bot, ShieldCheck, FileText,
-  AlertCircle, LogOut, ArrowRight
+  AlertCircle, LogOut, ArrowRight, ArrowLeft
 } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { getStoreTypeList } from '@/lib/storeTypes';
 import { ConfirmDelete } from '@/components/shared/ConfirmDelete';
@@ -214,18 +216,18 @@ const SettingsPage = () => {
   const SettingsRow = ({ icon: Icon, color, bg, title, subtitle, badge, onClick, danger = false }: any) => (
     <div 
       onClick={onClick}
-      className={`flex items-center gap-4 p-4 cursor-pointer transition-colors ${danger ? 'hover:bg-red-50' : 'hover:bg-slate-50'}`}
+      className={\`flex items-center gap-4 p-4 cursor-pointer transition-colors \${danger ? 'hover:bg-red-50' : 'hover:bg-slate-50'}\`}
     >
-      <div className={`w-10 h-10 rounded-[12px] flex items-center justify-center shrink-0 ${danger ? 'bg-red-50 text-red-500' : bg}`}>
-        <Icon className={`w-5 h-5 ${danger ? 'text-red-500' : color}`} strokeWidth={1.5} />
+      <div className={\`w-10 h-10 rounded-[12px] flex items-center justify-center shrink-0 \${danger ? 'bg-red-50 text-red-500' : bg}\`}>
+        <Icon className={\`w-5 h-5 \${danger ? 'text-red-500' : color}\`} strokeWidth={1.5} />
       </div>
       <div className="flex-1 min-w-0">
-        <h4 className={`text-[15px] font-bold leading-tight mb-0.5 ${danger ? 'text-red-600' : 'text-[#101B35]'}`}>{title}</h4>
+        <h4 className={\`text-[15px] font-bold leading-tight mb-0.5 \${danger ? 'text-red-600' : 'text-[#101B35]'}\`}>{title}</h4>
         {subtitle && <p className="text-[13px] text-[#64748B] font-medium truncate">{subtitle}</p>}
       </div>
       <div className="flex items-center gap-2 shrink-0">
         {badge && (
-          <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${badge.style === 'orange' ? 'bg-orange-50 text-orange-600' : 'bg-purple-50 text-purple-600'}`}>
+          <span className={\`text-[11px] font-bold px-2 py-0.5 rounded-full \${badge.style === 'orange' ? 'bg-orange-50 text-orange-600' : 'bg-purple-50 text-purple-600'}\`}>
             {badge.text}
           </span>
         )}
@@ -235,7 +237,7 @@ const SettingsPage = () => {
   );
 
   const SectionCard = ({ children, className = '' }: any) => (
-    <div className={`bg-white border border-[#E8ECF2] rounded-[24px] overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.02)] ${className}`}>
+    <div className={\`bg-white border border-[#E8ECF2] rounded-[24px] overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.02)] \${className}\`}>
       {children}
     </div>
   );
@@ -602,7 +604,7 @@ const SettingsPage = () => {
 
       </div>
 
-      <div className="absolute bottom-[60px] left-0 w-full p-4 bg-white border-t border-[#E8ECF2] shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-20">
+      <div className="absolute bottom-0 left-0 w-full p-4 bg-white border-t border-[#E8ECF2] shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-20">
         <button 
           onClick={handleProfileSave}
           className="w-full h-[56px] bg-gradient-to-r from-[#FF7A00] to-[#FF4D00] hover:from-[#FF6B00] hover:to-[#E64500] text-white font-bold text-[16px] rounded-[16px] shadow-[0_4px_14px_rgba(255,122,0,0.25)] transition-all active:scale-[0.98]"
@@ -629,7 +631,7 @@ const SettingsPage = () => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 py-6 custom-scrollbar space-y-6 pb-[100px]">
+      <div className="flex-1 overflow-y-auto px-5 py-6 custom-scrollbar space-y-6">
         
         <div className="bg-white border border-[#E8ECF2] rounded-[20px] p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] space-y-5">
           <div className="flex items-center gap-3 mb-2">
@@ -824,3 +826,6 @@ const SettingsPage = () => {
 };
 
 export default SettingsPage;
+\`;
+
+fs.writeFileSync('src/app/(dashboard)/settings/page.tsx', code);
