@@ -116,7 +116,7 @@ export default function EmployeesPage() {
     <div className="page-enter has-bottom-nav" style={{ minHeight: '100vh', background: '#F4F6FA', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       
       {/* Orange Hero Section */}
-      <div style={{ background: '#E65C00', paddingBottom: '32px', borderBottomLeftRadius: '24px', borderBottomRightRadius: '24px' }}>
+      <div style={{ background: '#f96c03', paddingBottom: '32px', borderBottomLeftRadius: '24px', borderBottomRightRadius: '24px' }}>
         
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px' }}>
@@ -130,7 +130,7 @@ export default function EmployeesPage() {
                 <div style={{ position: 'relative', cursor: 'pointer' }}>
                     <Bell size={22} color="white" />
                     {unreadCount > 0 && (
-                        <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '16px', height: '16px', background: '#EF4444', color: 'white', fontSize: '10px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', border: '2px solid #E65C00' }}>
+                        <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '16px', height: '16px', background: '#EF4444', color: 'white', fontSize: '10px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', border: '2px solid #f96c03' }}>
                             {unreadCount}
                         </div>
                     )}

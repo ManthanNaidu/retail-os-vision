@@ -129,7 +129,7 @@ export default function SetupPage() {
               <p className="text-slate-500 text-sm font-medium">Choose your store type to customize RetailOS for your business.</p>
             </div>
             
-            <div className="grid grid-cols-2 gap-4 mb-6 overflow-y-auto pr-2 custom-scrollbar">
+            <div className="grid grid-cols-2 gap-3 overflow-y-auto pr-2 flex-1 custom-scrollbar pb-32">
               {storeTypes.map(type => {
                 const IconComp = (LucideIcons as any)[type.iconName] || LucideIcons.Store;
                 const isSelected = selectedType?.id === type.id;
@@ -163,17 +163,17 @@ export default function SetupPage() {
               })}
             </div>
             
-            <div className="mt-auto pt-2 pb-8 bg-white z-10">
+            <div className="fixed bottom-0 left-0 w-full bg-white z-50 p-4 border-t border-amber-100 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
               <button
                 onClick={handleNext}
                 disabled={!selectedType}
-                className={`w-full py-4 rounded-2xl font-bold text-white shadow-lg flex items-center justify-center transition-all text-[15px] ${
+                className={`w-full py-6 rounded-2xl font-bold text-white shadow-xl flex items-center justify-center transition-all text-xl ${
                   selectedType 
                     ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:shadow-orange-500/25 active:scale-[0.98]' 
                     : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
                 }`}
               >
-                Continue <ArrowRight className="ml-2 w-5 h-5" />
+                Continue <ArrowRight className="ml-2 w-6 h-6" />
               </button>
             </div>
           </motion.div>
@@ -193,7 +193,7 @@ export default function SetupPage() {
               <p className="text-slate-500 text-sm font-medium">Let's set up your business profile.</p>
             </div>
             
-            <div className="space-y-4 mb-4 overflow-y-auto pr-2 flex-1 custom-scrollbar pb-10">
+            <div className="space-y-4 mb-4 overflow-y-auto pr-2 flex-1 custom-scrollbar pb-32">
               
               {/* Box 1: Core Details */}
               <div className="bg-[#fffdf8] border border-amber-100 rounded-2xl p-4 shadow-sm">
@@ -333,23 +333,23 @@ export default function SetupPage() {
 
             </div>
             
-            <div className="flex gap-3 mt-auto pt-4 pb-8 border-t border-amber-100 bg-white">
+            <div className="fixed bottom-0 left-0 w-full flex gap-3 p-4 border-t border-amber-100 bg-white shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-50">
               <button
                 onClick={handleBack}
-                className="px-6 py-4 rounded-2xl font-bold text-slate-600 bg-amber-50 hover:bg-amber-100 active:scale-[0.98] transition-all"
+                className="px-8 py-6 rounded-2xl font-bold text-slate-600 bg-amber-50 hover:bg-amber-100 active:scale-[0.98] transition-all text-lg"
               >
                 Back
               </button>
               <button
                 onClick={handleComplete}
                 disabled={loading || !storeDetails.storeName || !storeDetails.ownerName}
-                className={`flex-1 py-4 rounded-2xl font-bold text-white shadow-lg flex items-center justify-center transition-all text-[15px] ${
+                className={`flex-1 py-6 rounded-2xl font-bold text-white shadow-xl flex items-center justify-center transition-all text-xl ${
                   storeDetails.storeName && storeDetails.ownerName && !loading
                     ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:shadow-orange-500/25 active:scale-[0.98]' 
                     : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
                 }`}
               >
-                {loading ? 'Setting up...' : 'Finish Setup'} {!loading && <Check className="ml-2 w-5 h-5" />}
+                {loading ? 'Setting up...' : 'Finish Setup'} {!loading && <Check className="ml-2 w-6 h-6" />}
               </button>
             </div>
           </motion.div>
