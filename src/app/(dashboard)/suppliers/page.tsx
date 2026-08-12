@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Phone, Star, Plus, X, Search, Check,
-  Edit2, CreditCard, Factory, Package, MessageCircle, Trash2
+  Phone, Star, Plus, X, Search, Check, Menu, Bell,
+  Edit2, CreditCard, Factory, Package, MessageCircle, Trash2, Users
 } from 'lucide-react';
+import { useAppStore } from '@/stores/appStore';
 import { formatCurrency } from '@/lib/utils';
 import { ConfirmDelete } from '@/components/shared/ConfirmDelete';
 
@@ -124,6 +125,10 @@ export default function SuppliersPage() {
   const totalOutstanding = suppliers.reduce((sum, sup) => sum + sup.outstandingAmount, 0);
   const totalOrders = suppliers.reduce((sum, sup) => sum + sup.totalOrders, 0);
 
+  const notifications = useAppStore(s => s.notifications);
+  const sectionNotifications = notifications.filter(n => !n.section || n.section === '/suppliers');
+  const unreadCount = sectionNotifications.filter(n => !n.isRead).length;
+
   const handleSave = (s: Supplier) => {
     if (editingSupplier) setSuppliers(prev => prev.map(x => x.id === s.id ? s : x));
     else setSuppliers(prev => [s, ...prev]);
@@ -138,114 +143,144 @@ export default function SuppliersPage() {
   };
 
   return (
-    <div className="page-enter has-bottom-nav">
-      <div className="page-container py-5">
+    <div className="page-enter has-bottom-nav" style={{ minHeight: '100vh', background: '#F4F6FA', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      
+      {/* Orange Hero Section */}
+      <div style={{ background: 'linear-gradient(135deg, #FF7B00 0%, #FF5500 100%)', paddingBottom: '32px', borderBottomLeftRadius: '24px', borderBottomRightRadius: '24px' }}>
         
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Suppliers</h1>
-            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Manage your vendors</p>
-          </div>
-          <button 
-            onClick={() => { setEditingSupplier(undefined); setShowForm(true); }}
-            className="btn-primary h-10 px-4 rounded-xl flex items-center gap-2 text-sm font-semibold">
-            <Plus size={16} /> Add
-          </button>
-        </div>
-
-        {/* Search */}
-        <div className="relative mb-6">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
-          <input 
-            className="input-premium !pl-[40px] w-full h-12" 
-            placeholder="Search suppliers..." 
-            value={search} 
-            onChange={e => setSearch(e.target.value)} 
-          />
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-3 mb-8">
-          <div className="card p-3 text-center">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2" style={{ background: 'var(--primary-light)' }}>
-              <Factory size={16} style={{ color: 'var(--primary)' }} />
-            </div>
-            <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{suppliers.length}</p>
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Suppliers</p>
-          </div>
-          <div className="card p-3 text-center">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2" style={{ background: 'rgba(59, 130, 246, 0.1)' }}>
-              <Package size={16} style={{ color: '#3b82f6' }} />
-            </div>
-            <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{totalOrders}</p>
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Orders</p>
-          </div>
-          <div className="card p-3 text-center">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2" style={{ background: 'rgba(239, 68, 68, 0.1)' }}>
-              <CreditCard size={16} style={{ color: '#ef4444' }} />
-            </div>
-            <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{formatCurrency(totalOutstanding)}</p>
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Outstanding</p>
-          </div>
-        </div>
-
-        {/* List */}
-        <p className="section-header">All Suppliers</p>
-        <div className="space-y-3">
-          {filtered.map(supplier => (
-            <div key={supplier.id} className="list-item flex flex-col gap-3 p-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-bold text-base mb-1" style={{ color: 'var(--text-primary)' }}>{supplier.name}</h3>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: 'var(--primary-light)', color: 'var(--primary)' }}>
-                      {supplier.category}
-                    </span>
-                    <div className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
-                      <Phone size={12} /> {supplier.phone}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-col items-end gap-1">
-                  <div className="flex items-center gap-1 text-sm font-bold" style={{ color: '#f59e0b' }}>
-                    <Star size={14} fill="currentColor" /> {supplier.rating}
-                  </div>
-                  <p className="text-xs font-semibold" style={{ color: supplier.outstandingAmount > 0 ? '#ef4444' : '#10b981' }}>
-                    {supplier.outstandingAmount > 0 ? `Due: ${formatCurrency(supplier.outstandingAmount)}` : 'Clear'}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex gap-2 mt-2 pt-3 border-t" style={{ borderColor: 'var(--border)' }}>
-                <a 
-                  href={`https://wa.me/91${supplier.phone}?text=Hello ${supplier.contactPerson},`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 flex items-center justify-center gap-1.5 h-9 rounded-xl text-xs font-semibold text-white"
-                  style={{ background: '#22c55e' }}>
-                  <MessageCircle size={14} /> WhatsApp
-                </a>
-                <button 
-                  onClick={() => { setEditingSupplier(supplier); setShowForm(true); }}
-                  className="flex-1 flex items-center justify-center gap-1.5 h-9 rounded-xl text-xs font-semibold"
-                  style={{ background: 'var(--bg-pearl)', color: 'var(--text-secondary)' }}>
-                  <Edit2 size={14} /> Edit
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <button onClick={() => useAppStore.getState().toggleSidebar()} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                    <Menu size={24} color="white" />
                 </button>
-                <button 
-                  onClick={() => setSupplierToDelete(supplier)}
-                  className="w-10 flex items-center justify-center h-9 rounded-xl"
-                  style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>
-                  <Trash2 size={14} />
-                </button>
-              </div>
             </div>
-          ))}
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div style={{ position: 'relative', cursor: 'pointer' }}>
+                    <Bell size={22} color="white" />
+                    {unreadCount > 0 && (
+                        <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '16px', height: '16px', background: '#EF4444', color: 'white', fontSize: '10px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', border: '2px solid #FF5500' }}>
+                            {unreadCount}
+                        </div>
+                    )}
+                </div>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FF6B00', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}>
+                    U
+                </div>
+            </div>
         </div>
 
+        {/* Hero Content */}
+        <div style={{ padding: '0 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
+            <div style={{ zIndex: 10, maxWidth: '60%' }}>
+                <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '12px', fontWeight: 600, margin: '0 0 2px' }}>Suppliers</p>
+                <h2 style={{ color: 'white', fontSize: '28px', fontWeight: 800, lineHeight: 1.1, margin: '0 0 4px' }}>
+                    Manage your vendors
+                </h2>
+                
+                <button onClick={() => { setEditingSupplier(undefined); setShowForm(true); }} style={{ background: 'white', color: '#FF6B00', border: 'none', padding: '10px 20px', borderRadius: '12px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', marginTop: '16px' }}>
+                    <Plus size={18} /> Add Supplier
+                </button>
+            </div>
+            
+            <img src="/images/suppliers_banner.jpg" alt="Suppliers" style={{ position: 'absolute', right: '-20px', top: '-10px', width: '220px', height: 'auto', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+        </div>
       </div>
 
-      <AnimatePresence>
+      {/* Stats Cards - Overlapping the banner */}
+      <div style={{ padding: '0 16px', marginTop: '-24px', position: 'relative', zIndex: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+              <div style={{ background: 'white', padding: '16px', borderRadius: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#FFF7ED', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
+                      <Users size={16} color="#EA580C" />
+                  </div>
+                  <p style={{ fontSize: '11px', color: '#6B7280', margin: '0 0 4px', fontWeight: 600 }}>Total Suppliers</p>
+                  <p style={{ fontSize: '20px', fontWeight: 800, color: '#111827', margin: 0 }}>{suppliers.length}</p>
+              </div>
+              <div style={{ background: 'white', padding: '16px', borderRadius: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
+                      <Package size={16} color="#3B82F6" />
+                  </div>
+                  <p style={{ fontSize: '11px', color: '#6B7280', margin: '0 0 4px', fontWeight: 600 }}>Total Orders</p>
+                  <p style={{ fontSize: '20px', fontWeight: 800, color: '#111827', margin: 0 }}>{totalOrders}</p>
+              </div>
+              <div style={{ background: 'white', padding: '16px', borderRadius: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#FEF2F2', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
+                      <CreditCard size={16} color="#EF4444" />
+                  </div>
+                  <p style={{ fontSize: '11px', color: '#6B7280', margin: '0 0 4px', fontWeight: 600 }}>Total Outstanding</p>
+                  <p style={{ fontSize: '16px', fontWeight: 800, color: '#111827', margin: 0 }}>{formatCurrency(totalOutstanding)}</p>
+              </div>
+          </div>
+      </div>
+
+        <div className="px-4 mb-6 mt-6">
+          <div className="relative">
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: '#9CA3AF' }} />
+            <input 
+              type="text"
+              placeholder="Search suppliers..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full pl-11 pr-4 py-3.5 rounded-xl text-sm font-medium focus:outline-none"
+              style={{ background: 'white', border: 'none', color: '#111827', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}
+            />
+          </div>
+        </div>
+
+        <div className="px-4 mb-4">
+          <p style={{ fontSize: '12px', fontWeight: 800, color: '#F97316', letterSpacing: '0.05em', textTransform: 'uppercase' }}>All Suppliers</p>
+        </div>
+
+        <div className="px-4 space-y-3 pb-24">
+          {filtered.map(supplier => (
+              <div key={supplier.id} style={{ background: 'white', borderRadius: '16px', padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.03)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#FFF7ED', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#EA580C', fontWeight: 'bold', fontSize: '18px', flexShrink: 0 }}>
+                      <Factory size={24} />
+                    </div>
+                    <div>
+                      <p style={{ fontSize: '15px', fontWeight: 700, color: '#111827', margin: 0 }}>{supplier.name}</p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '2px 0 4px' }}>
+                          <span style={{ fontSize: '10px', fontWeight: 700, color: '#EA580C' }}>{supplier.category}</span>
+                          <span style={{ fontSize: '11px', color: '#6B7280', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <Phone size={10} /> {supplier.phone}
+                          </span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 800, color: '#F59E0B', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Star size={12} fill="currentColor" /> {supplier.rating}
+                    </div>
+                    <p style={{ fontSize: '11px', fontWeight: 700, color: supplier.outstandingAmount > 0 ? '#EF4444' : '#10B981', margin: 0 }}>
+                      {supplier.outstandingAmount > 0 ? `Due: ${formatCurrency(supplier.outstandingAmount)}` : 'Clear'}
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <a 
+                    href={`https://wa.me/91${supplier.phone}?text=Hello ${supplier.contactPerson},`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ flex: 1.2, height: '36px', borderRadius: '10px', border: '1px solid #D1FAE5', background: '#22C55E', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '12px', fontWeight: 700, textDecoration: 'none' }}>
+                    <MessageCircle size={14} /> WhatsApp
+                  </a>
+                  <button onClick={() => { setEditingSupplier(supplier); setShowForm(true); }} style={{ flex: 1, height: '36px', borderRadius: '10px', border: '1px solid #F3F4F6', background: 'white', color: '#4B5563', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '12px', fontWeight: 600 }}>
+                    <Edit2 size={14} /> Edit
+                  </button>
+                  <button onClick={() => setSupplierToDelete(supplier)} style={{ width: '36px', height: '36px', flexShrink: 0, borderRadius: '10px', border: '1px solid #FEE2E2', background: '#FEF2F2', color: '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+          ))}
+        </div>
+        <AnimatePresence>
         {showForm && (
           <SupplierForm 
             supplier={editingSupplier} 

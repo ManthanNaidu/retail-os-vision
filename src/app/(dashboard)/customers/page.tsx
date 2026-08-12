@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, Plus, X, Phone, MessageCircle, CreditCard,
   Star, Edit2, Trash2, Check, Users, TrendingUp,
-  Send, ChevronRight, Gift, Tag, Radio
+  Send, ChevronRight, Gift, Tag, Radio, Menu, Bell, Shield, Wallet
 } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { Customer } from '@/types';
@@ -379,53 +379,56 @@ function CustomerRow({ customer, onEdit, onDelete, onWhatsApp, index }: {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.04 }}
-      className="list-item"
+      style={{ background: 'white', borderRadius: '20px', padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.03)', display: 'flex', flexDirection: 'column', gap: '16px' }}
     >
-      {/* Avatar */}
-      <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-        style={{ background: 'var(--primary)' }}>
-        {customer.name.charAt(0)}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              {/* Avatar */}
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3B82F6', fontSize: '16px', fontWeight: 'bold' }}>
+                  {customer.name.charAt(0)}
+              </div>
+              
+              {/* Info */}
+              <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <p style={{ fontSize: '15px', fontWeight: 700, color: '#111827', margin: 0 }}>{customer.name}</p>
+                      <span style={{ fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '100px', background: seg.bg, color: seg.color }}>
+                          {customer.segment}
+                      </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '4px' }}>
+                      <p style={{ fontSize: '12px', color: '#6B7280', margin: 0 }}>+91 {customer.phone}</p>
+                      {customer.loyaltyPoints > 0 && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <Star size={12} color="#F59E0B" fill="#F59E0B" />
+                              <span style={{ fontSize: '12px', fontWeight: 600, color: '#D97706' }}>{customer.loyaltyPoints} pts</span>
+                          </div>
+                      )}
+                  </div>
+              </div>
+          </div>
+          
+          <div style={{ textAlign: 'right' }}>
+              <p style={{ fontSize: '15px', fontWeight: 700, color: customer.creditBalance > 0 ? '#EF4444' : '#10B981', margin: 0 }}>
+                  {customer.creditBalance > 0 ? formatCurrency(customer.creditBalance) : '₹0'}
+              </p>
+              <p style={{ fontSize: '11px', color: '#6B7280', margin: 0, fontWeight: 500 }}>
+                  {customer.creditBalance > 0 ? 'Due' : 'No Due'}
+              </p>
+          </div>
       </div>
 
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <p className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{customer.name}</p>
-          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
-            style={{ background: seg.bg, color: seg.color }}>{customer.segment}</span>
-        </div>
-        <div className="flex items-center gap-3 mt-0.5">
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>+91 {customer.phone}</p>
-          {customer.creditBalance > 0 && (
-            <p className="text-xs font-semibold text-red-500">Due: {formatCurrency(customer.creditBalance)}</p>
-          )}
-          {customer.loyaltyPoints > 0 && (
-            <p className="text-xs font-semibold text-amber-600">{customer.loyaltyPoints} pts</p>
-          )}
-        </div>
+      <div style={{ display: 'flex', gap: '12px' }}>
+          <button onClick={onWhatsApp} style={{ flex: 1, height: '36px', borderRadius: '12px', border: '1px solid #D1FAE5', background: '#F0FDF4', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
+              <MessageCircle size={15} />
+          </button>
+          <button onClick={onEdit} style={{ flex: 1, height: '36px', borderRadius: '12px', border: '1px solid #FEF3C7', background: '#FFFBEB', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
+              <Edit2 size={15} />
+          </button>
+          <button onClick={onDelete} style={{ flex: 1, height: '36px', borderRadius: '12px', border: '1px solid #FEE2E2', background: '#FEF2F2', color: '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
+              <Trash2 size={15} />
+          </button>
       </div>
-
-      {/* WhatsApp — prominent green button */}
-      <button onClick={onWhatsApp}
-        className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all hover:scale-110 active:scale-95"
-        style={{ background: '#25D366' }}
-        title="Send WhatsApp message">
-        <MessageCircle size={16} className="text-white" />
-      </button>
-
-      {/* Edit */}
-      <button onClick={onEdit}
-        className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 hover:bg-blue-50 transition-colors"
-        style={{ border: '1px solid var(--border)' }}>
-        <Edit2 size={13} style={{ color: 'var(--primary)' }} />
-      </button>
-
-      {/* Delete */}
-      <button onClick={onDelete}
-        className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 hover:bg-red-50 transition-colors"
-        style={{ border: '1px solid var(--border)' }}>
-        <Trash2 size={13} className="text-red-400" />
-      </button>
     </motion.div>
   );
 }
@@ -439,6 +442,11 @@ export default function CustomersPage() {
   const [editCustomer, setEditCustomer] = useState<Customer | undefined>();
   const [deleteTarget, setDeleteTarget] = useState<Customer | null>(null);
   const [showBroadcast, setShowBroadcast] = useState(false);
+
+  // Notifications filtering for this page
+  const notifications = useAppStore(s => s.notifications);
+  const sectionNotifications = notifications.filter(n => !n.section || n.section === '/customers');
+  const unreadCount = sectionNotifications.filter(n => !n.isRead).length;
 
   const filtered = useMemo(() => {
     let list = customers;
@@ -482,92 +490,137 @@ export default function CustomersPage() {
   ];
 
   return (
-    <div className="page-enter has-bottom-nav">
-      <div className="page-container py-5">
+    <div className="has-bottom-nav" style={{ minHeight: '100vh', background: '#F4F6FA', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', background: '#F4F6FA' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <button onClick={() => useAppStore.getState().toggleSidebar()} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                  <Menu size={24} color="#111827" />
+              </button>
+              <h1 style={{ fontSize: '20px', fontWeight: 800, color: '#111827', margin: 0 }}>Customers</h1>
+          </div>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{ position: 'relative', cursor: 'pointer' }}>
+                  <Bell size={22} color="#111827" />
+                  {unreadCount > 0 && (
+                      <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '16px', height: '16px', background: '#EF4444', color: 'white', fontSize: '10px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', border: '2px solid #F4F6FA' }}>
+                          {unreadCount}
+                      </div>
+                  )}
+              </div>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#F97316', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}>
+                  U
+              </div>
+          </div>
+      </div>
 
-        {/* Header */}
-        <div className="flex items-center justify-between mb-5">
+      <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '100px' }}>
+          
+          {/* Hero Banner */}
+          <div style={{ background: 'linear-gradient(135deg, #E0E7FF 0%, #C7D2FE 100%)', borderRadius: '16px', padding: '24px 20px', position: 'relative', overflow: 'hidden', boxShadow: '0 10px 25px -5px rgba(199, 210, 254, 0.5)' }}>
+              <div style={{ position: 'relative', zIndex: 10, maxWidth: '65%' }}>
+                  <h2 style={{ color: '#111827', fontSize: '18px', fontWeight: 800, lineHeight: 1.2, margin: '0 0 4px' }}>
+                      Customers Overview
+                  </h2>
+                  <p style={{ color: '#4B5563', fontSize: '12px', fontWeight: 500, margin: '0 0 20px' }}>
+                      Manage and build relationships
+                  </p>
+                  
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                      <button onClick={() => setShowBroadcast(true)} style={{ background: '#22C55E', color: 'white', border: 'none', padding: '10px 16px', borderRadius: '12px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', flex: 1, justifyContent: 'center', boxShadow: '0 4px 6px rgba(34, 197, 94, 0.2)' }}>
+                          <Radio size={16} /> Broadcast
+                      </button>
+                      <button onClick={() => { setEditCustomer(undefined); setShowForm(true); }} style={{ background: '#F97316', color: 'white', border: 'none', padding: '10px 16px', borderRadius: '12px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', flex: 1, justifyContent: 'center', boxShadow: '0 4px 6px rgba(249, 115, 22, 0.2)' }}>
+                          <Plus size={16} /> Add Customer
+                      </button>
+                  </div>
+              </div>
+              <img src="/images/icons/customers.jpg" alt="Customers" style={{ position: 'absolute', right: '-10px', bottom: '-10px', width: '150px', height: '150px', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+          </div>
+
+          {/* Stats Row */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+              <div style={{ background: 'white', padding: '16px', borderRadius: '16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
+                      <Users size={16} color="#3B82F6" />
+                  </div>
+                  <p style={{ fontSize: '11px', color: '#6B7280', margin: '0 0 4px', fontWeight: 600 }}>Total</p>
+                  <p style={{ fontSize: '20px', fontWeight: 800, color: '#111827', margin: 0 }}>{stats.total}</p>
+              </div>
+              <div style={{ background: 'white', padding: '16px', borderRadius: '16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#F3E8FF', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
+                      <Shield size={16} color="#A855F7" />
+                  </div>
+                  <p style={{ fontSize: '11px', color: '#6B7280', margin: '0 0 4px', fontWeight: 600 }}>VIP Members</p>
+                  <p style={{ fontSize: '20px', fontWeight: 800, color: '#111827', margin: 0 }}>{stats.vip}</p>
+              </div>
+              <div style={{ background: 'white', padding: '16px', borderRadius: '16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#FEF2F2', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
+                      <Wallet size={16} color="#EF4444" />
+                  </div>
+                  <p style={{ fontSize: '11px', color: '#6B7280', margin: '0 0 4px', fontWeight: 600 }}>Credit Due</p>
+                  <p style={{ fontSize: '16px', fontWeight: 800, color: '#EF4444', margin: 0 }}>{formatCurrency(stats.totalCredit)}</p>
+              </div>
+          </div>
+
+          {/* Search & Filters */}
           <div>
-            <h1 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>Customers</h1>
-            <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-              {stats.total} customers · {stats.withCredit} with pending credit
-            </p>
+              <div style={{ position: 'relative', marginBottom: '16px' }}>
+                  <Search size={18} color="#9CA3AF" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)' }} />
+                  <input 
+                      type="text" 
+                      placeholder="Search by name or phone..." 
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      style={{ width: '100%', padding: '14px 16px 14px 44px', borderRadius: '16px', border: '1px solid #F3F4F6', outline: 'none', fontSize: '14px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)', background: 'white' }}
+                  />
+              </div>
+              
+              <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none', msOverflowStyle: 'none' }} className="hide-scrollbar">
+                  {SEGMENT_TABS.map(tab => (
+                      <button
+                          key={tab.key}
+                          onClick={() => setSegmentFilter(tab.key)}
+                          style={{
+                              padding: '8px 16px',
+                              borderRadius: '100px',
+                              fontSize: '13px',
+                              fontWeight: 600,
+                              whiteSpace: 'nowrap',
+                              border: 'none',
+                              background: segmentFilter === tab.key ? '#F97316' : '#F3F4F6',
+                              color: segmentFilter === tab.key ? 'white' : '#4B5563',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s'
+                          }}
+                      >
+                          {tab.label}
+                      </button>
+                  ))}
+              </div>
           </div>
-          <div className="flex gap-2">
-            {/* WhatsApp Broadcast — prominent green */}
-            <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.95 }}
-              onClick={() => setShowBroadcast(true)}
-              className="flex items-center gap-2 !py-2.5 !px-4 text-sm font-bold rounded-full text-white"
-              style={{ background: '#25D366', boxShadow: '0 4px 16px rgba(37,211,102,0.35)' }}>
-              <Radio size={15} /> Broadcast
-            </motion.button>
-            <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.95 }}
-              onClick={() => { setEditCustomer(undefined); setShowForm(true); }}
-              className="btn-primary !py-2.5 !px-4 text-sm flex items-center gap-2">
-              <Plus size={16} /> Add
-            </motion.button>
-          </div>
-        </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-2.5 mb-5">
-          {[
-            { label: 'Total', value: stats.total, color: 'var(--primary)', bg: 'var(--primary-light)' },
-            { label: 'VIP Members', value: stats.vip, color: '#d97706', bg: '#fef3c7' },
-            { label: 'Credit Due', value: formatCurrency(stats.totalCredit), color: '#dc2626', bg: '#fee2e2', small: true },
-          ].map((s, i) => (
-            <div key={i} className="rounded-2xl p-3 text-center" style={{ background: s.bg }}>
-              <p className={`font-bold ${s.small ? 'text-base' : 'text-xl'}`} style={{ color: s.color }}>{s.value}</p>
-              <p className="text-[11px] mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Search */}
-        <div className="relative mb-3">
-          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
-          <input className="input-premium !pl-[36px] text-sm" placeholder="Search by name or phone..."
-            value={search} onChange={e => setSearch(e.target.value)} />
-        </div>
-
-        {/* Segment filter tabs */}
-        <div className="flex gap-2 overflow-x-auto pb-2 mb-4" style={{ scrollbarWidth: 'none' }}>
-          {SEGMENT_TABS.map(tab => (
-            <button key={tab.key} onClick={() => setSegmentFilter(tab.key)}
-              className="flex-shrink-0 text-xs font-semibold px-3.5 py-1.5 rounded-full border transition-all"
-              style={{
-                background: segmentFilter === tab.key ? 'var(--primary)' : 'white',
-                color: segmentFilter === tab.key ? 'white' : 'var(--text-secondary)',
-                borderColor: segmentFilter === tab.key ? 'var(--primary)' : 'var(--border)',
-              }}>
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Customer list */}
-        <div className="space-y-2">
-          {filtered.length === 0 ? (
-            <div className="text-center py-12">
-              <Users size={40} className="mx-auto mb-3" style={{ color: 'var(--text-muted)' }} />
-              <p className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
-                {search ? 'No customers match your search' : 'No customers yet'}
-              </p>
-              {!search && (
-                <button onClick={() => setShowForm(true)}
-                  className="btn-primary mt-4 !px-6 !py-2.5 text-sm">Add First Customer</button>
+          {/* Customer List */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {filtered.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+                      <Users size={40} style={{ color: '#D1D5DB', margin: '0 auto 12px' }} />
+                      <p style={{ color: '#6B7280', fontSize: 14, margin: 0 }}>
+                          {search ? 'No customers match your search.' : 'No customers yet.'}
+                      </p>
+                  </div>
+              ) : (
+                  filtered.map((c, i) => (
+                      <CustomerRow key={c.id} customer={c} index={i}
+                          onEdit={() => { setEditCustomer(c); setShowForm(true); }}
+                          onDelete={() => setDeleteTarget(c)}
+                          onWhatsApp={() => sendDirectWhatsApp(c)}
+                      />
+                  ))
               )}
-            </div>
-          ) : (
-            filtered.map((c, i) => (
-              <CustomerRow key={c.id} customer={c} index={i}
-                onEdit={() => { setEditCustomer(c); setShowForm(true); }}
-                onDelete={() => setDeleteTarget(c)}
-                onWhatsApp={() => sendDirectWhatsApp(c)}
-              />
-            ))
-          )}
-        </div>
+          </div>
       </div>
 
       <AnimatePresence>

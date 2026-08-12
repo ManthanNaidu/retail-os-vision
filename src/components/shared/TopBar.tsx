@@ -7,15 +7,22 @@ import { useAppStore } from '@/stores/appStore';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { formatTime } from '@/lib/utils';
 import { cn } from '@/lib/utils';
+import { usePathname, useRouter } from 'next/navigation';
 
 interface TopBarProps {
   title?: string;
 }
 
-export function TopBar({ title }: TopBarProps) {
-  const { notifications, unreadCount, toggleSidebar, markNotificationRead, markAllRead } = useAppStore();
+export function TopBar({ title }: { title: string }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { notifications, markNotificationRead, markAllRead, toggleSidebar } = useAppStore();
   const { user } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
+
+  // Filter notifications based on the current section
+  const sectionNotifications = notifications.filter(n => !n.section || n.section === pathname);
+  const unreadCount = sectionNotifications.filter(n => !n.isRead).length;
   
   const initial = user?.displayName ? user.displayName.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'U');
 
@@ -120,7 +127,7 @@ export function TopBar({ title }: TopBarProps) {
                     </button>
                   </div>
                   <div className="max-h-80 overflow-y-auto">
-                    {notifications.map(n => {
+                    {sectionNotifications.map(n => {
                       const meta = typeColors[n.type];
                       const IconComp = meta.icon;
                       return (

@@ -11,7 +11,9 @@ import { getStoreType } from '@/lib/storeTypes';
 
 export default function DashboardPage() {
     const router = useRouter();
-    const { products, sales, customers, notifications, unreadCount, markNotificationRead, markAllRead, addNotification } = useAppStore();
+    const { products, sales, customers, notifications, markNotificationRead, markAllRead, addNotification } = useAppStore();
+    const unreadCount = notifications.filter(n => !n.isRead && (!n.section || n.section === '/dashboard')).length;
+    const sectionNotifications = notifications.filter(n => !n.section || n.section === '/dashboard');
     
     const [ownerName, setOwnerName] = useState('Store Owner');
     const [storeCategory, setStoreCategory] = useState('Grocery / Kirana Store');
@@ -51,12 +53,12 @@ export default function DashboardPage() {
             if (stock === 0) {
                 const notifId = `out-of-stock-${p.id}`;
                 if (!existingAlertIds.includes(notifId)) {
-                    addNotification({ id: notifId, type: 'danger', title: 'Out of Stock', message: `${p.name} is completely out of stock.`, createdAt: new Date().toISOString(), isRead: false });
+                    addNotification({ id: notifId, type: 'danger', title: 'Out of Stock', message: `${p.name} is completely out of stock.`, createdAt: new Date().toISOString(), isRead: false, section: '/dashboard' });
                 }
             } else if (stock <= minStock) {
                 const notifId = `low-stock-${p.id}`;
                 if (!existingAlertIds.includes(notifId)) {
-                    addNotification({ id: notifId, type: 'warning', title: 'Low Stock Alert', message: `${p.name} is running low (${stock} left).`, createdAt: new Date().toISOString(), isRead: false });
+                    addNotification({ id: notifId, type: 'warning', title: 'Low Stock Alert', message: `${p.name} is running low (${stock} left).`, createdAt: new Date().toISOString(), isRead: false, section: '/dashboard' });
                 }
             }
         });
@@ -182,7 +184,7 @@ export default function DashboardPage() {
             <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '100px' }}>
                 
                 {/* Hero Banner */}
-                <div style={{ background: 'linear-gradient(100deg, #f97316 0%, #f59e0b 100%)', borderRadius: '16px', padding: '24px 20px', position: 'relative', overflow: 'hidden', boxShadow: '0 10px 25px -5px rgba(245, 158, 11, 0.4)' }}>
+                <div style={{ background: '#F6851D', borderRadius: '16px', padding: '24px 20px', position: 'relative', overflow: 'hidden', boxShadow: '0 10px 25px -5px rgba(246, 133, 29, 0.4)' }}>
                     <div style={{ position: 'relative', zIndex: 10, maxWidth: '65%' }}>
                         <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '13px', fontWeight: 500, marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                             {greeting}, {ownerName}! {isDay ? '☀️' : '🌙'}
@@ -196,7 +198,7 @@ export default function DashboardPage() {
                             <ChevronRight size={14} color="white" />
                         </div>
                     </div>
-                    <img src="/images/logo.jpg" alt="RetailOS" style={{ position: 'absolute', right: '-10px', bottom: '-10px', width: '140px', height: '140px', objectFit: 'contain', mixBlendMode: 'multiply', opacity: 0.9 }} />
+                    <img src="/images/icons/home-banner.jpg" alt="RetailOS" style={{ position: 'absolute', right: '-10px', bottom: '-10px', width: '180px', height: '180px', objectFit: 'contain' }} />
                 </div>
 
                 {/* Quick Actions */}
@@ -398,25 +400,25 @@ export default function DashboardPage() {
                 </div>
             </div>
             
-            {/* Notifications Dropdown (Same as before) */}
+            {/* Notifications Dropdown */}
             <AnimatePresence>
                 {showNotifications && (
                     <>
-                        <div style={{ position: 'fixed', inset: 0, zIndex: 40 }} onClick={() => setShowNotifications(false)} />
+                        <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)} />
                         <motion.div
                             initial={{ opacity: 0, y: -10, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                            style={{ position: 'absolute', top: 56, right: 20, width: 320, background: 'white', borderRadius: 20, zIndex: 50, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)', overflow: 'hidden', border: '1px solid #E5E7EB' }}
+                            className="absolute top-12 right-0 w-80 bg-white rounded-2xl shadow-xl z-50 border border-slate-100 overflow-hidden"
                         >
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid #E5E7EB' }}>
                                 <span style={{ fontWeight: 600, fontSize: 14, color: '#111827' }}>Notifications</span>
                                 <button onClick={markAllRead} style={{ fontSize: 12, fontWeight: 500, color: '#f59e0b', background: 'none', border: 'none', cursor: 'pointer' }}>Mark all read</button>
                             </div>
                             <div style={{ maxHeight: 320, overflowY: 'auto' }}>
-                                {notifications.length === 0 ? (
+                                {sectionNotifications.length === 0 ? (
                                     <div style={{ padding: 24, textAlign: 'center', color: '#6B7280', fontSize: 13 }}>No new notifications</div>
-                                ) : notifications.map(n => {
+                                ) : sectionNotifications.map(n => {
                                     const meta = n.type === 'danger' ? { bg: '#fee2e2', color: '#991b1b', icon: AlertTriangle } 
                                         : n.type === 'warning' ? { bg: '#fef3c7', color: '#92400e', icon: AlertTriangle }
                                         : { bg: '#d1fae5', color: '#065f46', icon: CheckCircle };

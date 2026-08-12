@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Plus, X, Check, Search, Phone,
+  Plus, X, Check, Search, Phone, Menu, Bell,
   Edit2, Trash2, Users, DollarSign, UserCheck, UserX, Umbrella
 } from 'lucide-react';
+import { useAppStore } from '@/stores/appStore';
 import { formatCurrency } from '@/lib/utils';
 import { ConfirmDelete } from '@/components/shared/ConfirmDelete';
 
@@ -101,6 +102,10 @@ export default function EmployeesPage() {
   const totalPayroll = employees.reduce((s, e) => s + e.salary, 0);
   const presentToday = employees.filter(e => e.status === 'active').length;
 
+  const notifications = useAppStore(s => s.notifications);
+  const sectionNotifications = notifications.filter(n => !n.section || n.section === '/employees');
+  const unreadCount = sectionNotifications.filter(n => !n.isRead).length;
+
   const getStatusConfig = (status: string) => {
     if (status === 'active') return { label: 'Present', bg: '#d1fae5', color: '#065f46', icon: UserCheck };
     if (status === 'absent') return { label: 'Absent', bg: '#fee2e2', color: '#991b1b', icon: UserX };
@@ -108,91 +113,134 @@ export default function EmployeesPage() {
   };
 
   return (
-    <div className="page-enter has-bottom-nav">
-      <div className="page-container py-5">
-        <div className="flex justify-between items-center mb-6 px-4">
-          <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Employees</h1>
-            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Manage your team members</p>
-          </div>
-          <button onClick={() => openForm()} className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold" style={{ background: 'var(--primary)' }}>
-            <Plus size={20} />
-          </button>
+    <div className="page-enter has-bottom-nav" style={{ minHeight: '100vh', background: '#F4F6FA', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      
+      {/* Orange Hero Section */}
+      <div style={{ background: 'linear-gradient(135deg, #FF7B00 0%, #FF5500 100%)', paddingBottom: '32px', borderBottomLeftRadius: '24px', borderBottomRightRadius: '24px' }}>
+        
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <button onClick={() => useAppStore.getState().toggleSidebar()} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                    <Menu size={24} color="white" />
+                </button>
+            </div>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div style={{ position: 'relative', cursor: 'pointer' }}>
+                    <Bell size={22} color="white" />
+                    {unreadCount > 0 && (
+                        <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '16px', height: '16px', background: '#EF4444', color: 'white', fontSize: '10px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', border: '2px solid #FF5500' }}>
+                            {unreadCount}
+                        </div>
+                    )}
+                </div>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FF6B00', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}>
+                    U
+                </div>
+            </div>
         </div>
 
-        <div className="px-4 mb-6">
-          <div className="grid grid-cols-3 gap-3">
-            <div className="p-3 rounded-2xl flex flex-col items-center text-center border" style={{ background: 'var(--bg-pearl)', borderColor: 'var(--border)' }}>
-              <Users size={18} className="mb-1" style={{ color: 'var(--primary)' }} />
-              <p className="text-xs font-semibold mb-0.5" style={{ color: 'var(--text-secondary)' }}>Total Staff</p>
-              <p className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>{employees.length}</p>
+        {/* Hero Content */}
+        <div style={{ padding: '0 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
+            <div style={{ zIndex: 10, maxWidth: '60%' }}>
+                <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '12px', fontWeight: 600, margin: '0 0 2px' }}>Team</p>
+                <h2 style={{ color: 'white', fontSize: '28px', fontWeight: 800, lineHeight: 1.1, margin: '0 0 4px' }}>
+                    Employees
+                </h2>
+                <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '13px', fontWeight: 500, margin: '0 0 16px' }}>
+                    Manage your team members
+                </p>
+                
+                <button onClick={() => openForm()} style={{ background: 'white', color: '#FF6B00', border: 'none', padding: '10px 20px', borderRadius: '12px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                    <Plus size={18} /> Add Employee
+                </button>
             </div>
-            <div className="p-3 rounded-2xl flex flex-col items-center text-center border" style={{ background: 'var(--bg-pearl)', borderColor: 'var(--border)' }}>
-              <UserCheck size={18} className="mb-1 text-green-600" />
-              <p className="text-xs font-semibold mb-0.5" style={{ color: 'var(--text-secondary)' }}>Present Today</p>
-              <p className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>{presentToday}</p>
-            </div>
-            <div className="p-3 rounded-2xl flex flex-col items-center text-center border" style={{ background: 'var(--bg-pearl)', borderColor: 'var(--border)' }}>
-              <DollarSign size={18} className="mb-1 text-amber-600" />
-              <p className="text-xs font-semibold mb-0.5" style={{ color: 'var(--text-secondary)' }}>Total Payroll</p>
-              <p className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>{formatCurrency(totalPayroll)}</p>
-            </div>
-          </div>
+            
+            <img src="/images/team_banner.jpg" alt="Team" style={{ position: 'absolute', right: '-20px', top: '-10px', width: '220px', height: 'auto', objectFit: 'contain', mixBlendMode: 'multiply' }} />
         </div>
+      </div>
 
-        <div className="px-4 mb-6">
+      {/* Stats Cards - Overlapping the banner */}
+      <div style={{ padding: '0 16px', marginTop: '-24px', position: 'relative', zIndex: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+              <div style={{ background: 'white', padding: '16px', borderRadius: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#FFF7ED', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
+                      <Users size={16} color="#EA580C" />
+                  </div>
+                  <p style={{ fontSize: '11px', color: '#6B7280', margin: '0 0 4px', fontWeight: 600 }}>Total Staff</p>
+                  <p style={{ fontSize: '20px', fontWeight: 800, color: '#111827', margin: 0 }}>{employees.length}</p>
+              </div>
+              <div style={{ background: 'white', padding: '16px', borderRadius: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#F0FDF4', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
+                      <UserCheck size={16} color="#16A34A" />
+                  </div>
+                  <p style={{ fontSize: '11px', color: '#6B7280', margin: '0 0 4px', fontWeight: 600 }}>Present Today</p>
+                  <p style={{ fontSize: '20px', fontWeight: 800, color: '#111827', margin: 0 }}>{presentToday}</p>
+              </div>
+              <div style={{ background: 'white', padding: '16px', borderRadius: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#EEF2FF', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
+                      <DollarSign size={16} color="#4F46E5" />
+                  </div>
+                  <p style={{ fontSize: '11px', color: '#6B7280', margin: '0 0 4px', fontWeight: 600 }}>Total Payroll</p>
+                  <p style={{ fontSize: '16px', fontWeight: 800, color: '#111827', margin: 0 }}>{formatCurrency(totalPayroll)}</p>
+              </div>
+          </div>
+      </div>
+
+        <div className="px-4 mb-6 mt-6">
           <div className="relative">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: '#9CA3AF' }} />
             <input 
               type="text"
               placeholder="Search employees..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full !pl-[40px] pr-4 py-3 rounded-xl border text-sm focus:outline-none"
-              style={{ background: 'var(--bg-pearl)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+              className="w-full pl-11 pr-4 py-3.5 rounded-xl text-sm font-medium focus:outline-none"
+              style={{ background: 'white', border: 'none', color: '#111827', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}
             />
           </div>
         </div>
 
         <div className="px-4 mb-4">
-          <p className="section-header">Team Members</p>
+          <p style={{ fontSize: '12px', fontWeight: 800, color: '#F97316', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Team Members</p>
         </div>
 
-        <div className="px-4 space-y-3 pb-20">
+        <div className="px-4 space-y-3 pb-24">
           {filtered.map(emp => {
             const status = getStatusConfig(emp.status);
             const StatusIcon = status.icon;
             return (
-              <div key={emp.id} className="list-item flex flex-col gap-3 p-4 rounded-2xl border" style={{ background: 'white', borderColor: 'var(--border)' }}>
-                <div className="flex justify-between items-start">
-                  <div className="flex gap-3 items-center">
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0" style={{ background: 'var(--primary)' }}>
+              <div key={emp.id} style={{ background: 'white', borderRadius: '16px', padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.03)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#FFF7ED', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#EA580C', fontWeight: 'bold', fontSize: '18px', flexShrink: 0 }}>
                       {emp.name.charAt(0)}
                     </div>
                     <div>
-                      <p className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>{emp.name}</p>
-                      <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{emp.role}</p>
+                      <p style={{ fontSize: '15px', fontWeight: 700, color: '#111827', margin: 0 }}>{emp.name}</p>
+                      <p style={{ fontSize: '12px', color: '#6B7280', margin: '2px 0 4px' }}>{emp.role}</p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: '#6B7280' }}>
+                        <Phone size={10} /> {emp.phone}
+                      </div>
                     </div>
                   </div>
-                  <span className="text-[10px] px-2 py-1 rounded-full font-semibold flex items-center gap-1" style={{ background: status.bg, color: status.color }}>
-                    <StatusIcon size={10} /> {status.label}
-                  </span>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-2 my-1">
-                  <div className="flex items-center gap-1.5 text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
-                    <Phone size={12} /> {emp.phone}
-                  </div>
-                  <div className="flex items-center gap-1.5 text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>
-                    <DollarSign size={12} /> {formatCurrency(emp.salary)} / mo
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+                    <span style={{ fontSize: '10px', padding: '4px 10px', borderRadius: '100px', fontWeight: 700, background: status.bg, color: status.color, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      {status.label}
+                    </span>
+                    <div style={{ fontSize: '12px', fontWeight: 800, color: '#111827' }}>
+                      {formatCurrency(emp.salary)} <span style={{ color: '#6B7280', fontWeight: 500 }}>/ mo</span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex gap-2 pt-3 border-t mt-1" style={{ borderColor: 'var(--border)' }}>
-                  <button onClick={() => openForm(emp)} className="flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5" style={{ background: 'var(--bg-pearl)', color: 'var(--text-primary)' }}>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button onClick={() => openForm(emp)} style={{ flex: 1, height: '36px', borderRadius: '10px', border: '1px solid #F3F4F6', background: 'white', color: '#4B5563', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '12px', fontWeight: 600 }}>
                     <Edit2 size={14} /> Edit
                   </button>
-                  <button onClick={() => setEmployeeToDelete(emp)} className="flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5" style={{ background: '#fee2e2', color: '#dc2626' }}>
+                  <button onClick={() => setEmployeeToDelete(emp)} style={{ flex: 1, height: '36px', borderRadius: '10px', border: '1px solid #FEE2E2', background: '#FEF2F2', color: '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '12px', fontWeight: 600 }}>
                     <Trash2 size={14} /> Delete
                   </button>
                 </div>
@@ -279,7 +327,6 @@ export default function EmployeesPage() {
             onCancel={() => setEmployeeToDelete(undefined)}
           />
         )}
-      </div>
     </div>
   );
 }

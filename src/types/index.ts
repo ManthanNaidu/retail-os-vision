@@ -112,6 +112,7 @@ export interface Notification {
   type: 'warning' | 'success' | 'info' | 'danger';
   title: string;
   message: string;
+  section?: string; // Optional field to tie notifications to a specific page/section (e.g., '/inventory')
   createdAt: string;
   isRead: boolean;
 }

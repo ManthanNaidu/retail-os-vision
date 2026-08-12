@@ -138,12 +138,12 @@ export function AppSidebar() {
                     )}
                   >
                     {item.badge && (
-                      <span className="absolute top-2 right-2 text-[9px] px-1.5 py-0.5 rounded-md font-black tracking-widest uppercase bg-orange-100 text-orange-600 z-10 shadow-sm">
+                      <span className="absolute top-2 right-2 text-[10px] px-2 py-0.5 rounded-md font-black tracking-widest uppercase bg-orange-100 text-orange-600 z-10 shadow-sm">
                         {item.badge}
                       </span>
                     )}
                     {item.image && (
-                      <div className="w-12 h-12 mb-3 relative">
+                      <div className="w-16 h-16 mb-3 relative">
                         <img 
                           src={item.image} 
                           alt={item.label} 
@@ -151,7 +151,7 @@ export function AppSidebar() {
                         />
                       </div>
                     )}
-                    <span className="text-[12px] font-bold tracking-tight z-10 text-center leading-tight">{item.label}</span>
+                    <span className="text-[13px] font-bold tracking-tight z-10 text-center leading-tight">{item.label}</span>
                   </motion.div>
                 </Link>
               );

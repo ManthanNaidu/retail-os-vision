@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Plus, Edit2, Trash2, X, Package, AlertTriangle, FileImage, Check, ChevronDown } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, X, Package, AlertTriangle, FileImage, Check, ChevronDown, Menu, Bell, ScanLine } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { formatCurrency, getDaysUntilExpiry } from '@/lib/utils';
 import { Product } from '@/types';
@@ -21,6 +21,11 @@ export default function InventoryPage() {
   const [showScanner, setShowScanner] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  // Notifications filtering for this page
+  const notifications = useAppStore(s => s.notifications);
+  const sectionNotifications = notifications.filter(n => !n.section || n.section === '/inventory');
+  const unreadCount = sectionNotifications.filter(n => !n.isRead).length;
 
   const initialFormState: Partial<Product> = {
     name: '',
@@ -123,161 +128,174 @@ export default function InventoryPage() {
     <div className="has-bottom-nav" style={{ minHeight: '100vh', background: '#F4F6FA', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       
       {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg, #F59E0B, #F97316)', padding: '20px 20px 32px' }}>
-        <h1 style={{ color: 'white', fontSize: 22, fontWeight: 700, margin: 0 }}>Inventory</h1>
-        <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, marginTop: 4, marginBottom: 0 }}>
-          {products.length} products in stock
-        </p>
-        <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-          <button 
-            onClick={() => setShowScanner(true)} 
-            style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: '1px solid rgba(255,255,255,0.3)', padding: '8px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, flex: 1, justifyContent: 'center' }}
-          >
-            <FileImage size={15} /> Scan Invoice
-          </button>
-          <button 
-            onClick={handleOpenAdd} 
-            style={{ background: 'white', color: '#F97316', border: 'none', padding: '8px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, flex: 1, justifyContent: 'center' }}
-          >
-            <Plus size={15} /> Add Product
-          </button>
-        </div>
-      </div>
-
-      {/* Content Area */}
-      <div style={{ background: '#F4F6FA', padding: '0 16px', marginTop: -20, paddingBottom: 80, borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingTop: 20 }}>
-        
-        {/* Stats Row */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
-          <div style={{ background: 'white', padding: '12px', borderRadius: 12, boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-            <p style={{ fontSize: 11, color: '#6B7280', margin: '0 0 4px', fontWeight: 600, textTransform: 'uppercase' }}>Total</p>
-            <p style={{ fontSize: 18, fontWeight: 700, color: '#111827', margin: 0 }}>{stats.total}</p>
-          </div>
-          <div style={{ background: 'white', padding: '12px', borderRadius: 12, boxShadow: '0 1px 2px rgba(0,0,0,0.05)', borderBottom: '3px solid #F59E0B' }}>
-            <p style={{ fontSize: 11, color: '#6B7280', margin: '0 0 4px', fontWeight: 600, textTransform: 'uppercase' }}>Low Stock</p>
-            <p style={{ fontSize: 18, fontWeight: 700, color: '#F59E0B', margin: 0 }}>{stats.lowStock}</p>
-          </div>
-          <div style={{ background: 'white', padding: '12px', borderRadius: 12, boxShadow: '0 1px 2px rgba(0,0,0,0.05)', borderBottom: '3px solid #EF4444' }}>
-            <p style={{ fontSize: 11, color: '#6B7280', margin: '0 0 4px', fontWeight: 600, textTransform: 'uppercase' }}>Out of Stock</p>
-            <p style={{ fontSize: 18, fontWeight: 700, color: '#EF4444', margin: 0 }}>{stats.outOfStock}</p>
-          </div>
-        </div>
-
-        {/* Search & Filters */}
-        <div style={{ marginBottom: 20 }}>
-          <div style={{ position: 'relative', marginBottom: 16 }}>
-            <Search size={18} color="#9CA3AF" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)' }} />
-            <input 
-              type="text" 
-              placeholder="Search products by name or brand..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ width: '100%', padding: '12px 12px 12px 40px', borderRadius: 12, border: '1px solid #E5E7EB', outline: 'none', fontSize: 14, boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}
-            />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', background: '#F4F6FA' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <button onClick={() => useAppStore.getState().toggleSidebar()} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                  <Menu size={24} color="#111827" />
+              </button>
+              <h1 style={{ fontSize: '20px', fontWeight: 800, color: '#111827', margin: 0 }}>Inventory</h1>
           </div>
           
-          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, scrollbarWidth: 'none', msOverflowStyle: 'none' }} className="hide-scrollbar">
-            {allCategories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                style={{
-                  padding: '6px 14px',
-                  borderRadius: 20,
-                  fontSize: 13,
-                  fontWeight: 600,
-                  whiteSpace: 'nowrap',
-                  border: 'none',
-                  background: selectedCategory === cat ? '#F97316' : '#E5E7EB',
-                  color: selectedCategory === cat ? 'white' : '#4B5563',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-              >
-                {cat}
-              </button>
-            ))}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{ position: 'relative', cursor: 'pointer' }}>
+                  <Bell size={22} color="#111827" />
+                  {unreadCount > 0 && (
+                      <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '16px', height: '16px', background: '#EF4444', color: 'white', fontSize: '10px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', border: '2px solid #F4F6FA' }}>
+                          {unreadCount}
+                      </div>
+                  )}
+              </div>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#F97316', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}>
+                  U
+              </div>
           </div>
-        </div>
+      </div>
 
-        {/* Product List */}
-        {products.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 20px', background: 'white', borderRadius: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-            <Package size={56} style={{ color: '#D1D5DB', margin: '0 auto 16px' }} />
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 8px' }}>No Products Yet</h3>
-            <p style={{ color: '#6B7280', margin: 0, fontSize: 14, lineHeight: 1.5 }}>Add your first product or scan a distributor invoice to get started.</p>
-            <div style={{ display: 'flex', gap: 10, marginTop: 20, justifyContent: 'center' }}>
-              <button onClick={handleOpenAdd} style={{ background: '#F97316', color: 'white', border: 'none', padding: '10px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Plus size={15} /> Add Product
-              </button>
-              <button onClick={() => setShowScanner(true)} style={{ background: 'white', color: '#F97316', border: '1px solid #F97316', padding: '10px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <FileImage size={15} /> Scan Invoice
-              </button>
-            </div>
+      <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '100px' }}>
+          
+          {/* Hero Banner */}
+          <div style={{ background: '#FD5C04', borderRadius: '16px', padding: '24px 20px', position: 'relative', overflow: 'hidden', boxShadow: '0 10px 25px -5px rgba(253, 92, 4, 0.4)' }}>
+              <div style={{ position: 'relative', zIndex: 10, maxWidth: '65%' }}>
+                  <h2 style={{ color: 'white', fontSize: '18px', fontWeight: 800, lineHeight: 1.2, margin: '0 0 4px' }}>
+                      Inventory Overview
+                  </h2>
+                  <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '12px', fontWeight: 500, margin: '0 0 20px' }}>
+                      Your stock at a glance
+                  </p>
+                  
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                      <button onClick={() => setShowScanner(true)} style={{ background: 'white', color: '#FD5C04', border: 'none', padding: '10px 16px', borderRadius: '12px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', flex: 1, justifyContent: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+                          <ScanLine size={16} /> Scan Invoice
+                      </button>
+                      <button onClick={handleOpenAdd} style={{ background: 'white', color: '#FD5C04', border: 'none', padding: '10px 16px', borderRadius: '12px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', flex: 1, justifyContent: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+                          <Plus size={16} /> Add Product
+                      </button>
+                  </div>
+              </div>
+              <img src="/images/icons/inventory-banner.jpg" alt="Inventory" style={{ position: 'absolute', right: '-10px', top: '10px', width: '130px', height: '130px', objectFit: 'contain' }} />
           </div>
-        ) : filteredProducts.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-            <AlertTriangle size={40} style={{ color: '#D1D5DB', margin: '0 auto 12px' }} />
-            <p style={{ color: '#6B7280', fontSize: 14, margin: 0 }}>No products match your search.</p>
+
+          {/* Stats Row */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+              <div style={{ background: 'white', padding: '16px', borderRadius: '16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
+                      <Package size={16} color="#3B82F6" />
+                  </div>
+                  <p style={{ fontSize: '11px', color: '#6B7280', margin: '0 0 4px', fontWeight: 600 }}>Total Products</p>
+                  <p style={{ fontSize: '20px', fontWeight: 800, color: '#111827', margin: 0 }}>{stats.total}</p>
+              </div>
+              <div style={{ background: 'white', padding: '16px', borderRadius: '16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#FFF7ED', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
+                      <AlertTriangle size={16} color="#F97316" />
+                  </div>
+                  <p style={{ fontSize: '11px', color: '#6B7280', margin: '0 0 4px', fontWeight: 600 }}>Low Stock</p>
+                  <p style={{ fontSize: '20px', fontWeight: 800, color: '#111827', margin: 0 }}>{stats.lowStock}</p>
+              </div>
+              <div style={{ background: 'white', padding: '16px', borderRadius: '16px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#FEF2F2', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
+                      <X size={16} color="#EF4444" />
+                  </div>
+                  <p style={{ fontSize: '11px', color: '#6B7280', margin: '0 0 4px', fontWeight: 600 }}>Out of Stock</p>
+                  <p style={{ fontSize: '20px', fontWeight: 800, color: '#EF4444', margin: 0 }}>{stats.outOfStock}</p>
+              </div>
           </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {filteredProducts.map(product => {
-              const margin = calculateMargin(product.sellingPrice, product.purchasePrice);
-              const isLowStock = product.stock > 0 && product.stock <= (product.minStock || 5);
-              const isOutOfStock = product.stock === 0;
+
+          {/* Search & Filters */}
+          <div>
+              <div style={{ position: 'relative', marginBottom: '16px' }}>
+                  <Search size={18} color="#9CA3AF" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)' }} />
+                  <input 
+                      type="text" 
+                      placeholder="Search products by name, brand..." 
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      style={{ width: '100%', padding: '14px 16px 14px 44px', borderRadius: '16px', border: '1px solid #F3F4F6', outline: 'none', fontSize: '14px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)', background: 'white' }}
+                  />
+              </div>
               
-              return (
-                <div key={product.id} style={{ background: 'white', borderRadius: 16, padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', position: 'relative' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                      <h3 style={{ fontSize: 15, fontWeight: 700, color: '#111827', margin: '0 0 4px', paddingRight: 60 }}>{product.name}</h3>
-                      <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: 11, background: '#F3F4F6', color: '#4B5563', padding: '2px 8px', borderRadius: 4, fontWeight: 600 }}>{product.category}</span>
-                        {product.brand && <span style={{ fontSize: 11, color: '#6B7280' }}>• {product.brand}</span>}
-                      </div>
-                    </div>
-                    
-                    <div style={{ position: 'absolute', top: 16, right: 16, display: 'flex', gap: 6 }}>
-                      <button onClick={() => handleOpenEdit(product)} style={{ background: '#F3F4F6', border: 'none', width: 28, height: 28, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4B5563', cursor: 'pointer' }}>
-                        <Edit2 size={14} />
+              <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none', msOverflowStyle: 'none' }} className="hide-scrollbar">
+                  {allCategories.map(cat => (
+                      <button
+                          key={cat}
+                          onClick={() => setSelectedCategory(cat)}
+                          style={{
+                              padding: '8px 16px',
+                              borderRadius: '100px',
+                              fontSize: '13px',
+                              fontWeight: 600,
+                              whiteSpace: 'nowrap',
+                              border: 'none',
+                              background: selectedCategory === cat ? '#F97316' : '#F3F4F6',
+                              color: selectedCategory === cat ? 'white' : '#4B5563',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s'
+                          }}
+                      >
+                          {cat}
                       </button>
-                      <button onClick={() => setProductToDelete(product.id)} style={{ background: '#FEE2E2', border: 'none', width: 28, height: 28, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#EF4444', cursor: 'pointer' }}>
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginTop: 16, paddingTop: 16, borderTop: '1px dashed #E5E7EB' }}>
-                    <div>
-                      <p style={{ fontSize: 11, color: '#6B7280', margin: '0 0 2px' }}>Base Stock</p>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <p style={{ fontSize: 14, fontWeight: 700, margin: 0, color: isOutOfStock ? '#EF4444' : isLowStock ? '#F59E0B' : '#10B981' }}>
-                          {product.stock} {product.baseUnit || 'pcs'}
-                        </p>
-                        <button onClick={() => handleQuickAddStock(product)} style={{ background: '#F3F4F6', border: 'none', width: 22, height: 22, borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F97316', cursor: 'pointer', outline: 'none' }} title="Add Stock">
-                          <Plus size={12} />
-                        </button>
-                      </div>
-                    </div>
-                    <div>
-                      <p style={{ fontSize: 11, color: '#6B7280', margin: '0 0 2px' }}>Sell Price</p>
-                      <p style={{ fontSize: 14, fontWeight: 700, color: '#111827', margin: 0 }}>
-                        {formatCurrency(product.sellingPrice)} <span style={{fontSize: 10, color: '#9CA3AF', fontWeight: 'normal'}}>/ {product.sellingUnit || product.baseUnit}</span>
-                      </p>
-                    </div>
-                    <div>
-                      <p style={{ fontSize: 11, color: '#6B7280', margin: '0 0 2px' }}>Margin</p>
-                      <p style={{ fontSize: 14, fontWeight: 700, color: Number(margin) > 0 ? '#10B981' : '#6B7280', margin: 0 }}>
-                        {margin}%
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+                  ))}
+              </div>
           </div>
-        )}
+
+          {/* Product List */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {filteredProducts.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+                      <AlertTriangle size={40} style={{ color: '#D1D5DB', margin: '0 auto 12px' }} />
+                      <p style={{ color: '#6B7280', fontSize: 14, margin: 0 }}>No products match your search.</p>
+                  </div>
+              ) : (
+                  filteredProducts.map(product => {
+                      const margin = calculateMargin(product.sellingPrice, product.purchasePrice);
+                      const isLowStock = product.stock > 0 && product.stock <= (product.minStock || 5);
+                      const isOutOfStock = product.stock === 0;
+                      
+                      return (
+                          <div key={product.id} style={{ background: 'white', borderRadius: '20px', padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.03)', position: 'relative' }}>
+                              <div style={{ display: 'flex', gap: '16px' }}>
+                                  <div style={{ flex: 1 }}>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                          <div>
+                                              <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#111827', margin: '0 0 4px', paddingRight: '60px' }}>{product.name}</h3>
+                                              <span style={{ fontSize: '12px', color: '#6B7280', fontWeight: 500 }}>{product.category}</span>
+                                          </div>
+                                          <div style={{ position: 'absolute', top: '16px', right: '16px', display: 'flex', gap: '8px' }}>
+                                              <button onClick={() => handleOpenEdit(product)} style={{ background: '#F9FAFB', border: '1px solid #F3F4F6', width: '32px', height: '32px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6B7280', cursor: 'pointer' }}>
+                                                  <Edit2 size={14} />
+                                              </button>
+                                              <button onClick={() => setProductToDelete(product.id)} style={{ background: '#FEF2F2', border: 'none', width: '32px', height: '32px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#EF4444', cursor: 'pointer' }}>
+                                                  <Trash2 size={14} />
+                                              </button>
+                                          </div>
+                                      </div>
+
+                                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginTop: '16px' }}>
+                                          <div>
+                                              <p style={{ fontSize: '11px', color: '#9CA3AF', margin: '0 0 4px', fontWeight: 500 }}>Stock</p>
+                                              <p style={{ fontSize: '13px', fontWeight: 700, margin: 0, color: isOutOfStock ? '#EF4444' : isLowStock ? '#F59E0B' : '#10B981' }}>
+                                                  {product.stock} {product.baseUnit || 'Piece'}
+                                              </p>
+                                          </div>
+                                          <div>
+                                              <p style={{ fontSize: '11px', color: '#9CA3AF', margin: '0 0 4px', fontWeight: 500 }}>Sell Price</p>
+                                              <p style={{ fontSize: '14px', fontWeight: 700, color: '#111827', margin: 0 }}>
+                                                  {formatCurrency(product.sellingPrice)} <span style={{fontSize: '11px', color: '#9CA3AF', fontWeight: 'normal'}}>/ {product.sellingUnit ? product.sellingUnit.split(' ')[0].toLowerCase() : 'pc'}</span>
+                                              </p>
+                                          </div>
+                                          <div>
+                                              <p style={{ fontSize: '11px', color: '#9CA3AF', margin: '0 0 4px', fontWeight: 500 }}>Margin</p>
+                                              <p style={{ fontSize: '13px', fontWeight: 700, color: '#10B981', margin: 0 }}>
+                                                  {margin}%
+                                              </p>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      );
+                  })
+              )}
+          </div>
       </div>
 
       {/* Add/Edit Product Bottom Sheet */}
