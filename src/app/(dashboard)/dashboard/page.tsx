@@ -148,15 +148,17 @@ export default function DashboardPage() {
             
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', background: 'white' }}>
-                <button onClick={() => useAppStore.getState().toggleSidebar()} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                    <Menu size={24} color="#111827" />
-                </button>
-                
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', fontSize: '20px', fontWeight: 800, letterSpacing: '-0.5px' }}>
-                        <span style={{ color: '#111827' }}>Retail</span><span style={{ color: '#f59e0b' }}>OS</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <button onClick={() => useAppStore.getState().toggleSidebar()} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                        <Menu size={24} color="#111827" />
+                    </button>
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', fontSize: '20px', fontWeight: 800, letterSpacing: '-0.5px', lineHeight: 1.1 }}>
+                            <span style={{ color: '#111827' }}>Retail</span><span style={{ color: '#f59e0b' }}>OS</span>
+                        </div>
+                        <span style={{ fontSize: '10px', color: '#6B7280', fontWeight: 500, letterSpacing: '0.2px', marginTop: '-1px' }}>Business OS</span>
                     </div>
-                    <span style={{ fontSize: '10px', color: '#6B7280', fontWeight: 500, letterSpacing: '0.2px', marginTop: '-2px' }}>Business OS</span>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -169,7 +171,9 @@ export default function DashboardPage() {
                         )}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={() => router.push('/settings')}>
-                        <img src="/images/icons/team.jpg" alt="Profile" style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #E5E7EB' }} />
+                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #DBEAFE', color: '#3B82F6', overflow: 'hidden' }}>
+                            <img src="/images/icons/customers.jpg" alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        </div>
                         <ChevronDown size={14} color="#6B7280" />
                     </div>
                 </div>
@@ -192,7 +196,7 @@ export default function DashboardPage() {
                             <ChevronRight size={14} color="white" />
                         </div>
                     </div>
-                    <img src={storeImage} alt="Store" style={{ position: 'absolute', right: '-20px', bottom: '-20px', width: '160px', height: '160px', objectFit: 'contain', filter: 'drop-shadow(0 20px 20px rgba(0,0,0,0.2))' }} />
+                    <img src="/images/logo.jpg" alt="RetailOS" style={{ position: 'absolute', right: '-10px', bottom: '-10px', width: '140px', height: '140px', objectFit: 'contain', mixBlendMode: 'multiply', opacity: 0.9 }} />
                 </div>
 
                 {/* Quick Actions */}
