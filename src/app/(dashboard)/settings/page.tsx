@@ -358,8 +358,8 @@ const SettingsPage = () => {
 
         {/* Subscription Plan */}
         <div className="bg-[#FFF9F0] border border-[#FFEDD5] rounded-[24px] p-5 shadow-[0_4px_20px_rgba(255,122,0,0.05)] relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 opacity-20 pointer-events-none translate-x-4 -translate-y-4">
-             <img src="/images/setup_store.jpg" className="w-full h-full object-contain mix-blend-multiply" alt="Store" />
+          <div className="absolute top-0 right-0 w-32 h-32 pointer-events-none translate-x-4 -translate-y-4 z-0">
+             <img src="/images/setup_store.jpg" className="w-full h-full object-contain" alt="Store" />
           </div>
           
           <div className="flex items-start gap-4 mb-5 relative z-10">
