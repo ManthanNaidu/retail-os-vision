@@ -146,7 +146,7 @@ export default function SuppliersPage() {
     <div className="page-enter has-bottom-nav" style={{ minHeight: '100vh', background: '#F4F6FA', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       
       {/* Orange Hero Section */}
-      <div style={{ background: '#FF5A00', paddingBottom: '32px', borderBottomLeftRadius: '24px', borderBottomRightRadius: '24px' }}>
+      <div style={{ background: '#E65C00', paddingBottom: '32px', borderBottomLeftRadius: '24px', borderBottomRightRadius: '24px' }}>
         
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px' }}>
@@ -160,7 +160,7 @@ export default function SuppliersPage() {
                 <div style={{ position: 'relative', cursor: 'pointer' }}>
                     <Bell size={22} color="white" />
                     {unreadCount > 0 && (
-                        <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '16px', height: '16px', background: '#EF4444', color: 'white', fontSize: '10px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', border: '2px solid #FF5500' }}>
+                        <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '16px', height: '16px', background: '#EF4444', color: 'white', fontSize: '10px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', border: '2px solid #E65C00' }}>
                             {unreadCount}
                         </div>
                     )}
@@ -223,8 +223,8 @@ export default function SuppliersPage() {
               placeholder="Search suppliers..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full pl-11 pr-4 py-3.5 rounded-xl text-sm font-medium focus:outline-none"
-              style={{ background: 'white', border: 'none', color: '#111827', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}
+              className="w-full pr-4 py-3.5 rounded-xl text-sm font-medium focus:outline-none"
+              style={{ paddingLeft: '44px', background: 'white', border: 'none', color: '#111827', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}
             />
           </div>
         </div>

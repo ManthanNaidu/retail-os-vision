@@ -116,7 +116,7 @@ export default function EmployeesPage() {
     <div className="page-enter has-bottom-nav" style={{ minHeight: '100vh', background: '#F4F6FA', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       
       {/* Orange Hero Section */}
-      <div style={{ background: '#FF5A00', paddingBottom: '32px', borderBottomLeftRadius: '24px', borderBottomRightRadius: '24px' }}>
+      <div style={{ background: '#E65C00', paddingBottom: '32px', borderBottomLeftRadius: '24px', borderBottomRightRadius: '24px' }}>
         
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px' }}>
@@ -130,7 +130,7 @@ export default function EmployeesPage() {
                 <div style={{ position: 'relative', cursor: 'pointer' }}>
                     <Bell size={22} color="white" />
                     {unreadCount > 0 && (
-                        <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '16px', height: '16px', background: '#EF4444', color: 'white', fontSize: '10px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', border: '2px solid #FF5500' }}>
+                        <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '16px', height: '16px', background: '#EF4444', color: 'white', fontSize: '10px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', border: '2px solid #E65C00' }}>
                             {unreadCount}
                         </div>
                     )}
@@ -196,8 +196,8 @@ export default function EmployeesPage() {
               placeholder="Search employees..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full pl-11 pr-4 py-3.5 rounded-xl text-sm font-medium focus:outline-none"
-              style={{ background: 'white', border: 'none', color: '#111827', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}
+              className="w-full pr-4 py-3.5 rounded-xl text-sm font-medium focus:outline-none"
+              style={{ paddingLeft: '44px', background: 'white', border: 'none', color: '#111827', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}
             />
           </div>
         </div>
@@ -237,11 +237,11 @@ export default function EmployeesPage() {
                 </div>
 
                 <div style={{ display: 'flex', gap: '12px' }}>
-                  <button onClick={() => openForm(emp)} style={{ flex: 1, height: '36px', borderRadius: '10px', border: '1px solid #F3F4F6', background: 'white', color: '#4B5563', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '12px', fontWeight: 600 }}>
-                    <Edit2 size={14} /> Edit
+                  <button onClick={() => openForm(emp)} style={{ flex: 1, height: '44px', borderRadius: '12px', border: '1px solid #F3F4F6', background: 'white', color: '#4B5563', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '14px', fontWeight: 700 }}>
+                    <Edit2 size={16} /> Edit
                   </button>
-                  <button onClick={() => setEmployeeToDelete(emp)} style={{ flex: 1, height: '36px', borderRadius: '10px', border: '1px solid #FEE2E2', background: '#FEF2F2', color: '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '12px', fontWeight: 600 }}>
-                    <Trash2 size={14} /> Delete
+                  <button onClick={() => setEmployeeToDelete(emp)} style={{ flex: 1, height: '44px', borderRadius: '12px', border: '1px solid #FEE2E2', background: '#FEF2F2', color: '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '14px', fontWeight: 700 }}>
+                    <Trash2 size={16} /> Delete
                   </button>
                 </div>
               </div>
@@ -307,8 +307,8 @@ export default function EmployeesPage() {
                       ))}
                     </div>
                   </div>
-                  <button type="submit" className="w-full py-3.5 rounded-xl font-bold text-white flex items-center justify-center gap-2 mt-4" style={{ background: 'var(--primary)' }}>
-                    <Check size={18} /> {editingEmployee ? 'Save Changes' : 'Add Employee'}
+                  <button type="submit" className="w-full py-4 rounded-xl font-bold text-white flex items-center justify-center gap-2 mt-6 mb-4 text-base" style={{ background: 'var(--primary)' }}>
+                    <Check size={20} /> {editingEmployee ? 'Save Changes' : 'Add Employee'}
                   </button>
                 </form>
               </motion.div>

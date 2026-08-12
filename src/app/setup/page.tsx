@@ -163,7 +163,7 @@ export default function SetupPage() {
               })}
             </div>
             
-            <div className="mt-auto pt-2 bg-white z-10">
+            <div className="mt-auto pt-2 pb-8 bg-white z-10">
               <button
                 onClick={handleNext}
                 disabled={!selectedType}
@@ -333,7 +333,7 @@ export default function SetupPage() {
 
             </div>
             
-            <div className="flex gap-3 mt-auto pt-4 border-t border-amber-100 bg-white">
+            <div className="flex gap-3 mt-auto pt-4 pb-8 border-t border-amber-100 bg-white">
               <button
                 onClick={handleBack}
                 className="px-6 py-4 rounded-2xl font-bold text-slate-600 bg-amber-50 hover:bg-amber-100 active:scale-[0.98] transition-all"
