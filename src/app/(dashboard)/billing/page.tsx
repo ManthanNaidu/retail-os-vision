@@ -30,6 +30,8 @@ export default function BillingPage() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [storeName, setStoreName] = useState('My Store');
   const [storeAddress, setStoreAddress] = useState('Store Address');
+  const [upiQrCode, setUpiQrCode] = useState<string | null>(null);
+  const [showUpiModal, setShowUpiModal] = useState(false);
 
   // Load store details
   useMemo(() => {
@@ -39,6 +41,9 @@ export default function BillingPage() {
         if (profile.storeName) setStoreName(profile.storeName);
         if (profile.location) setStoreAddress(profile.location);
       } catch (e) {}
+      
+      const savedQr = localStorage.getItem('retailos_upi_qr');
+      if (savedQr) setUpiQrCode(savedQr);
     }
   }, []);
 
@@ -61,7 +66,7 @@ export default function BillingPage() {
     c.name.toLowerCase().includes(customerQuery.toLowerCase()) || c.phone.includes(customerQuery)
   ).slice(0, 6);
 
-  const handleCompleteSale = () => {
+  const finalizeSale = () => {
     if (cart.length === 0) return;
     const invoice = generateInvoiceNumber();
     const sale: Sale = {
@@ -78,15 +83,28 @@ export default function BillingPage() {
       status: 'completed',
       createdAt: new Date().toISOString(),
     };
-    // Deduct stock
+    // Deduct stock based on selling conversion factor
     cart.forEach(item => {
       const product = products.find(p => p.id === item.productId);
-      if (product) updateProduct(product.id, { stock: Math.max(0, product.stock - item.quantity) });
+      if (product) {
+        const factor = product.sellingConversionFactor || 1;
+        updateProduct(product.id, { stock: Math.max(0, product.stock - (item.quantity * factor)) });
+      }
     });
     addSale(sale);
     setCompletedSale(sale);
     clearCart();
+    setShowUpiModal(false);
     setShowInvoice(true);
+  };
+
+  const handleCheckoutClick = () => {
+    if (cart.length === 0) return;
+    if (paymentMethod === 'upi' && upiQrCode) {
+      setShowUpiModal(true);
+    } else {
+      finalizeSale();
+    }
   };
 
   const shareWhatsApp = (sale: Sale) => {
@@ -437,7 +455,7 @@ export default function BillingPage() {
             <motion.button
               whileHover={{ scale: 1.02, boxShadow: '0 12px 32px rgba(26,86,219,0.35)' }}
               whileTap={{ scale: 0.97 }}
-              onClick={handleCompleteSale}
+              onClick={handleCheckoutClick}
               className="w-full py-4 rounded-2xl text-white font-bold text-base flex items-center justify-center gap-2 gradient-primary"
               style={{ boxShadow: 'var(--shadow-blue)' }}
             >
@@ -446,6 +464,56 @@ export default function BillingPage() {
           </div>
         )}
       </div>
+
+      {/* ─── UPI Payment Modal ────────────────────────────── */}
+      <AnimatePresence>
+        {showUpiModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.8, y: 40 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.8, y: 40 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="bg-white rounded-3xl w-full max-w-sm overflow-hidden p-6 flex flex-col items-center text-center"
+            >
+              <h2 className="text-xl font-bold text-slate-800 mb-1">UPI Payment</h2>
+              <p className="text-slate-500 text-sm mb-4">Ask customer to scan and pay</p>
+              
+              <div className="w-56 h-56 border-2 border-slate-100 rounded-2xl p-2 mb-4 bg-white shadow-sm flex items-center justify-center">
+                {upiQrCode ? (
+                  <img src={upiQrCode} alt="Scan to pay" className="w-full h-full object-contain" />
+                ) : (
+                  <div className="text-slate-400">QR Code missing</div>
+                )}
+              </div>
+              
+              <div className="text-3xl font-black text-slate-800 mb-6">
+                ₹{getTotal().toFixed(0)}
+              </div>
+              
+              <div className="w-full flex gap-3">
+                <button
+                  onClick={() => setShowUpiModal(false)}
+                  className="flex-1 py-3.5 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={finalizeSale}
+                  className="flex-[2] py-3.5 rounded-xl font-bold text-white bg-green-600 hover:bg-green-700 shadow-lg shadow-green-600/30 transition-all flex items-center justify-center gap-2"
+                >
+                  <Check size={18} /> Payment Received
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ─── Invoice Modal ────────────────────────────────── */}
       <AnimatePresence>

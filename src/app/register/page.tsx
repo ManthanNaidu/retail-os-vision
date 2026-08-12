@@ -14,15 +14,29 @@ export default function RegisterPage() {
     fullName: '',
     businessName: '',
     email: '',
+    phone: '',
+    whatsapp: '',
     password: '',
     confirmPassword: ''
   });
+  const [sameAsPhone, setSameAsPhone] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const newFormData = { ...formData, [e.target.name]: e.target.value };
+    if (e.target.name === 'phone' && sameAsPhone) {
+      newFormData.whatsapp = e.target.value;
+    }
+    setFormData(newFormData);
+  };
+
+  const handleSameAsPhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSameAsPhone(e.target.checked);
+    if (e.target.checked) {
+      setFormData(prev => ({ ...prev, whatsapp: prev.phone }));
+    }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -36,6 +50,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      // Phone numbers would typically be saved to the user's document in Firestore here.
       router.push('/setup');
     } catch (err: any) {
       setError(err.message || 'Failed to create account. Please try again.');
@@ -84,7 +99,7 @@ export default function RegisterPage() {
           <form onSubmit={handleRegister} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Full Name</label>
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Full Name *</label>
                 <input
                   type="text"
                   name="fullName"
@@ -97,7 +112,7 @@ export default function RegisterPage() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Business Name</label>
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Business Name *</label>
                 <input
                   type="text"
                   name="businessName"
@@ -111,7 +126,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Email</label>
+              <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Email *</label>
               <input
                 type="email"
                 name="email"
@@ -125,7 +140,51 @@ export default function RegisterPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Password</label>
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Phone Number *</label>
+                <input
+                  type="tel"
+                  name="phone"
+                  required
+                  pattern="[0-9]{10}"
+                  title="Please enter a valid 10-digit phone number"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="input-premium w-full px-4 py-2 border border-[var(--border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                  placeholder="9876543210"
+                />
+              </div>
+              
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-sm font-medium text-[var(--text-secondary)]">WhatsApp Number *</label>
+                  <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      checked={sameAsPhone}
+                      onChange={handleSameAsPhoneChange}
+                      className="rounded border-slate-300 text-[var(--primary)] focus:ring-[var(--primary)]"
+                    />
+                    Same as phone
+                  </label>
+                </div>
+                <input
+                  type="tel"
+                  name="whatsapp"
+                  required
+                  disabled={sameAsPhone}
+                  pattern="[0-9]{10}"
+                  title="Please enter a valid 10-digit WhatsApp number"
+                  value={formData.whatsapp}
+                  onChange={handleChange}
+                  className={`input-premium w-full px-4 py-2 border border-[var(--border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary)] ${sameAsPhone ? 'bg-slate-50 text-slate-500 cursor-not-allowed' : ''}`}
+                  placeholder="9876543210"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">Password *</label>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   name="password"

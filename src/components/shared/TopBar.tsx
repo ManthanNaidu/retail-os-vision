@@ -25,6 +25,34 @@ export function TopBar({ title }: TopBarProps) {
     // Trial days logic disabled due to async backend move
   }, []);
 
+  // Global Announcement to Notification
+  useEffect(() => {
+    async function checkGlobalAnnouncement() {
+      try {
+        const { getGlobalAnnouncement } = await import('@/lib/licenseManager');
+        const msg = await getGlobalAnnouncement();
+        if (msg) {
+          // Add it only if it doesn't already exist in the store
+          const { notifications, addNotification } = useAppStore.getState();
+          const exists = notifications.find(n => n.message === msg && n.title === 'System Announcement');
+          if (!exists) {
+            addNotification({
+              id: `global-ann-${Date.now()}`,
+              type: 'info',
+              title: 'System Announcement',
+              message: msg,
+              createdAt: new Date().toISOString(),
+              isRead: false
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Failed to check global announcement", err);
+      }
+    }
+    checkGlobalAnnouncement();
+  }, []);
+
   const typeColors = {
     warning: { bg: '#fef3c7', text: '#92400e', icon: AlertTriangle },
     danger:  { bg: '#fee2e2', text: '#991b1b', icon: AlertTriangle },

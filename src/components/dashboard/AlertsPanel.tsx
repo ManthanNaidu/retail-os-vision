@@ -44,7 +44,7 @@ export function AlertsPanel({ lowStockProducts, expiringProducts, creditCustomer
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{p.name}</p>
-                  <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Only {p.stock} {p.unit} left</p>
+                  <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Only {p.stock} {p.baseUnit || 'items'} left</p>
                 </div>
                 <span className="text-[10px] font-bold bg-amber-100 text-amber-600 px-2 py-0.5 rounded-full">Low Stock</span>
               </div>

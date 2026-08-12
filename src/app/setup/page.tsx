@@ -21,6 +21,8 @@ export default function SetupPage() {
   const [storeDetails, setStoreDetails] = useState({
     storeName: '',
     ownerName: '',
+    phone: '',
+    whatsapp: '',
     email: '',
     city: '',
     address: '',
@@ -28,6 +30,25 @@ export default function SetupPage() {
     upiId: ''
   });
   
+  const [sameAsPhone, setSameAsPhone] = useState(false);
+  
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setStoreDetails(prev => {
+      const next = { ...prev, phone: value };
+      if (sameAsPhone) next.whatsapp = value;
+      return next;
+    });
+  };
+
+  const handleSameAsPhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = e.target.checked;
+    setSameAsPhone(checked);
+    if (checked) {
+      setStoreDetails(prev => ({ ...prev, whatsapp: prev.phone }));
+    }
+  };
+
   useEffect(() => {
     try {
       const types = getStoreTypeList();
@@ -47,7 +68,7 @@ export default function SetupPage() {
   
   const handleNext = () => {
     if (step === 1 && !selectedType) return;
-    if (step === 2 && (!storeDetails.storeName || !storeDetails.ownerName)) return;
+    if (step === 2 && (!storeDetails.storeName || !storeDetails.ownerName || !storeDetails.phone || !storeDetails.whatsapp)) return;
     setStep(prev => prev + 1);
   };
   
@@ -65,6 +86,8 @@ export default function SetupPage() {
         storeType: selectedType?.id,
         storeName: storeDetails.storeName,
         ownerName: storeDetails.ownerName,
+        phone: storeDetails.phone,
+        whatsapp: storeDetails.whatsapp,
         email: storeDetails.email,
         city: storeDetails.city,
         address: storeDetails.address,
@@ -106,7 +129,7 @@ export default function SetupPage() {
               <p className="text-slate-500 text-sm font-medium">Choose your store type to customize RetailOS for your business.</p>
             </div>
             
-            <div className="grid grid-cols-2 gap-3 mb-6 overflow-y-auto pr-2 custom-scrollbar">
+            <div className="grid grid-cols-2 gap-4 mb-6 overflow-y-auto pr-2 custom-scrollbar">
               {storeTypes.map(type => {
                 const IconComp = (LucideIcons as any)[type.iconName] || LucideIcons.Store;
                 const isSelected = selectedType?.id === type.id;
@@ -117,22 +140,22 @@ export default function SetupPage() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setSelectedType(type)}
-                    className={`p-4 rounded-2xl border-2 text-left flex flex-col items-center justify-center transition-all ${
+                    className={`p-4 rounded-[2rem] border-2 text-center flex flex-col items-center justify-center transition-all min-h-[160px] ${
                       isSelected 
-                        ? 'border-orange-500 bg-orange-50 shadow-md shadow-orange-500/10' 
-                        : 'border-amber-100 bg-[#fffdf8] hover:border-orange-300 hover:bg-amber-50'
+                        ? 'border-orange-500 bg-orange-50 shadow-lg shadow-orange-500/10' 
+                        : 'border-amber-100 bg-[#fffdf8] hover:border-orange-300 hover:bg-amber-50 shadow-sm'
                     }`}
                   >
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-3 transition-colors overflow-hidden ${
-                      isSelected ? 'bg-orange-500 text-white ring-4 ring-orange-500/20' : 'bg-amber-100 text-orange-600'
+                    <div className={`w-24 h-24 sm:w-28 sm:h-28 rounded-3xl flex items-center justify-center mb-4 transition-all duration-300 overflow-hidden ${
+                      isSelected ? 'bg-orange-500 text-white ring-4 ring-orange-500/20 scale-105 shadow-md' : 'bg-amber-50 text-orange-600'
                     }`}>
                       {type.image ? (
-                        <img src={type.image} alt={type.name} className="w-full h-full object-cover" />
+                        <img src={type.image} alt={type.name} className="w-full h-full object-cover scale-[1.15]" />
                       ) : (
-                        <IconComp size={24} strokeWidth={2.5} />
+                        <IconComp size={48} strokeWidth={2.5} />
                       )}
                     </div>
-                    <span className={`font-bold text-sm text-center ${isSelected ? 'text-orange-700' : 'text-slate-700'}`}>
+                    <span className={`font-extrabold text-[15px] leading-tight ${isSelected ? 'text-orange-700' : 'text-slate-700'}`}>
                       {type.name}
                     </span>
                   </motion.button>
@@ -140,7 +163,7 @@ export default function SetupPage() {
               })}
             </div>
             
-            <div className="mt-auto pt-2 bg-white">
+            <div className="mt-auto pt-2 bg-white z-10">
               <button
                 onClick={handleNext}
                 disabled={!selectedType}
@@ -190,7 +213,7 @@ export default function SetupPage() {
                   </div>
                 </div>
                 
-                <div>
+                <div className="mb-4">
                   <label className="block text-[13px] font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Owner Name <span className="text-orange-500">*</span></label>
                   <div className="relative">
                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-orange-400">
@@ -203,6 +226,45 @@ export default function SetupPage() {
                       placeholder="e.g. Rajesh Kumar"
                       className="w-full !pl-[44px] pr-4 py-3 bg-white border border-amber-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all text-slate-800 font-medium placeholder:text-slate-400 shadow-inner shadow-amber-500/5"
                     />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[12px] font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Phone <span className="text-orange-500">*</span></label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-orange-400">
+                        <Phone className="w-4 h-4" />
+                      </div>
+                      <input
+                        type="tel"
+                        value={storeDetails.phone}
+                        onChange={handlePhoneChange}
+                        placeholder="9876543210"
+                        maxLength={10}
+                        className="w-full !pl-[34px] pr-3 py-3 bg-white border border-amber-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all text-slate-800 font-medium placeholder:text-slate-400 shadow-inner shadow-amber-500/5 text-sm"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-[12px] font-bold text-slate-700 uppercase tracking-wide truncate">WhatsApp <span className="text-orange-500">*</span></label>
+                      <label className="flex items-center gap-1 text-[9px] text-slate-500 cursor-pointer whitespace-nowrap">
+                        <input type="checkbox" checked={sameAsPhone} onChange={handleSameAsPhoneChange} className="rounded-sm border-amber-300 text-orange-500 focus:ring-orange-500 w-3 h-3" />
+                        Same
+                      </label>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="tel"
+                        value={storeDetails.whatsapp}
+                        onChange={(e) => setStoreDetails({...storeDetails, whatsapp: e.target.value})}
+                        disabled={sameAsPhone}
+                        placeholder="9876543210"
+                        maxLength={10}
+                        className={`w-full px-3 py-3 border border-amber-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all text-slate-800 font-medium placeholder:text-slate-400 shadow-inner shadow-amber-500/5 text-sm ${sameAsPhone ? 'bg-amber-50/50 text-slate-500' : 'bg-white'}`}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -295,75 +357,95 @@ export default function SetupPage() {
         
       case 4:
         const FinalIconComp = selectedType ? ((LucideIcons as any)[selectedType.iconName] || LucideIcons.Store) : LucideIcons.Store;
+        
+        // Flower falling animation components - strictly flowers
+        const flowers = ['🌸', '🌼', '🏵️', '🌺', '🌻', '🌷', '🌹'];
+
         return (
           <motion.div
             key="step4"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col h-full text-center relative pt-10"
+            className="flex flex-col h-full text-center relative pt-20"
           >
-            {/* Attractive Background Header */}
-            <div className="absolute top-[-32px] left-[-32px] right-[-32px] h-[240px] bg-gradient-to-b from-amber-100/80 via-orange-50/50 to-transparent -z-10 rounded-t-[2rem]">
-              <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #f59e0b 0%, transparent 70%)' }}></div>
-              <motion.div 
-                animate={{ y: [0, -10, 0], rotate: [0, 5, -5, 0] }} 
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute top-10 left-10 w-16 h-16 opacity-30 rounded-2xl shadow-lg overflow-hidden"
-              >
-                <img src="/images/icons/icon_home.jpg" alt="Decor" className="w-full h-full object-cover blur-[1px]" />
-              </motion.div>
-              <motion.div 
-                animate={{ y: [0, 15, 0], rotate: [0, -10, 10, 0] }} 
-                transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute top-16 right-10 w-12 h-12 opacity-30 rounded-2xl shadow-lg overflow-hidden"
-              >
-                <img src="/images/icons/icon_setup.jpg" alt="Decor" className="w-full h-full object-cover blur-[1px]" />
-              </motion.div>
+            {/* Flowers Animation Overlay */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none z-50 rounded-[2rem]">
+              {[...Array(15)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute text-2xl"
+                  initial={{ 
+                    top: -50, 
+                    left: `${Math.random() * 100}%`,
+                    rotate: 0,
+                    opacity: 1
+                  }}
+                  animate={{ 
+                    top: '120%', 
+                    rotate: 360,
+                    opacity: 0
+                  }}
+                  transition={{ 
+                    duration: 4 + Math.random() * 5, 
+                    repeat: Infinity, 
+                    delay: Math.random() * 5,
+                    ease: "linear"
+                  }}
+                >
+                  {flowers[Math.floor(Math.random() * flowers.length)]}
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Garland Decoration */}
+            <div className="absolute top-[-32px] left-[-32px] right-[-32px] h-[300px] -z-10 rounded-t-[2rem] overflow-hidden pointer-events-none">
+              <img src="/images/marigold_garland.jpg" alt="garland" className="w-full h-full object-cover object-top opacity-100" style={{ mixBlendMode: 'multiply' }} />
             </div>
 
             <motion.div 
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-              className="w-28 h-28 mx-auto bg-gradient-to-br from-amber-400 to-orange-500 rounded-[2rem] flex items-center justify-center mb-6 shadow-2xl shadow-orange-500/30 border-4 border-white rotate-3"
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 15 }}
+              className="w-28 h-28 mx-auto bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mb-6 shadow-xl shadow-orange-500/30 border-4 border-white z-10"
             >
-              <Check className="w-14 h-14 text-white drop-shadow-md" strokeWidth={3} />
+              <Check className="w-14 h-14 text-white drop-shadow-lg" strokeWidth={4} />
             </motion.div>
             
-            <h1 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">All Set!</h1>
-            <p className="text-slate-500 font-medium mb-8">Your smart store is ready to go.</p>
+            <h1 className="text-[32px] font-black text-slate-900 mb-2 tracking-tight leading-tight">
+              Welcome Onboard!
+            </h1>
+            <p className="text-[#a52a2a] font-bold mb-8 text-[15px]">Shubh Aarambh! Your smart store is ready.</p>
             
-            <div className="bg-[#fffdf8] rounded-3xl p-8 w-full mb-auto border border-amber-100 shadow-xl shadow-amber-500/5 relative overflow-hidden group hover:border-orange-200 transition-colors">
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-amber-400 via-orange-500 to-amber-400"></div>
-              
-              <div className="w-20 h-20 rounded-[2rem] bg-orange-100 text-orange-600 flex items-center justify-center mx-auto mb-5 overflow-hidden shadow-lg shadow-orange-500/20 group-hover:scale-110 transition-transform duration-500">
+            <div className="bg-white rounded-3xl p-5 w-full mb-auto border border-amber-300 shadow-sm relative overflow-hidden group flex items-center gap-4">
+              <div className="w-24 h-24 rounded-2xl bg-slate-50 flex-shrink-0 flex items-center justify-center overflow-hidden shadow-sm border border-slate-100">
                  {selectedType?.image ? (
-                   <img src={selectedType.image} alt="Store type" className="w-full h-full object-cover" />
+                   <img src={selectedType.image} alt="Store type" className="w-full h-full object-cover scale-110" />
                  ) : (
-                   <FinalIconComp size={36} strokeWidth={2} />
+                   <FinalIconComp size={40} className="text-slate-400" strokeWidth={1.5} />
                  )}
               </div>
-              <h2 className="text-2xl font-black text-slate-800 mb-1">{storeDetails.storeName}</h2>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 rounded-full">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <p className="text-orange-700 font-bold text-xs tracking-wide uppercase">{selectedType?.name}</p>
+              <div className="flex flex-col items-start text-left flex-1">
+                <h2 className="text-xl font-black text-slate-900 mb-1 leading-tight">{storeDetails.storeName || 'Amma store'}</h2>
+                <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-orange-50 rounded-md">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  <p className="text-[#a52a2a] font-bold text-[10px] tracking-widest uppercase">{selectedType?.name || 'GROCERY / KIRANA'}</p>
+                </div>
               </div>
             </div>
             
-            <div className="mt-8 pt-4 bg-white">
+            <div className="mt-8 pt-4 bg-transparent z-10 relative">
               <button
                 onClick={finishSetup}
-                className="w-full py-4 rounded-2xl font-black text-white bg-gradient-to-r from-amber-500 to-orange-500 shadow-xl shadow-orange-500/25 hover:shadow-orange-500/40 active:scale-[0.98] hover:-translate-y-1 transition-all flex items-center justify-center text-lg overflow-hidden relative group"
+                className="w-full py-4 rounded-full font-bold text-white bg-gradient-to-r from-red-500 via-orange-500 to-amber-500 shadow-lg shadow-orange-500/20 active:scale-[0.98] transition-all flex items-center justify-center text-lg relative"
               >
-                <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full skew-x-12 transition-transform duration-700 ease-out"></div>
-                <span className="relative z-10 flex items-center">Launch Dashboard <Zap className="ml-2 w-6 h-6 fill-white drop-shadow-md" /></span>
+                Launch Dashboard <Zap className="ml-2 w-5 h-5 fill-white" />
               </button>
             </div>
           </motion.div>
         );
     }
   };
-  
+
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 bg-slate-50">
       <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-[480px] h-[720px] max-h-[95vh] flex flex-col relative overflow-hidden border border-slate-100">

@@ -1,7 +1,7 @@
 import { doc, getDoc, getDocs, collection, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from './firebase';
 
-export const ADMIN_PASSWORD = 'RETAILOS@MASTER2024';
+export const ADMIN_PASSWORD = 'RETAILOS@MASTER2026';
 export const ADMIN_KEY = 'retailos_admin_auth';
 
 export interface StoreRecord {
@@ -128,5 +128,27 @@ export function isAdminLoggedIn(): boolean {
 export function adminLogout(): void {
   if (typeof window !== 'undefined') {
     sessionStorage.removeItem(ADMIN_KEY);
+  }
+}
+
+// Global Announcements
+export async function getGlobalAnnouncement(): Promise<string | null> {
+  try {
+    const snap = await getDoc(doc(db, 'globals', 'announcement'));
+    if (snap.exists()) {
+      return snap.data()?.message || null;
+    }
+    return null;
+  } catch (err) {
+    console.error("Error fetching announcement:", err);
+    return null;
+  }
+}
+
+export async function setGlobalAnnouncement(message: string | null): Promise<void> {
+  try {
+    await setDoc(doc(db, 'globals', 'announcement'), { message, updatedAt: new Date().toISOString() });
+  } catch (err) {
+    console.error("Error setting announcement:", err);
   }
 }

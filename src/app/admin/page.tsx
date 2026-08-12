@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { StoreRecord, getAllStores, saveStoreRecord, registerStore, adminLogin, isAdminLoggedIn, getTrialDaysRemaining } from '@/lib/licenseManager';
-import { Search, Filter, Plus, Store, Users, IndianRupee, ShieldCheck, Play, Ban, KeyRound, MessageCircle, Megaphone, X, Send, CheckSquare, Square } from 'lucide-react';
+import { StoreRecord, getAllStores, saveStoreRecord, registerStore, adminLogin, isAdminLoggedIn, getTrialDaysRemaining, setGlobalAnnouncement, getGlobalAnnouncement } from '@/lib/licenseManager';
+import { Search, Filter, Plus, Store, Users, IndianRupee, ShieldCheck, Play, Ban, KeyRound, MessageCircle, Megaphone, X, Send, CheckSquare, Eye, BellRing } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AdminDashboard() {
@@ -18,10 +18,13 @@ export default function AdminDashboard() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [newStore, setNewStore] = useState({ email: '', ownerName: '', storeName: '', city: '', phone: '' });
 
-  // Broadcast
+  // Broadcast & Announcements
   const [isBroadcastOpen, setIsBroadcastOpen] = useState(false);
   const [selectedStores, setSelectedStores] = useState<Set<string>>(new Set());
   const [broadcastMessage, setBroadcastMessage] = useState('Hi {name}, your {subscription_plan} plan has {trial_days_remaining} days left. Let me know if you need help! - RetailOS');
+  
+  const [isAnnouncementOpen, setIsAnnouncementOpen] = useState(false);
+  const [announcementText, setAnnouncementText] = useState('');
   
   useEffect(() => {
     const auth = isAdminLoggedIn();
@@ -34,6 +37,8 @@ export default function AdminDashboard() {
   async function loadStores() {
     const data = await getAllStores();
     setStores(data);
+    const ann = await getGlobalAnnouncement();
+    if (ann) setAnnouncementText(ann);
   }
   
   const handleLogin = (e: React.FormEvent) => {
@@ -112,6 +117,20 @@ export default function AdminDashboard() {
     }
     
     setIsBroadcastOpen(false);
+  };
+
+  const handleSaveAnnouncement = async () => {
+    await setGlobalAnnouncement(announcementText || null);
+    setIsAnnouncementOpen(false);
+    alert('Global announcement updated!');
+  };
+
+  const handleImpersonate = (store: StoreRecord) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('impersonatedStore', store.email);
+      localStorage.setItem('impersonatedStoreName', store.storeName);
+      window.location.href = '/dashboard';
+    }
   };
 
   const handleDirectWhatsApp = (store: StoreRecord) => {
@@ -202,6 +221,13 @@ export default function AdminDashboard() {
                 Broadcast
               </button>
               <button 
+                onClick={() => setIsAnnouncementOpen(true)}
+                className="bg-white/20 hover:bg-white/30 text-white border border-white/30 px-5 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 flex-1 sm:flex-none"
+              >
+                <BellRing size={18} />
+                Announce
+              </button>
+              <button 
                 onClick={() => setIsAddOpen(true)}
                 className="bg-white text-orange-500 hover:bg-orange-50 px-6 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-xl shadow-orange-500/20 active:scale-95 flex-1 sm:flex-none"
               >
@@ -258,6 +284,7 @@ export default function AdminDashboard() {
                 placeholder="Search stores, owners, or emails..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
+                style={{ paddingLeft: '3rem' }}
                 className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-400 outline-none transition-all shadow-sm font-medium"
               />
             </div>
@@ -337,6 +364,14 @@ export default function AdminDashboard() {
                             title={store.phone ? "WhatsApp Direct" : "No Phone Number"}
                           >
                             <MessageCircle size={18} />
+                          </button>
+                          
+                          <button
+                            onClick={() => handleImpersonate(store)}
+                            className="p-2 rounded-xl transition-all border bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white border-blue-200 hover:border-blue-600"
+                            title="Log in as Store"
+                          >
+                            <Eye size={18} />
                           </button>
                           
                           {store.status === 'suspended' ? (
@@ -452,6 +487,49 @@ export default function AdminDashboard() {
                 >
                   <Send size={18} />
                   Send to {selectedStores.size} Stores
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Announcement Modal */}
+      <AnimatePresence>
+        {isAnnouncementOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsAnnouncementOpen(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+            <motion.div initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }} className="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full flex flex-col border border-white/20 overflow-hidden">
+              <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-6 sm:p-8 text-white relative shrink-0">
+                <button onClick={() => setIsAnnouncementOpen(false)} className="absolute top-6 right-6 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors"><X size={20} /></button>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="bg-white/20 p-2 rounded-xl backdrop-blur-md"><BellRing size={24} /></div>
+                  <h2 className="text-2xl font-bold">Global Announcement</h2>
+                </div>
+                <p className="text-blue-100 text-sm font-medium opacity-90">Set a persistent banner that appears on every store's dashboard.</p>
+              </div>
+
+              <div className="p-6 sm:p-8 flex-1 bg-slate-50">
+                <label className="block text-sm font-bold text-slate-700 mb-2">Announcement Message</label>
+                <textarea 
+                  value={announcementText}
+                  onChange={(e) => setAnnouncementText(e.target.value)}
+                  className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all resize-none h-32 text-sm font-medium"
+                  placeholder="e.g. Scheduled Maintenance tonight at 2 AM..."
+                />
+                <p className="text-xs text-slate-500 mt-2">Leave blank and save to remove the current announcement.</p>
+              </div>
+
+              <div className="p-6 border-t border-slate-100 bg-white shrink-0 flex gap-4">
+                <button onClick={() => setIsAnnouncementOpen(false)} className="flex-1 px-4 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl transition-colors">
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleSaveAnnouncement} 
+                  className="flex-1 px-4 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-600/20 transition-all active:scale-[0.98] flex justify-center items-center gap-2"
+                >
+                  <Send size={18} />
+                  Publish Banner
                 </button>
               </div>
             </motion.div>

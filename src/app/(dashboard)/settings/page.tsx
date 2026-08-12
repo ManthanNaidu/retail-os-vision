@@ -48,6 +48,8 @@ const SettingsPage = () => {
   const stats = { products: products.length, customers: customers.length, sales: thisMonthSales };
   const [storeTypes, setStoreTypes] = useState<{id: string, name: string}[]>([]);
 
+    const [upiQrCode, setUpiQrCode] = useState<string | null>(null);
+
   useEffect(() => {
     // Load store types
     try {
@@ -77,6 +79,10 @@ const SettingsPage = () => {
       setHasPassword(!!pwd);
     }
     
+    // Load UPI QR Code
+    const savedQr = localStorage.getItem('retailos_upi_qr');
+    if (savedQr) setUpiQrCode(savedQr);
+
     // Load subscription
     const stores = localStorage.getItem('retailos_stores');
     if (stores) {
@@ -91,10 +97,27 @@ const SettingsPage = () => {
         }
       } catch(e) {}
     }
-    
-    // Load stats from Zustand store (already loaded elsewhere)
-    // Stats are set in the component body via useAppStore
   }, []);
+
+  const handleQrUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setUpiQrCode(base64String);
+        localStorage.setItem('retailos_upi_qr', base64String);
+        showToast('QR Code saved successfully');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveQr = () => {
+    setUpiQrCode(null);
+    localStorage.removeItem('retailos_upi_qr');
+    showToast('QR Code removed');
+  };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -209,11 +232,13 @@ const SettingsPage = () => {
                 />
               </div>
               <div>
-                <label className="text-xs text-text-muted font-medium mb-1 block">Phone (Read-only)</label>
+                <label className="text-xs text-text-muted font-medium mb-1 block">Phone Number</label>
                 <input 
-                  className="input-premium w-full bg-bg-pearl opacity-70"
+                  type="tel"
+                  className="input-premium w-full"
                   value={profile.phone}
-                  readOnly
+                  onChange={e => setProfile({...profile, phone: e.target.value})}
+                  placeholder="E.g. 9876543210"
                 />
               </div>
             </div>
@@ -265,6 +290,31 @@ const SettingsPage = () => {
                   placeholder="For QR payments"
                 />
               </div>
+            </div>
+            <div className="pt-2 border-t border-border">
+              <label className="text-xs text-text-muted font-medium mb-2 block">UPI Payment QR Code (Displayed at Billing)</label>
+              {upiQrCode ? (
+                <div className="flex flex-col items-start gap-2">
+                  <div className="w-32 h-32 border-2 border-primary rounded-xl overflow-hidden shadow-sm p-1 bg-white">
+                    <img src={upiQrCode} alt="UPI QR Code" className="w-full h-full object-contain" />
+                  </div>
+                  <button onClick={handleRemoveQr} className="text-xs text-red-500 font-semibold hover:text-red-600">Remove QR Code</button>
+                </div>
+              ) : (
+                <div className="w-full relative">
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleQrUpload} 
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  <div className="w-full border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center justify-center text-center bg-bg-pearl text-text-muted hover:border-primary hover:text-primary transition-colors">
+                    <DollarSign className="w-6 h-6 mb-2" />
+                    <span className="text-sm font-semibold">Upload QR Code Photo</span>
+                    <span className="text-xs mt-1">Tap to select from gallery</span>
+                  </div>
+                </div>
+              )}
             </div>
             <button className="btn-primary w-full mt-2" onClick={handleProfileSave}>
               Save Profile

@@ -13,7 +13,11 @@ export interface Product {
   mrp: number;
   stock: number;
   minStock: number;
-  unit: string;
+  baseUnit: string;
+  purchaseUnit: string;
+  sellingUnit: string;
+  purchaseConversionFactor: number; // How many base units in 1 purchase unit
+  sellingConversionFactor: number;  // How many base units in 1 selling unit
   gstPercent: number;
   supplier?: string;
   expiryDate?: string;

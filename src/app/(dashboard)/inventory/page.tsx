@@ -9,6 +9,7 @@ import { Product } from '@/types';
 import { ConfirmDelete } from '@/components/shared/ConfirmDelete';
 import { InvoiceScanner } from '@/components/shared/InvoiceScanner';
 import { getStoreType } from '@/lib/storeTypes';
+import { getUnitsForCategory } from '@/lib/inventoryUnits';
 
 export default function InventoryPage() {
   const { products, addProduct, updateProduct, deleteProduct } = useAppStore();
@@ -30,7 +31,11 @@ export default function InventoryPage() {
     mrp: 0,
     stock: 0,
     minStock: 5,
-    unit: 'pcs',
+    baseUnit: 'Piece (pc)',
+    purchaseUnit: 'Piece (pc)',
+    sellingUnit: 'Piece (pc)',
+    purchaseConversionFactor: 1,
+    sellingConversionFactor: 1,
     gstPercent: 0,
     expiryDate: ''
   };
@@ -101,10 +106,11 @@ export default function InventoryPage() {
   };
 
   const handleQuickAddStock = (product: Product) => {
-    const qty = window.prompt(`How much stock to add for ${product.name}?`, '10');
+    const qty = window.prompt(`How much stock to add for ${product.name} (in ${product.purchaseUnit || 'Purchase Unit'})?`, '10');
     const parsed = parseInt(qty || '0', 10);
     if (!isNaN(parsed) && parsed > 0) {
-      updateProduct(product.id, { stock: product.stock + parsed });
+      const factor = product.purchaseConversionFactor || 1;
+      updateProduct(product.id, { stock: product.stock + (parsed * factor) });
     }
   };
 
@@ -244,10 +250,10 @@ export default function InventoryPage() {
 
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginTop: 16, paddingTop: 16, borderTop: '1px dashed #E5E7EB' }}>
                     <div>
-                      <p style={{ fontSize: 11, color: '#6B7280', margin: '0 0 2px' }}>Stock</p>
+                      <p style={{ fontSize: 11, color: '#6B7280', margin: '0 0 2px' }}>Base Stock</p>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                         <p style={{ fontSize: 14, fontWeight: 700, margin: 0, color: isOutOfStock ? '#EF4444' : isLowStock ? '#F59E0B' : '#10B981' }}>
-                          {product.stock} {product.unit || 'pcs'}
+                          {product.stock} {product.baseUnit || 'pcs'}
                         </p>
                         <button onClick={() => handleQuickAddStock(product)} style={{ background: '#F3F4F6', border: 'none', width: 22, height: 22, borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F97316', cursor: 'pointer', outline: 'none' }} title="Add Stock">
                           <Plus size={12} />
@@ -257,7 +263,7 @@ export default function InventoryPage() {
                     <div>
                       <p style={{ fontSize: 11, color: '#6B7280', margin: '0 0 2px' }}>Sell Price</p>
                       <p style={{ fontSize: 14, fontWeight: 700, color: '#111827', margin: 0 }}>
-                        {formatCurrency(product.sellingPrice)}
+                        {formatCurrency(product.sellingPrice)} <span style={{fontSize: 10, color: '#9CA3AF', fontWeight: 'normal'}}>/ {product.sellingUnit || product.baseUnit}</span>
                       </p>
                     </div>
                     <div>
@@ -311,7 +317,11 @@ export default function InventoryPage() {
                   <div>
                     <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#4B5563', marginBottom: 6 }}>Category *</label>
                     <div style={{ position: 'relative' }}>
-                      <select required value={formData.category || ''} onChange={e => setFormData({...formData, category: e.target.value})} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 14, outline: 'none', appearance: 'none', backgroundColor: 'white' }}>
+                      <select required value={formData.category || ''} onChange={e => {
+                        const newCat = e.target.value;
+                        const defaultUnit = getUnitsForCategory(newCat)[0] || 'Piece (pc)';
+                        setFormData({...formData, category: newCat, baseUnit: defaultUnit, purchaseUnit: defaultUnit, sellingUnit: defaultUnit});
+                      }} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 14, outline: 'none', appearance: 'none', backgroundColor: 'white' }}>
                         {availableCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                       </select>
                       <ChevronDown size={14} color="#6B7280" style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
@@ -349,18 +359,60 @@ export default function InventoryPage() {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#4B5563', marginBottom: 6 }}>Stock</label>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#4B5563', marginBottom: 6 }}>Current Stock (in Base Unit)</label>
                     <input type="number" value={formData.stock || ''} onChange={e => setFormData({...formData, stock: parseInt(e.target.value) || 0})} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 14, outline: 'none' }} placeholder="0" />
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#4B5563', marginBottom: 6 }}>Min Stock</label>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#4B5563', marginBottom: 6 }}>Min Stock Alert</label>
                     <input type="number" value={formData.minStock || ''} onChange={e => setFormData({...formData, minStock: parseInt(e.target.value) || 0})} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 14, outline: 'none' }} placeholder="5" />
                   </div>
-                  <div>
-                    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#4B5563', marginBottom: 6 }}>Unit</label>
-                    <input type="text" value={formData.unit || ''} onChange={e => setFormData({...formData, unit: e.target.value})} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 14, outline: 'none' }} placeholder="pcs, kg" />
+                </div>
+
+                <div style={{ padding: 16, border: '1px solid #E5E7EB', borderRadius: 12, background: '#F8FAFC' }}>
+                  <h4 style={{ fontSize: 13, fontWeight: 700, margin: '0 0 12px', color: '#1F2937' }}>Unit Configuration</h4>
+                  
+                  <div style={{ marginBottom: 16 }}>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#4B5563', marginBottom: 6 }}>Base Unit (Inventory is tracked in this)</label>
+                    <div style={{ position: 'relative' }}>
+                      <select value={formData.baseUnit || ''} onChange={e => setFormData({...formData, baseUnit: e.target.value})} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 14, outline: 'none', appearance: 'none', backgroundColor: 'white' }}>
+                        {getUnitsForCategory(formData.category || availableCategories[0]).map(u => <option key={u} value={u}>{u}</option>)}
+                      </select>
+                      <ChevronDown size={14} color="#6B7280" style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: 12, marginBottom: 16 }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#4B5563', marginBottom: 6 }}>Selling Unit (Bills are made in this)</label>
+                      <div style={{ position: 'relative' }}>
+                        <select value={formData.sellingUnit || ''} onChange={e => setFormData({...formData, sellingUnit: e.target.value})} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 14, outline: 'none', appearance: 'none', backgroundColor: 'white' }}>
+                          {getUnitsForCategory(formData.category || availableCategories[0]).map(u => <option key={u} value={u}>{u}</option>)}
+                        </select>
+                        <ChevronDown size={14} color="#6B7280" style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+                      </div>
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#4B5563', marginBottom: 6 }}>1 {formData.sellingUnit || 'Selling Unit'} = X {formData.baseUnit || 'Base Unit'}</label>
+                      <input type="number" step="0.01" value={formData.sellingConversionFactor || ''} onChange={e => setFormData({...formData, sellingConversionFactor: parseFloat(e.target.value) || 1})} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 14, outline: 'none' }} placeholder="1" />
+                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: 12 }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#4B5563', marginBottom: 6 }}>Purchase Unit (Purchases are made in this)</label>
+                      <div style={{ position: 'relative' }}>
+                        <select value={formData.purchaseUnit || ''} onChange={e => setFormData({...formData, purchaseUnit: e.target.value})} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 14, outline: 'none', appearance: 'none', backgroundColor: 'white' }}>
+                          {getUnitsForCategory(formData.category || availableCategories[0]).map(u => <option key={u} value={u}>{u}</option>)}
+                        </select>
+                        <ChevronDown size={14} color="#6B7280" style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+                      </div>
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#4B5563', marginBottom: 6 }}>1 {formData.purchaseUnit || 'Purchase Unit'} = X {formData.baseUnit || 'Base Unit'}</label>
+                      <input type="number" step="0.01" value={formData.purchaseConversionFactor || ''} onChange={e => setFormData({...formData, purchaseConversionFactor: parseFloat(e.target.value) || 1})} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 14, outline: 'none' }} placeholder="1" />
+                    </div>
                   </div>
                 </div>
                 
