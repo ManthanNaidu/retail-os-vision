@@ -328,10 +328,10 @@ export default function DashboardPage() {
                                     </linearGradient>
                                 </defs>
                                 <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94A3B8', fontWeight: 600 }} />
-                                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94A3B8', fontWeight: 600 }} tickFormatter={(val) => val >= 1000 ? \`\${val/1000}K\` : val} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94A3B8', fontWeight: 600 }} tickFormatter={(val) => val >= 1000 ? `${val/1000}K` : val} />
                                 <Tooltip 
                                     contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                                    formatter={(value: number) => [\`₹\${value}\`, 'Revenue']}
+                                    formatter={(value: number) => [`₹${value}`, 'Revenue']}
                                 />
                                 <Area type="monotone" dataKey="sales" stroke="#f59e0b" strokeWidth={3} fillOpacity={1} fill="url(#colorSalesOrange)" />
                                 {/* Overlay dot for peak */}
