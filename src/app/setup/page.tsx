@@ -186,143 +186,143 @@ export default function SetupPage() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="flex flex-col h-full"
+            className="flex flex-col h-full absolute inset-0 pb-[88px]"
           >
-            <div className="flex items-center justify-between mb-6 px-2">
-              <div className="flex-1">
-                <h1 className="text-3xl font-black text-slate-900 mb-1 tracking-tight leading-tight">Let's set up<br/>your store <Sparkles className="inline w-6 h-6 text-amber-400" /></h1>
-                <p className="text-slate-500 text-sm font-medium mt-2">Tell us a little about your business.</p>
+            <div className="overflow-y-auto px-6 pt-2 pb-6 flex-1 custom-scrollbar w-full">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex-1">
+                  <h1 className="text-3xl font-black text-slate-900 mb-1 tracking-tight leading-tight">Let's set up<br/>your store <Sparkles className="inline w-6 h-6 text-amber-400" /></h1>
+                  <p className="text-slate-500 text-[13px] font-medium mt-1">Tell us a little about your business.</p>
+                </div>
+                <div className="w-28 h-28 shrink-0 -mr-2 relative">
+                   <img src="/images/my_store.png" alt="Store setup" className="w-full h-full object-contain drop-shadow-sm" />
+                </div>
               </div>
-              <div className="w-32 h-32 shrink-0 -mr-4 relative">
-                 <img src="/images/my_store.jpg" alt="Store setup" className="w-full h-full object-contain mix-blend-multiply" />
-              </div>
-            </div>
-            
-            <div className="space-y-3 overflow-y-auto px-2 flex-1 custom-scrollbar pb-32">
-              <h3 className="text-[11px] font-bold text-slate-400 tracking-wider uppercase mb-1 px-1">Basic Information</h3>
               
-              <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
-                  <Store className="w-6 h-6 text-orange-500" />
-                </div>
-                <div className="flex-1">
-                  <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Store Name <span className="text-orange-500">*</span></label>
-                  <input type="text" value={storeDetails.storeName} onChange={e => setStoreDetails({...storeDetails, storeName: e.target.value})} placeholder="e.g. Shree Ram Stores" className="w-full bg-transparent border-none outline-none text-slate-900 font-bold text-[15px] p-0 placeholder:text-slate-300 placeholder:font-medium" />
-                </div>
-              </div>
-
-              <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
-                  <LucideIcons.User className="w-6 h-6 text-orange-500" />
-                </div>
-                <div className="flex-1">
-                  <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Owner Name <span className="text-orange-500">*</span></label>
-                  <input type="text" value={storeDetails.ownerName} onChange={e => setStoreDetails({...storeDetails, ownerName: e.target.value})} placeholder="e.g. Rajesh Kumar" className="w-full bg-transparent border-none outline-none text-slate-900 font-bold text-[15px] p-0 placeholder:text-slate-300 placeholder:font-medium" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex flex-col justify-center">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
-                      <Phone className="w-4 h-4 text-orange-500" />
-                    </div>
-                    <label className="block text-[11px] font-bold text-slate-500">Phone <span className="text-orange-500">*</span></label>
+              <div className="space-y-3">
+                <h3 className="text-[11px] font-bold text-slate-400 tracking-wider uppercase mb-1">Basic Information</h3>
+                
+                <div className="bg-white border border-slate-200 rounded-[20px] p-4 flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
+                    <Store className="w-5 h-5 text-orange-500" />
                   </div>
-                  <input type="tel" value={storeDetails.phone} onChange={handlePhoneChange} placeholder="9876543210" maxLength={10} className="w-full bg-transparent border-none outline-none text-slate-900 font-bold text-[15px] p-0 placeholder:text-slate-300 placeholder:font-medium pl-1" />
+                  <div className="flex-1">
+                    <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Store Name <span className="text-orange-500">*</span></label>
+                    <input type="text" value={storeDetails.storeName} onChange={e => setStoreDetails({...storeDetails, storeName: e.target.value})} placeholder="e.g. Shree Ram Stores" className="w-full bg-transparent border-none outline-none text-slate-800 font-bold text-[14px] p-0 placeholder:text-slate-300" />
+                  </div>
                 </div>
 
-                <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex flex-col justify-center relative">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center shrink-0">
-                      <LucideIcons.MessageCircle className="w-4 h-4 text-green-500" />
-                    </div>
-                    <label className="block text-[11px] font-bold text-slate-500">WhatsApp</label>
+                <div className="bg-white border border-slate-200 rounded-[20px] p-4 flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
+                    <LucideIcons.User className="w-5 h-5 text-orange-500" />
                   </div>
-                  <input type="tel" value={storeDetails.whatsapp} onChange={e => setStoreDetails({...storeDetails, whatsapp: e.target.value})} disabled={sameAsPhone} placeholder="9876543210" maxLength={10} className={`w-full bg-transparent border-none outline-none text-slate-900 font-bold text-[15px] p-0 placeholder:text-slate-300 placeholder:font-medium pl-1 ${sameAsPhone ? 'opacity-50' : ''}`} />
+                  <div className="flex-1">
+                    <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Owner Name <span className="text-orange-500">*</span></label>
+                    <input type="text" value={storeDetails.ownerName} onChange={e => setStoreDetails({...storeDetails, ownerName: e.target.value})} placeholder="e.g. Rajesh Kumar" className="w-full bg-transparent border-none outline-none text-slate-800 font-bold text-[14px] p-0 placeholder:text-slate-300" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-white border border-slate-200 rounded-[20px] p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
+                      <Phone className="w-5 h-5 text-orange-500" />
+                    </div>
+                    <div className="flex-1 overflow-hidden">
+                      <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Phone <span className="text-orange-500">*</span></label>
+                      <input type="tel" value={storeDetails.phone} onChange={handlePhoneChange} placeholder="9876543210" maxLength={10} className="w-full bg-transparent border-none outline-none text-slate-800 font-bold text-[14px] p-0 placeholder:text-slate-300" />
+                    </div>
+                  </div>
+
+                  <div className="bg-white border border-slate-200 rounded-[20px] p-4 flex items-center gap-3 relative">
+                    <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center shrink-0">
+                      <LucideIcons.MessageCircle className="w-5 h-5 text-green-500" />
+                    </div>
+                    <div className="flex-1 overflow-hidden">
+                      <label className="block text-[11px] font-bold text-slate-500 mb-0.5">WhatsApp</label>
+                      <input type="tel" value={storeDetails.whatsapp} onChange={e => setStoreDetails({...storeDetails, whatsapp: e.target.value})} disabled={sameAsPhone} placeholder="9876543210" maxLength={10} className={`w-full bg-transparent border-none outline-none text-slate-800 font-bold text-[14px] p-0 placeholder:text-slate-300 ${sameAsPhone ? 'opacity-50' : ''}`} />
+                    </div>
+                    <label className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium absolute top-4 right-4 cursor-pointer">
+                      <input type="checkbox" checked={sameAsPhone} onChange={handleSameAsPhoneChange} className="rounded-sm border-slate-300 text-orange-500 focus:ring-orange-500 w-3 h-3" />
+                      Same
+                    </label>
+                  </div>
+                </div>
+
+                <div className="bg-white border border-slate-200 rounded-[20px] p-4 flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
+                    <MapPin className="w-5 h-5 text-orange-500" />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-[11px] font-bold text-slate-500 mb-0.5">City <span className="text-orange-500">*</span></label>
+                    <input type="text" value={storeDetails.city} onChange={e => setStoreDetails({...storeDetails, city: e.target.value})} placeholder="e.g. Bengaluru, Karnataka" className="w-full bg-transparent border-none outline-none text-slate-800 font-bold text-[14px] p-0 placeholder:text-slate-300" />
+                  </div>
+                  <LucideIcons.ChevronDown className="w-5 h-5 text-slate-400" />
+                </div>
+
+                <div className="bg-white border border-slate-200 rounded-[20px] p-4 flex items-center justify-between mt-2 cursor-pointer">
+                  <div>
+                    <h4 className="text-[14px] font-bold text-slate-900">More business details <span className="text-slate-400 font-medium text-[13px]">(Optional)</span></h4>
+                    <p className="text-[11px] text-slate-400 font-medium mt-0.5">GST, UPI ID, Full Address, Pincode...</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-slate-400" />
+                </div>
+                
+                {/* Your Store Preview */}
+                <div className="bg-[#FFF8F3] border border-orange-100 rounded-[24px] p-5 mt-6 shadow-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-[14px] font-bold text-slate-800">Your Store Preview</h4>
+                    <span className="text-green-600 text-[10px] font-bold tracking-wider uppercase">LIVE</span>
+                  </div>
                   
-                  <label className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium absolute bottom-3 right-3 cursor-pointer">
-                    <input type="checkbox" checked={sameAsPhone} onChange={handleSameAsPhoneChange} className="rounded-sm border-slate-300 text-orange-500 focus:ring-orange-500 w-3 h-3" />
-                    Same
-                  </label>
-                </div>
-              </div>
-
-              <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
-                  <MapPin className="w-6 h-6 text-orange-500" />
-                </div>
-                <div className="flex-1">
-                  <label className="block text-[11px] font-bold text-slate-500 mb-0.5">City <span className="text-orange-500">*</span></label>
-                  <input type="text" value={storeDetails.city} onChange={e => setStoreDetails({...storeDetails, city: e.target.value})} placeholder="e.g. Bengaluru, Karnataka" className="w-full bg-transparent border-none outline-none text-slate-900 font-bold text-[15px] p-0 placeholder:text-slate-300 placeholder:font-medium" />
-                </div>
-                <LucideIcons.ChevronDown className="w-5 h-5 text-slate-400" />
-              </div>
-
-              <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex items-center justify-between mt-2 cursor-pointer">
-                <div>
-                  <h4 className="text-[14px] font-bold text-slate-900">More business details <span className="text-slate-400 font-medium text-[13px]">(Optional)</span></h4>
-                  <p className="text-[11px] text-slate-400 font-medium mt-0.5">GST, UPI ID, Full Address, Pincode...</p>
-                </div>
-                <ChevronRight className="w-5 h-5 text-slate-400" />
-              </div>
-              
-              {/* Your Store Preview */}
-              <div className="bg-[#FFF8F3] border border-orange-100 rounded-[24px] p-5 mt-6 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-[14px] font-bold text-slate-800">Your Store Preview</h4>
-                  <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">Live</span>
-                </div>
-                
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-20 h-20 rounded-full bg-white border-4 border-orange-50 shadow-sm flex items-center justify-center overflow-hidden shrink-0 p-2">
-                    {selectedType?.image ? (
-                       <img src={selectedType.image} alt="Store type" className="w-full h-full object-cover scale-110" />
-                     ) : (
-                       <Store className="w-8 h-8 text-slate-400" />
-                     )}
-                  </div>
-                  <div className="flex flex-col">
-                    <h3 className="text-lg font-black text-slate-900 leading-tight">{storeDetails.storeName || 'Shree Ram Stores'}</h3>
-                    <p className="text-slate-500 font-semibold text-sm mt-0.5">{selectedType?.name || 'Grocery / Kirana'}</p>
-                    <div className="flex items-center gap-1 text-slate-400 text-[11px] font-medium mt-1">
-                      <MapPin className="w-3 h-3" /> {storeDetails.city || 'Bengaluru, Karnataka'}
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center overflow-hidden shrink-0 border border-slate-100 p-1">
+                      {selectedType?.image ? (
+                         <img src={selectedType.image} alt="Store type" className="w-full h-full object-cover scale-110" />
+                       ) : (
+                         <Store className="w-8 h-8 text-slate-400" />
+                       )}
                     </div>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-4 gap-2">
-                  {[
-                    { icon: LucideIcons.Receipt, label: 'Billing', bg: 'bg-[#F3E8FF]', color: 'text-[#9333EA]' },
-                    { icon: LucideIcons.Package, label: 'Inventory', bg: 'bg-[#FFEDD5]', color: 'text-[#EA580C]' },
-                    { icon: LucideIcons.Users, label: 'Customers', bg: 'bg-[#E0F2FE]', color: 'text-[#0284C7]' },
-                    { icon: Sparkles, label: 'AI Assistant', bg: 'bg-[#FDF4FF]', color: 'text-[#C026D3]' },
-                  ].map((item, i) => (
-                    <div key={i} className="flex flex-col items-center gap-1.5">
-                      <div className={`w-12 h-12 rounded-full ${item.bg} flex items-center justify-center`}>
-                        <item.icon className={`w-5 h-5 ${item.color}`} />
+                    <div className="flex flex-col">
+                      <h3 className="text-[16px] font-black text-slate-900 leading-tight">{storeDetails.storeName || 'Shree Ram Stores'}</h3>
+                      <p className="text-slate-500 font-semibold text-[13px] mt-0.5">{selectedType?.name || 'Grocery / Kirana'}</p>
+                      <div className="flex items-center gap-1 text-slate-400 text-[11px] font-medium mt-1">
+                        <MapPin className="w-3 h-3" /> {storeDetails.city || 'Bengaluru, Karnataka'}
                       </div>
-                      <span className="text-[9px] font-bold text-slate-600 text-center leading-tight">{item.label}</span>
                     </div>
-                  ))}
+                  </div>
+                  
+                  <div className="grid grid-cols-4 gap-2">
+                    {[
+                      { icon: LucideIcons.Receipt, label: 'Billing', bg: 'bg-[#F3E8FF]', color: 'text-[#9333EA]' },
+                      { icon: LucideIcons.Package, label: 'Inventory', bg: 'bg-[#FFEDD5]', color: 'text-[#EA580C]' },
+                      { icon: LucideIcons.Users, label: 'Customers', bg: 'bg-[#E0F2FE]', color: 'text-[#0284C7]' },
+                      { icon: Sparkles, label: 'AI Assistant', bg: 'bg-[#FDF4FF]', color: 'text-[#C026D3]' },
+                    ].map((item, i) => (
+                      <div key={i} className="flex flex-col items-center gap-1.5">
+                        <div className={`w-12 h-12 rounded-full ${item.bg} flex items-center justify-center`}>
+                          <item.icon className={`w-5 h-5 ${item.color}`} />
+                        </div>
+                        <span className="text-[9px] font-bold text-slate-600 text-center leading-tight">{item.label}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-
             </div>
             
-            <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-slate-100 z-50">
+            <div className="absolute bottom-0 left-0 w-full p-4 bg-white border-t border-slate-100 z-50">
               <button
                 onClick={handleComplete}
                 disabled={loading || !storeDetails.storeName || !storeDetails.ownerName || !storeDetails.phone}
-                className={`w-full py-4 rounded-2xl font-bold text-white flex items-center justify-center transition-all text-[17px] shadow-lg shadow-orange-500/20 active:scale-[0.98] ${
+                className={`w-full py-4 rounded-full font-bold text-white flex items-center justify-center transition-all text-[16px] active:scale-[0.98] ${
                   storeDetails.storeName && storeDetails.ownerName && storeDetails.phone && !loading
-                    ? 'bg-[#FF6B00]' 
+                    ? 'bg-[#FF6B00] shadow-lg shadow-orange-500/20' 
                     : 'bg-slate-200 text-slate-400 shadow-none cursor-not-allowed'
                 }`}
               >
-                {loading ? 'Saving...' : 'Continue'} {!loading && <ArrowRight className="ml-2 w-5 h-5" />}
+                {loading ? 'Saving...' : 'Continue'} {!loading && <ArrowRight className="ml-2 w-5 h-5 opacity-70" />}
               </button>
-              <div className="text-center mt-3 flex items-center justify-center gap-1.5 text-slate-400 text-[11px] font-medium">
+              <div className="text-center mt-3 flex items-center justify-center gap-1.5 text-slate-400 text-[10px] font-medium pb-2">
                 <LucideIcons.Lock className="w-3 h-3" /> Your data is safe and secure
               </div>
             </div>
@@ -335,63 +335,55 @@ export default function SetupPage() {
             key="step4"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col h-full relative"
+            className="flex flex-col h-full absolute inset-0 pb-[120px]"
           >
             {/* Top Graphics */}
-            <div className="absolute -top-10 -left-8 -right-8 h-48 bg-[#FFF8F3] -z-10 rounded-t-[2rem]">
-               {/* Flower decals */}
-               <img src="/images/diya.jpg" alt="decor" className="absolute top-8 right-4 w-16 opacity-50 mix-blend-multiply" />
-               <img src="/images/diya.jpg" alt="decor" className="absolute top-4 left-4 w-12 opacity-50 mix-blend-multiply" />
-            </div>
+            <div className="absolute -top-10 -left-8 -right-8 h-48 bg-[#FFF8F3] -z-10 rounded-t-[2rem]"></div>
 
-            <div className="flex flex-col items-center mt-8 mb-6 relative">
-              <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 rounded-[2rem]">
-                {[...Array(15)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute text-2xl"
-                    initial={{ top: -50, left: `${Math.random() * 100}%`, rotate: 0, opacity: 1 }}
-                    animate={{ top: '120%', rotate: 360, opacity: 0 }}
-                    transition={{ duration: 4 + Math.random() * 5, repeat: Infinity, delay: Math.random() * 5, ease: "linear" }}
-                  >
-                    {['🌸', '🌼', '🏵️', '🌺', '🌻', '🌷', '🌹'][Math.floor(Math.random() * 7)]}
-                  </motion.div>
-                ))}
+            <div className="overflow-y-auto px-6 pt-2 pb-6 flex-1 custom-scrollbar w-full">
+              <div className="flex flex-col items-center mt-8 mb-6 relative">
+                <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 rounded-[2rem]">
+                  {[...Array(15)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute text-2xl"
+                      initial={{ top: -50, left: `${Math.random() * 100}%`, rotate: 0, opacity: 1 }}
+                      animate={{ top: '120%', rotate: 360, opacity: 0 }}
+                      transition={{ duration: 4 + Math.random() * 5, repeat: Infinity, delay: Math.random() * 5, ease: "linear" }}
+                    >
+                      {['🌸', '🌼', '🏵️', '🌺', '🌻', '🌷', '🌹'][Math.floor(Math.random() * 7)]}
+                    </motion.div>
+                  ))}
+                </div>
+                <div className="w-24 h-24 bg-[#10B981] rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(16,185,129,0.3)] mb-4 z-10 relative">
+                   <Check className="w-12 h-12 text-white" strokeWidth={4} />
+                </div>
+                <h1 className="text-[32px] font-black text-slate-900 tracking-tight leading-tight z-10 relative">Welcome Onboard!</h1>
+                <p className="text-[14px] font-bold mt-1 text-slate-600 z-10 relative"><span className="text-[#FF6B00]">Shubh Aarambh!</span> Your store is ready.</p>
               </div>
-              <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center border-8 border-green-50 shadow-lg shadow-green-500/20 mb-4 z-10 relative">
-                 <Check className="w-12 h-12 text-white" strokeWidth={4} />
-                 {/* Diya underneath */}
-                 <div className="absolute -bottom-8 right-0 w-20">
-                    <img src="/images/diya.jpg" alt="diya" className="w-full h-full object-contain mix-blend-multiply" />
-                 </div>
-              </div>
-              <h1 className="text-[32px] font-black text-slate-900 tracking-tight leading-tight z-10 relative">Welcome Onboard!</h1>
-              <p className="text-[14px] font-bold mt-1 text-slate-600 z-10 relative"><span className="text-[#FF6B00]">Shubh Aarambh!</span> Your store is ready.</p>
-            </div>
-            
-            <div className="overflow-y-auto px-2 flex-1 custom-scrollbar pb-40 z-10 relative">
-              <div className="bg-[#FFF8F3] border border-orange-100 rounded-3xl p-4 w-full mb-6 shadow-sm flex items-center gap-4">
-                <div className="w-20 h-20 rounded-2xl bg-white shadow-sm flex items-center justify-center overflow-hidden shrink-0 p-1 border border-orange-50">
+              
+              <div className="bg-[#FFF8F3] border border-orange-100 rounded-[20px] p-4 w-full mb-6 flex items-center gap-4">
+                <div className="w-16 h-16 rounded-xl bg-white shadow-sm flex items-center justify-center overflow-hidden shrink-0 border border-orange-50 p-1">
                    {selectedType?.image ? (
-                     <img src={selectedType.image} alt="Store type" className="w-full h-full object-cover scale-110" />
+                     <img src={selectedType?.image} alt="Store type" className="w-full h-full object-cover scale-110" />
                    ) : (
-                     <Store size={40} className="text-slate-400" strokeWidth={1.5} />
+                     <Store size={32} className="text-slate-400" strokeWidth={1.5} />
                    )}
                 </div>
                 <div className="flex flex-col items-start text-left flex-1">
-                  <h2 className="text-[18px] font-black text-slate-900 mb-1 leading-tight">{storeDetails.storeName || 'Shree Ram Stores'}</h2>
+                  <h2 className="text-[16px] font-black text-slate-900 mb-0.5 leading-tight">{storeDetails.storeName || 'Shree Ram Stores'}</h2>
                   <div className="flex items-center gap-1.5 text-[12px] text-slate-500 font-semibold mb-1">
-                    <span className="w-2 h-2 rounded-full bg-green-500"></span> {selectedType?.name || 'Grocery / Kirana'}
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> {selectedType?.name || 'Grocery / Kirana'}
                   </div>
                   <div className="flex items-center gap-1 text-[11px] text-slate-400 font-medium">
-                    <MapPin className="w-3.5 h-3.5" /> {storeDetails.city || 'Bengaluru, Karnataka'}
+                    <MapPin className="w-3 h-3" /> {storeDetails.city || 'Bengaluru, Karnataka'}
                   </div>
                 </div>
               </div>
               
-              <h3 className="text-[11px] font-bold text-slate-400 tracking-wider uppercase mb-3 px-1">Your Store is Ready</h3>
+              <h3 className="text-[11px] font-bold text-slate-400 tracking-wider uppercase mb-2 px-1">Your Store is Ready</h3>
               
-              <div className="bg-white border border-slate-100 rounded-3xl p-2 shadow-sm mb-6">
+              <div className="bg-white border border-slate-100 rounded-3xl py-2 px-1 mb-6">
                 {[
                   { icon: Store, title: 'Store Profile', subtitle: 'Completed', color: 'text-[#FF6B00]', bg: 'bg-orange-50' },
                   { icon: LucideIcons.Receipt, title: 'Billing & Invoicing', subtitle: 'Ready to use', color: 'text-[#9333EA]', bg: 'bg-[#F3E8FF]' },
@@ -399,7 +391,7 @@ export default function SetupPage() {
                   { icon: LucideIcons.Users, title: 'Customers & Credit', subtitle: 'Enabled', color: 'text-[#0284C7]', bg: 'bg-[#E0F2FE]' },
                   { icon: LucideIcons.Bot, title: 'RetailBot AI Assistant', subtitle: 'Active & Ready', color: 'text-[#7C3AED]', bg: 'bg-[#F3E8FF]' }
                 ].map((item, i) => (
-                  <div key={i} className={`flex items-center gap-3 p-3 ${i !== 4 ? 'border-b border-slate-50' : ''}`}>
+                  <div key={i} className={`flex items-center gap-3 p-2.5 ${i !== 4 ? 'border-b border-slate-50' : ''}`}>
                     <div className={`w-10 h-10 rounded-full ${item.bg} flex items-center justify-center shrink-0`}>
                       <item.icon className={`w-5 h-5 ${item.color}`} />
                     </div>
@@ -415,35 +407,35 @@ export default function SetupPage() {
               </div>
 
               {/* RetailBot Promo */}
-              <div className="bg-[#F8F5FF] border border-[#E9D5FF] rounded-3xl p-5 shadow-sm flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-white shadow-sm border border-[#E9D5FF] flex items-center justify-center overflow-hidden shrink-0">
+              <div className="bg-[#F8F5FF] border border-[#E9D5FF] rounded-[20px] p-4 flex items-center gap-4 mb-2">
+                <div className="w-14 h-14 rounded-full bg-white shadow-sm border border-[#E9D5FF] flex items-center justify-center overflow-hidden shrink-0">
                   <img src="/images/retailbot.jpg" alt="RetailBot" className="w-full h-full object-cover mix-blend-multiply" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-[14px] font-bold text-[#7C3AED] leading-tight flex items-center gap-1">RetailBot is here to help you <Sparkles className="w-3.5 h-3.5" /></h4>
-                  <p className="text-[11px] text-slate-500 font-medium mt-1 mb-3">I've set up everything for your store. What would you like to do next?</p>
-                  <button className="bg-[#E9D5FF] text-[#7C3AED] text-[11px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1">
+                  <h4 className="text-[13px] font-bold text-[#7C3AED] leading-tight flex items-center gap-1 mb-1">RetailBot is here to help you <Sparkles className="w-3.5 h-3.5" /></h4>
+                  <p className="text-[10px] text-slate-500 font-medium mt-0.5 mb-2 leading-tight">I've set up everything for your store. What would you like to do next?</p>
+                  <button className="text-[#7C3AED] text-[11px] font-bold flex items-center gap-1">
                     Ask RetailBot <Sparkles className="w-3 h-3" />
                   </button>
                 </div>
               </div>
             </div>
             
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-transparent pt-10 pb-6 px-4 z-50">
+            <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-white via-white to-transparent pt-10 pb-6 px-6 z-50">
               <button
                 onClick={finishSetup}
-                className="w-full py-4 rounded-full font-bold text-white bg-[#FF6B00] shadow-lg shadow-orange-500/20 active:scale-[0.98] transition-all flex items-center justify-center text-[17px] relative"
+                className="w-full py-3.5 rounded-full font-bold text-white bg-[#FF6B00] shadow-lg shadow-orange-500/20 active:scale-[0.98] transition-all flex items-center justify-center text-[16px] relative"
               >
                 Launch Dashboard <LucideIcons.Rocket className="ml-2 w-5 h-5" fill="currentColor" />
               </button>
               
-              <button onClick={finishSetup} className="w-full text-center mt-4 text-[#7C3AED] font-bold text-[14px]">
+              <button onClick={finishSetup} className="w-full text-center mt-3 text-[#7C3AED] font-bold text-[13px]">
                 Explore features
               </button>
               
-              <div className="mt-6 mx-auto w-fit bg-[#FFF8F3] border border-orange-100 rounded-lg px-4 py-2 flex items-center gap-2">
-                <Shield className="w-4 h-4 text-orange-500" />
-                <span className="text-[11px] font-bold text-slate-800">Made for Indian Retailers</span>
+              <div className="mt-4 mx-auto w-fit bg-[#FFF8F3] border border-orange-100 rounded-md px-3 py-1.5 flex items-center gap-1.5">
+                <Shield className="w-3.5 h-3.5 text-orange-500" />
+                <span className="text-[10px] font-bold text-slate-800">Made for Indian Retailers</span>
               </div>
             </div>
           </motion.div>
@@ -459,21 +451,23 @@ export default function SetupPage() {
         {/* Header - Hidden on success step */}
         {step < 4 && (
           <div className="px-6 pt-6 pb-2 flex flex-col gap-6 bg-white z-10">
-            <div className="flex items-center justify-between relative">
-              <button className="text-slate-500 p-2 -ml-2" onClick={() => step > 1 ? handleBack() : router.back()}>
-                <LucideIcons.ArrowLeft size={24} />
-              </button>
-              <div className="flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"
+            <div className="grid grid-cols-3 items-center w-full">
+              <div className="flex justify-start">
+                <button className="text-slate-500 p-2 -ml-2 hover:bg-slate-50 rounded-full transition-colors" onClick={() => step > 1 ? handleBack() : router.back()}>
+                  <LucideIcons.ArrowLeft size={24} />
+                </button>
+              </div>
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm shrink-0"
                    style={{ background: 'linear-gradient(135deg, #fbbf24, #f97316)' }}>
                   <Zap className="w-4 h-4 text-white" fill="white" />
                 </div>
                 <div className="flex flex-col items-start">
                   <span className="font-extrabold text-lg text-slate-800 tracking-tight leading-none">Retail<span className="text-orange-500">OS</span></span>
-                  <span className="text-slate-400 text-[9px] font-black tracking-widest uppercase mt-0.5">Setup</span>
+                  <span className="text-slate-500 text-[9px] font-black tracking-widest uppercase mt-0.5">Setup</span>
                 </div>
               </div>
-              <div className="w-10"></div>
+              <div className="flex justify-end"></div>
             </div>
             
             {/* Progress Bar */}
@@ -502,7 +496,7 @@ export default function SetupPage() {
         )}
         
         {/* Content Area */}
-        <div className="flex-1 px-8 pb-8 pt-2 overflow-hidden relative flex flex-col">
+        <div className="flex-1 overflow-hidden relative flex flex-col">
           <AnimatePresence mode="wait">
             {renderStep()}
           </AnimatePresence>
