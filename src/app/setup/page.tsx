@@ -195,11 +195,11 @@ export default function SetupPage() {
                   <p className="text-slate-500 text-[13px] font-medium mt-1">Tell us a little about your business.</p>
                 </div>
                 <div className="w-28 h-28 shrink-0 -mr-2 relative">
-                   <img src="/images/my_store.png" alt="Store setup" className="w-full h-full object-contain drop-shadow-sm" />
+                   <img src="/images/setup_store.jpg" alt="Store setup" className="w-full h-full object-contain drop-shadow-sm mix-blend-multiply" />
                 </div>
               </div>
               
-              <div className="space-y-3">
+              <div className="space-y-5">
                 <h3 className="text-[11px] font-bold text-slate-400 tracking-wider uppercase mb-1">Basic Information</h3>
                 
                 <div className="bg-white border border-slate-200 rounded-[20px] p-4 flex items-center gap-4">
