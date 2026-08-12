@@ -116,7 +116,7 @@ export default function EmployeesPage() {
     <div className="page-enter has-bottom-nav" style={{ minHeight: '100vh', background: '#F4F6FA', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       
       {/* Orange Hero Section */}
-      <div style={{ background: 'linear-gradient(135deg, #FF7B00 0%, #FF5500 100%)', paddingBottom: '32px', borderBottomLeftRadius: '24px', borderBottomRightRadius: '24px' }}>
+      <div style={{ background: '#FF5A00', paddingBottom: '32px', borderBottomLeftRadius: '24px', borderBottomRightRadius: '24px' }}>
         
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px' }}>
@@ -157,7 +157,7 @@ export default function EmployeesPage() {
                 </button>
             </div>
             
-            <img src="/images/team_banner.jpg" alt="Team" style={{ position: 'absolute', right: '-20px', top: '-10px', width: '220px', height: 'auto', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+            <img src="/images/team_banner.jpg" alt="Team" style={{ position: 'absolute', right: '-20px', top: '-10px', width: '220px', height: 'auto', objectFit: 'contain' }} />
         </div>
       </div>
 
