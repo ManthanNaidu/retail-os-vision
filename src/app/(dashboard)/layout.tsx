@@ -85,7 +85,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {pathname !== '/dashboard' && pathname !== '/inventory' && pathname !== '/customers' && pathname !== '/ai-assistant' && pathname !== '/employees' && pathname !== '/suppliers' && <TopBar title={title} />}
+        {pathname !== '/dashboard' && pathname !== '/inventory' && pathname !== '/customers' && pathname !== '/ai-assistant' && pathname !== '/employees' && pathname !== '/suppliers' && pathname !== '/settings' && <TopBar title={title} />}
         <main className="flex-1 overflow-y-auto has-bottom-nav lg:pb-0">
           {children}
         </main>

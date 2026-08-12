@@ -271,7 +271,7 @@ const SettingsPage = () => {
         </div>
       </div>
 
-      <div className="px-5 space-y-5">
+      <div className="px-5 flex flex-col gap-5">
         
         {/* Business Snapshot */}
         <div className="flex gap-3 overflow-x-auto pb-2 custom-scrollbar -mx-5 px-5">
@@ -468,9 +468,9 @@ const SettingsPage = () => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 py-6 custom-scrollbar space-y-6 pb-[100px]">
+      <div className="flex-1 overflow-y-auto px-5 py-6 custom-scrollbar flex flex-col gap-6 pb-[100px]">
         
-        <div className="bg-white border border-[#E8ECF2] rounded-[20px] p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] space-y-5">
+        <div className="bg-white border border-[#E8ECF2] rounded-[20px] p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col gap-5">
           <h3 className="text-[14px] font-bold text-[#64748B] tracking-wider uppercase mb-2">Basic Info</h3>
           
           <div>
@@ -522,7 +522,7 @@ const SettingsPage = () => {
           </div>
         </div>
 
-        <div className="bg-white border border-[#E8ECF2] rounded-[20px] p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] space-y-5">
+        <div className="bg-white border border-[#E8ECF2] rounded-[20px] p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col gap-5">
           <h3 className="text-[14px] font-bold text-[#64748B] tracking-wider uppercase mb-2">Location & Tax</h3>
           
           <div>
@@ -556,7 +556,7 @@ const SettingsPage = () => {
           </div>
         </div>
         
-        <div className="bg-white border border-[#E8ECF2] rounded-[20px] p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] space-y-5">
+        <div className="bg-white border border-[#E8ECF2] rounded-[20px] p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col gap-5">
           <h3 className="text-[14px] font-bold text-[#64748B] tracking-wider uppercase mb-2">Payments</h3>
           
           <div>
@@ -629,9 +629,9 @@ const SettingsPage = () => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 py-6 custom-scrollbar space-y-6 pb-[100px]">
+      <div className="flex-1 overflow-y-auto px-5 py-6 custom-scrollbar flex flex-col gap-6 pb-[100px]">
         
-        <div className="bg-white border border-[#E8ECF2] rounded-[20px] p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] space-y-5">
+        <div className="bg-white border border-[#E8ECF2] rounded-[20px] p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col gap-5">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center shrink-0">
               <Shield className="w-5 h-5 text-green-600" />
