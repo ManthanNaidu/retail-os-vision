@@ -32,7 +32,7 @@ export default function DashboardPage() {
                     const typeData = getStoreType(profile.storeType);
                     if (typeData) {
                         setStoreCategory(typeData.name);
-                        setStoreImage(typeData.image);
+                        setStoreImage(typeData.image || '/images/logo.jpg');
                     }
                 }
             }
