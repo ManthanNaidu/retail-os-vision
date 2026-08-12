@@ -188,90 +188,89 @@ export default function SetupPage() {
             exit={{ opacity: 0, x: -20 }}
             className="flex flex-col h-full absolute inset-0 pb-[88px]"
           >
-            <div className="overflow-y-auto px-6 pt-2 pb-6 flex-1 custom-scrollbar w-full">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex-1">
-                  <h1 className="text-3xl font-black text-slate-900 mb-1 tracking-tight leading-tight">Let's set up<br/>your store <Sparkles className="inline w-6 h-6 text-amber-400" /></h1>
-                  <p className="text-slate-500 text-[13px] font-medium mt-1">Tell us a little about your business.</p>
+            <div className="overflow-y-auto px-6 pt-4 pb-6 flex-1 custom-scrollbar w-full">
+              
+              <div className="flex items-start justify-between mb-8 relative">
+                <div className="flex-1 pt-2 z-10">
+                  <h1 className="text-4xl font-black text-slate-900 mb-2 tracking-tight leading-[1.1]">
+                    Let's set up<br/>your <span className="text-[#FF6B00]">store</span> <Sparkles className="inline w-7 h-7 text-amber-400" />
+                  </h1>
+                  <p className="text-slate-500 text-[14px] font-medium mt-1">Tell us a little about your business.</p>
                 </div>
-                <div className="w-28 h-28 shrink-0 -mr-2 relative">
-                   <img src="/images/setup_store.jpg" alt="Store setup" className="w-full h-full object-contain drop-shadow-sm mix-blend-multiply" />
+                <div className="w-40 h-40 shrink-0 absolute right-[-10px] top-[-20px] z-0">
+                   <img src="/images/setup_store.jpg" alt="Store setup" className="w-full h-full object-contain mix-blend-multiply" />
                 </div>
               </div>
               
-              <div className="space-y-5">
-                <h3 className="text-[11px] font-bold text-slate-400 tracking-wider uppercase mb-1">Basic Information</h3>
+              <div className="space-y-4 relative z-10 mt-10">
+                <h3 className="text-[12px] font-bold text-slate-500 tracking-wider uppercase mb-2">Basic Information</h3>
                 
                 <div className="bg-white border border-slate-200 rounded-[20px] p-4 flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
-                    <Store className="w-5 h-5 text-orange-500" />
-                  </div>
+                  <Store className="w-7 h-7 text-[#FF6B00] shrink-0" strokeWidth={1.5} />
                   <div className="flex-1">
-                    <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Store Name <span className="text-orange-500">*</span></label>
-                    <input type="text" value={storeDetails.storeName} onChange={e => setStoreDetails({...storeDetails, storeName: e.target.value})} placeholder="e.g. Shree Ram Stores" className="w-full bg-transparent border-none outline-none text-slate-800 font-bold text-[14px] p-0 placeholder:text-slate-300" />
+                    <label className="block text-[12px] font-bold text-slate-500 mb-0.5">Store Name <span className="text-[#FF6B00]">*</span></label>
+                    <input type="text" value={storeDetails.storeName} onChange={e => setStoreDetails({...storeDetails, storeName: e.target.value})} placeholder="e.g. Shree Ram Stores" className="w-full bg-transparent border-none outline-none text-slate-800 font-bold text-[15px] p-0 placeholder:text-slate-300" />
                   </div>
                 </div>
 
                 <div className="bg-white border border-slate-200 rounded-[20px] p-4 flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
-                    <LucideIcons.User className="w-5 h-5 text-orange-500" />
-                  </div>
+                  <LucideIcons.User className="w-7 h-7 text-[#FF6B00] shrink-0" strokeWidth={1.5} />
                   <div className="flex-1">
-                    <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Owner Name <span className="text-orange-500">*</span></label>
-                    <input type="text" value={storeDetails.ownerName} onChange={e => setStoreDetails({...storeDetails, ownerName: e.target.value})} placeholder="e.g. Rajesh Kumar" className="w-full bg-transparent border-none outline-none text-slate-800 font-bold text-[14px] p-0 placeholder:text-slate-300" />
+                    <label className="block text-[12px] font-bold text-slate-500 mb-0.5">Owner Name <span className="text-[#FF6B00]">*</span></label>
+                    <input type="text" value={storeDetails.ownerName} onChange={e => setStoreDetails({...storeDetails, ownerName: e.target.value})} placeholder="e.g. Rajesh Kumar" className="w-full bg-transparent border-none outline-none text-slate-800 font-bold text-[15px] p-0 placeholder:text-slate-300" />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-white border border-slate-200 rounded-[20px] p-4 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
-                      <Phone className="w-5 h-5 text-orange-500" />
-                    </div>
+                  <div className="bg-white border border-slate-200 rounded-[20px] p-4 flex items-start gap-3">
+                    <Phone className="w-6 h-6 text-[#FF6B00] shrink-0 mt-0.5" strokeWidth={1.5} />
                     <div className="flex-1 overflow-hidden">
-                      <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Phone <span className="text-orange-500">*</span></label>
-                      <input type="tel" value={storeDetails.phone} onChange={handlePhoneChange} placeholder="9876543210" maxLength={10} className="w-full bg-transparent border-none outline-none text-slate-800 font-bold text-[14px] p-0 placeholder:text-slate-300" />
+                      <label className="block text-[12px] font-bold text-slate-500 mb-0.5 whitespace-nowrap">Phone Number <span className="text-[#FF6B00]">*</span></label>
+                      <input type="tel" value={storeDetails.phone} onChange={handlePhoneChange} placeholder="98765 43210" maxLength={10} className="w-full bg-transparent border-none outline-none text-slate-800 font-bold text-[15px] p-0 placeholder:text-slate-300" />
                     </div>
                   </div>
 
-                  <div className="bg-white border border-slate-200 rounded-[20px] p-4 flex items-center gap-3 relative">
-                    <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center shrink-0">
-                      <LucideIcons.MessageCircle className="w-5 h-5 text-green-500" />
+                  <div className="bg-white border border-slate-200 rounded-[20px] p-4 flex items-start gap-3 relative">
+                    <LucideIcons.MessageCircle className="w-6 h-6 text-[#10B981] shrink-0 mt-0.5" strokeWidth={1.5} />
+                    <div className="flex-1 overflow-hidden flex flex-col">
+                      <label className="block text-[12px] font-bold text-slate-500 mb-0.5 whitespace-nowrap">WhatsApp Number</label>
+                      <input type="tel" value={storeDetails.whatsapp} onChange={e => setStoreDetails({...storeDetails, whatsapp: e.target.value})} disabled={sameAsPhone} placeholder="98765 43210" maxLength={10} className={`w-full bg-transparent border-none outline-none text-slate-800 font-bold text-[15px] p-0 mb-2 placeholder:text-slate-300 ${sameAsPhone ? 'opacity-50' : ''}`} />
+                      <label className="flex items-center gap-1.5 text-[12px] text-slate-500 font-medium cursor-pointer">
+                        <div className={`w-4 h-4 rounded border flex items-center justify-center ${sameAsPhone ? 'bg-[#FF6B00] border-[#FF6B00]' : 'border-slate-300'}`}>
+                          {sameAsPhone && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                        </div>
+                        <input type="checkbox" checked={sameAsPhone} onChange={handleSameAsPhoneChange} className="sr-only" />
+                        Same as phone
+                      </label>
                     </div>
-                    <div className="flex-1 overflow-hidden">
-                      <label className="block text-[11px] font-bold text-slate-500 mb-0.5">WhatsApp</label>
-                      <input type="tel" value={storeDetails.whatsapp} onChange={e => setStoreDetails({...storeDetails, whatsapp: e.target.value})} disabled={sameAsPhone} placeholder="9876543210" maxLength={10} className={`w-full bg-transparent border-none outline-none text-slate-800 font-bold text-[14px] p-0 placeholder:text-slate-300 ${sameAsPhone ? 'opacity-50' : ''}`} />
-                    </div>
-                    <label className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium absolute top-4 right-4 cursor-pointer">
-                      <input type="checkbox" checked={sameAsPhone} onChange={handleSameAsPhoneChange} className="rounded-sm border-slate-300 text-orange-500 focus:ring-orange-500 w-3 h-3" />
-                      Same
-                    </label>
                   </div>
                 </div>
 
                 <div className="bg-white border border-slate-200 rounded-[20px] p-4 flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
-                    <MapPin className="w-5 h-5 text-orange-500" />
-                  </div>
+                  <MapPin className="w-7 h-7 text-[#FF6B00] shrink-0" strokeWidth={1.5} />
                   <div className="flex-1">
-                    <label className="block text-[11px] font-bold text-slate-500 mb-0.5">City <span className="text-orange-500">*</span></label>
-                    <input type="text" value={storeDetails.city} onChange={e => setStoreDetails({...storeDetails, city: e.target.value})} placeholder="e.g. Bengaluru, Karnataka" className="w-full bg-transparent border-none outline-none text-slate-800 font-bold text-[14px] p-0 placeholder:text-slate-300" />
+                    <label className="block text-[12px] font-bold text-slate-500 mb-0.5">City <span className="text-[#FF6B00]">*</span></label>
+                    <input type="text" value={storeDetails.city} onChange={e => setStoreDetails({...storeDetails, city: e.target.value})} placeholder="e.g. Bengaluru, Karnataka" className="w-full bg-transparent border-none outline-none text-slate-800 font-bold text-[15px] p-0 placeholder:text-slate-300" />
                   </div>
                   <LucideIcons.ChevronDown className="w-5 h-5 text-slate-400" />
                 </div>
 
-                <div className="bg-white border border-slate-200 rounded-[20px] p-4 flex items-center justify-between mt-2 cursor-pointer">
+                <div className="bg-white border border-slate-200 rounded-[20px] p-4 flex items-center justify-between cursor-pointer">
                   <div>
-                    <h4 className="text-[14px] font-bold text-slate-900">More business details <span className="text-slate-400 font-medium text-[13px]">(Optional)</span></h4>
-                    <p className="text-[11px] text-slate-400 font-medium mt-0.5">GST, UPI ID, Full Address, Pincode...</p>
+                    <h4 className="text-[15px] font-bold text-slate-900">More business details <span className="text-slate-400 font-medium text-[14px]">(Optional)</span></h4>
+                    <p className="text-[12px] text-slate-400 font-medium mt-0.5">GST, UPI ID, Full Address, Pincode...</p>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-slate-400" />
+                  <ChevronRight className="w-5 h-5 text-slate-600" />
                 </div>
                 
                 {/* Your Store Preview */}
-                <div className="bg-[#FFF8F3] border border-orange-100 rounded-[24px] p-5 mt-6 shadow-sm">
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-[14px] font-bold text-slate-800">Your Store Preview</h4>
-                    <span className="text-green-600 text-[10px] font-bold tracking-wider uppercase">LIVE</span>
+                <div className="bg-[#FFF8F3] border border-[#FFE4D6] rounded-[24px] p-5 mt-6 shadow-sm">
+                  <div className="flex items-center justify-between mb-5">
+                    <h4 className="text-[15px] font-bold text-slate-800">Your Store Preview</h4>
+                    <div className="bg-green-100 text-green-700 px-2 py-0.5 rounded-md flex items-center gap-1.5">
+                      <span className="text-[11px] font-bold tracking-wider uppercase">LIVE</span>
+                      <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                    </div>
                   </div>
                   
                   <div className="flex items-center gap-4 mb-6">
@@ -283,10 +282,10 @@ export default function SetupPage() {
                        )}
                     </div>
                     <div className="flex flex-col">
-                      <h3 className="text-[16px] font-black text-slate-900 leading-tight">{storeDetails.storeName || 'Shree Ram Stores'}</h3>
-                      <p className="text-slate-500 font-semibold text-[13px] mt-0.5">{selectedType?.name || 'Grocery / Kirana'}</p>
-                      <div className="flex items-center gap-1 text-slate-400 text-[11px] font-medium mt-1">
-                        <MapPin className="w-3 h-3" /> {storeDetails.city || 'Bengaluru, Karnataka'}
+                      <h3 className="text-[16px] font-black text-slate-900 leading-tight mb-1">{storeDetails.storeName || 'Shree Ram Stores'}</h3>
+                      <p className="text-slate-500 font-semibold text-[13px] mb-0.5">{selectedType?.name || 'Grocery / Kirana'}</p>
+                      <div className="flex items-center gap-1 text-slate-500 text-[12px] font-medium">
+                        <MapPin className="w-3.5 h-3.5" /> {storeDetails.city || 'Bengaluru, Karnataka'}
                       </div>
                     </div>
                   </div>
@@ -298,11 +297,11 @@ export default function SetupPage() {
                       { icon: LucideIcons.Users, label: 'Customers', bg: 'bg-[#E0F2FE]', color: 'text-[#0284C7]' },
                       { icon: Sparkles, label: 'AI Assistant', bg: 'bg-[#FDF4FF]', color: 'text-[#C026D3]' },
                     ].map((item, i) => (
-                      <div key={i} className="flex flex-col items-center gap-1.5">
+                      <div key={i} className="flex flex-col items-center gap-2">
                         <div className={`w-12 h-12 rounded-full ${item.bg} flex items-center justify-center`}>
                           <item.icon className={`w-5 h-5 ${item.color}`} />
                         </div>
-                        <span className="text-[9px] font-bold text-slate-600 text-center leading-tight">{item.label}</span>
+                        <span className="text-[10px] font-bold text-slate-700 text-center leading-tight">{item.label}</span>
                       </div>
                     ))}
                   </div>
@@ -314,16 +313,16 @@ export default function SetupPage() {
               <button
                 onClick={handleComplete}
                 disabled={loading || !storeDetails.storeName || !storeDetails.ownerName || !storeDetails.phone}
-                className={`w-full py-4 rounded-full font-bold text-white flex items-center justify-center transition-all text-[16px] active:scale-[0.98] ${
+                className={`w-full py-4 rounded-2xl font-bold text-white flex items-center justify-center transition-all text-[16px] active:scale-[0.98] ${
                   storeDetails.storeName && storeDetails.ownerName && storeDetails.phone && !loading
                     ? 'bg-[#FF6B00] shadow-lg shadow-orange-500/20' 
                     : 'bg-slate-200 text-slate-400 shadow-none cursor-not-allowed'
                 }`}
               >
-                {loading ? 'Saving...' : 'Continue'} {!loading && <ArrowRight className="ml-2 w-5 h-5 opacity-70" />}
+                {loading ? 'Saving...' : 'Continue'} {!loading && <ArrowRight className="ml-2 w-5 h-5" />}
               </button>
-              <div className="text-center mt-3 flex items-center justify-center gap-1.5 text-slate-400 text-[10px] font-medium pb-2">
-                <LucideIcons.Lock className="w-3 h-3" /> Your data is safe and secure
+              <div className="text-center mt-3 flex items-center justify-center gap-1.5 text-slate-400 text-[11px] font-medium pb-1">
+                <LucideIcons.Lock className="w-3.5 h-3.5" /> Your data is safe and secure
               </div>
             </div>
           </motion.div>
@@ -457,14 +456,14 @@ export default function SetupPage() {
                   <LucideIcons.ArrowLeft size={24} />
                 </button>
               </div>
-              <div className="flex items-center justify-center gap-2">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm shrink-0"
+              <div className="flex items-center justify-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md shadow-orange-500/20 shrink-0"
                    style={{ background: 'linear-gradient(135deg, #fbbf24, #f97316)' }}>
-                  <Zap className="w-4 h-4 text-white" fill="white" />
+                  <Zap className="w-5 h-5 text-white" fill="white" />
                 </div>
                 <div className="flex flex-col items-start">
-                  <span className="font-extrabold text-lg text-slate-800 tracking-tight leading-none">Retail<span className="text-orange-500">OS</span></span>
-                  <span className="text-slate-500 text-[9px] font-black tracking-widest uppercase mt-0.5">Setup</span>
+                  <span className="font-extrabold text-2xl text-slate-800 tracking-tight leading-none">Retail<span className="text-[#FF6B00]">OS</span></span>
+                  <span className="text-slate-500 text-[10px] font-black tracking-widest uppercase mt-1">Setup Your Store</span>
                 </div>
               </div>
               <div className="flex justify-end"></div>
