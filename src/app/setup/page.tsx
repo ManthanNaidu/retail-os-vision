@@ -186,7 +186,7 @@ export default function SetupPage() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="flex flex-col h-full absolute inset-0 pb-[88px]"
+            className="flex flex-col h-full absolute inset-0 pb-[140px]"
           >
             <div className="overflow-y-auto px-6 pt-4 pb-6 flex-1 custom-scrollbar w-full">
               
@@ -202,8 +202,8 @@ export default function SetupPage() {
                 </div>
               </div>
               
-              <div className="space-y-4 relative z-10 mt-6">
-                <h3 className="text-[13px] font-bold text-[#64748B] tracking-wider uppercase mb-1">Basic Information</h3>
+              <div className="flex flex-col gap-4 relative z-10 mt-6">
+                <h3 className="text-[13px] font-bold text-[#64748B] tracking-wider uppercase mb-0 -ml-1">Basic Information</h3>
                 
                 <div className="bg-white border border-[#E8ECF2] rounded-[16px] p-4 flex items-center gap-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)] transition-all focus-within:border-[#FF7A00] focus-within:shadow-[0_0_0_2px_rgba(255,122,0,0.1)]">
                   <Store className="w-6 h-6 text-[#FF7A00] shrink-0" strokeWidth={1.5} />
