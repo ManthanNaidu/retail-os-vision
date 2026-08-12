@@ -51,12 +51,12 @@ export default function BillingPage() {
 
   const filteredProducts = useMemo(() => {
     const bySearch = searchQuery.length > 0
-      ? products.filter(p => p.isActive && (
+      ? products.filter(p => p.isActive !== false && (
           p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           p.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
           (p.barcode?.includes(searchQuery))
         ))
-      : products.filter(p => p.isActive);
+      : products.filter(p => p.isActive !== false);
 
     if (activeCategory === 'All') return bySearch.slice(0, 24);
     return bySearch.filter(p => p.category === activeCategory).slice(0, 24);

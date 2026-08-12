@@ -42,7 +42,8 @@ export default function InventoryPage() {
     purchaseConversionFactor: 1,
     sellingConversionFactor: 1,
     gstPercent: 0,
-    expiryDate: ''
+    expiryDate: '',
+    isActive: true
   };
 
   const [formData, setFormData] = useState<Partial<Product>>(initialFormState);
