@@ -11,7 +11,8 @@ export async function POST(req: Request) {
     const token = authHeader.split('Bearer ')[1];
     
     // Verify the caller's token
-    const decodedToken = await getAdminAuth().verifyIdToken(token);
+    const adminAuth = await getAdminAuth();
+    const decodedToken = await adminAuth.verifyIdToken(token);
     
     const body = await req.json();
     const { targetUid, role } = body;
@@ -41,7 +42,7 @@ export async function POST(req: Request) {
     }
 
     // Security Check: A manager/cashier can only be assigned to the current user's tenant
-    await getAdminAuth().setCustomUserClaims(targetUid, {
+    await adminAuth.setCustomUserClaims(targetUid, {
       role: role,
       tenant_id: tenantId
     });

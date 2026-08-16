@@ -12,7 +12,8 @@ export async function POST(req: Request) {
     }
 
     const token = authHeader.split('Bearer ')[1];
-    const decodedToken = await getAdminAuth().verifyIdToken(token);
+    const adminAuth = await getAdminAuth();
+    const decodedToken = await adminAuth.verifyIdToken(token);
     
     // Check if the user has AI permission. E.g., maybe Cashiers can't ask AI.
     if (decodedToken.role === 'CASHIER') {
@@ -29,7 +30,8 @@ export async function POST(req: Request) {
     }
 
     // Retrieve the tenant's data safely on the backend
-    const tenantRef = getAdminDb().collection('users').doc(tenantId);
+    const adminDb = await getAdminDb();
+    const tenantRef = adminDb.collection('users').doc(tenantId);
     const tenantDoc = await tenantRef.get();
     const tenantData = tenantDoc.data() || {};
     
