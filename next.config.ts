@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
     // In production we handle TS checks separately; allow builds to complete
     ignoreBuildErrors: false,
   },
+  serverExternalPackages: ['firebase-admin'],
 };
 
 export default nextConfig;
