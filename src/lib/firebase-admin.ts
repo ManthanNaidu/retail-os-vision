@@ -1,8 +1,10 @@
-import { getApps, initializeApp, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
-import { getAuth } from 'firebase-admin/auth';
+export const isAdminConfigured = !!(process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_CLIENT_EMAIL);
 
-function initFirebaseAdmin() {
+export async function initFirebaseAdmin() {
+  if (!isAdminConfigured) return;
+  
+  const { getApps, initializeApp, cert } = await import('firebase-admin/app');
+  
   if (!getApps().length) {
     try {
       const serviceAccount = {
@@ -11,15 +13,10 @@ function initFirebaseAdmin() {
         privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
       };
       
-      // Only initialize if we have the credentials
       if (serviceAccount.projectId && serviceAccount.clientEmail && serviceAccount.privateKey) {
         initializeApp({
           credential: cert(serviceAccount),
         });
-      } else {
-        console.warn('Firebase Admin SDK credentials missing. API routes will fail.');
-        // Initialize a dummy app so that the build doesn't crash
-        initializeApp({ projectId: 'dummy-project' });
       }
     } catch (error: any) {
       console.error('Firebase admin initialization error', error.stack);
@@ -27,8 +24,14 @@ function initFirebaseAdmin() {
   }
 }
 
-initFirebaseAdmin();
+export async function getAdminDb() {
+  await initFirebaseAdmin();
+  const { getFirestore } = await import('firebase-admin/firestore');
+  return getFirestore();
+}
 
-export const isAdminConfigured = !!(process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_CLIENT_EMAIL);
-export const getAdminDb = () => getFirestore();
-export const getAdminAuth = () => getAuth();
+export async function getAdminAuth() {
+  await initFirebaseAdmin();
+  const { getAuth } = await import('firebase-admin/auth');
+  return getAuth();
+}

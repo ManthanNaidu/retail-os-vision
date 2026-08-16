@@ -14,7 +14,8 @@ export async function POST(req: Request) {
     }
 
     const token = authHeader.split('Bearer ')[1];
-    const decodedToken = await getAdminAuth().verifyIdToken(token);
+    const adminAuth = await getAdminAuth();
+    const decodedToken = await adminAuth.verifyIdToken(token);
     const tenantId = decodedToken.tenant_id || decodedToken.uid;
     
     // Enforce RBAC
@@ -34,7 +35,8 @@ export async function POST(req: Request) {
     const maxDiscountPercent = role === 'CASHIER' ? 5 : role === 'MANAGER' ? 20 : 100;
 
     // Read the tenant's current data from Firestore
-    const tenantRef = getAdminDb().collection('users').doc(tenantId);
+    const adminDb = await getAdminDb();
+    const tenantRef = adminDb.collection('users').doc(tenantId);
     const tenantDoc = await tenantRef.get();
     
     if (!tenantDoc.exists) {
