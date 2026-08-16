@@ -1,29 +1,11 @@
 'use client';
 
-// RetailOS AI Engine — powered by Google Gemini (free tier) with intelligent fallbacks
-
-const GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+import { auth } from '@/lib/firebase';
 
 export interface AIMessage {
   role: 'user' | 'assistant';
   content: string;
 }
-
-const SYSTEM_CONTEXT = `You are RetailOS AI — an intelligent business assistant for Indian retail stores.
-You help shopkeepers increase profits, reduce losses, manage inventory, handle customers, and make better business decisions.
-The store is: Shree Ram Medical & General Stores, Bangalore.
-Current data context:
-- Today's sales: ₹16,700 | Profit: ₹4,500 | Orders: 47
-- Monthly revenue: ₹4,56,000
-- Low stock items: Maggi (5 packs), Amul Butter (3 packs), Aashirvaad Atta (8 bags), Amoxicillin expiring in 20 days
-- Pending payments: Rahul Sharma owes ₹2,300
-- Best sellers this week: Tata Salt, Fortune Oil, Dettol Soap
-- Inactive customers: Suresh Kumar (72 days), Ravi Gupta (108 days)
-
-Always respond in simple, friendly language. Use ₹ for currency. 
-Give specific, actionable advice. Keep responses concise (max 3-4 lines).
-Add relevant emojis. When user asks in Hindi or mixed language, respond accordingly.`;
 
 // Smart local responses for common queries (works without internet)
 const localResponses: Record<string, string> = {
@@ -59,29 +41,26 @@ function findLocalResponse(query: string): string | null {
 export async function askAI(messages: AIMessage[]): Promise<string> {
   const lastMessage = messages[messages.length - 1].content;
 
-  // Try Gemini API first
-  if (GEMINI_API_KEY) {
-    try {
-      const conversation = messages.map(m => ({
-        role: m.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: m.content }],
-      }));
-
-      const response = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+  try {
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      const token = await currentUser.getIdToken();
+      const response = await fetch('/api/ai/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: SYSTEM_CONTEXT }] },
-          contents: conversation,
-          generationConfig: { temperature: 0.7, maxOutputTokens: 300 },
-        }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ messages }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        return data.candidates?.[0]?.content?.parts?.[0]?.text || getSmartFallback(lastMessage);
+        return data.reply;
       }
-    } catch { /* fall through to local */ }
+    }
+  } catch (error) {
+    console.error('AI fetch error:', error);
   }
 
   // Intelligent local fallback

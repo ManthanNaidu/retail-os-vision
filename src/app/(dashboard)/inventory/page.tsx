@@ -6,8 +6,8 @@ import { Search, Plus, Edit2, Trash2, X, Package, AlertTriangle, FileImage, Chec
 import { useAppStore } from '@/stores/appStore';
 import { formatCurrency, getDaysUntilExpiry } from '@/lib/utils';
 import { Product } from '@/types';
-import { ConfirmDelete } from '@/components/shared/ConfirmDelete';
-import { InvoiceScanner } from '@/components/shared/InvoiceScanner';
+import { ConfirmDelete } from '@/components/ui/ConfirmDelete';
+import { InvoiceScanner } from '@/components/ui/InvoiceScanner';
 import { getStoreType } from '@/lib/storeTypes';
 import { getUnitsForCategory } from '@/lib/inventoryUnits';
 

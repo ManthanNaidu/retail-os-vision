@@ -12,6 +12,7 @@ import { useAppStore } from '@/stores/appStore';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { formatCurrency, getDaysUntilExpiry } from '@/lib/utils';
 import { Product, Customer, Sale } from '@/types';
+import { AnalyticsEngine } from '@/lib/services/analyticsEngine';
 
 // --- Logic ---
 export interface AIMessage {
@@ -28,9 +29,10 @@ function findLocalResponse(query: string, products: Product[], sales: Sale[], cu
   
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const todaySales = sales.filter(s => new Date(s.createdAt) >= today);
-  const todayRevenue = todaySales.reduce((sum, s) => sum + s.total, 0);
-  const todayProfit = todaySales.reduce((sum, s) => sum + (s.total * 0.2), 0);
+  const todaySales = AnalyticsEngine.filterSalesByDate(sales, today, new Date());
+  const metrics = AnalyticsEngine.calculateMetrics(todaySales, products);
+  const todayRevenue = metrics.totalRevenue;
+  const todayProfit = metrics.totalProfit;
   
   const lowStock = products.filter(p => p.stock > 0 && p.stock < (p.minStock || 5));
   const outOfStock = products.filter(p => p.stock === 0);
@@ -231,11 +233,14 @@ export default function AIAssistantPage() {
   const stats = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const todaySales = sales.filter(s => new Date(s.createdAt) >= today).reduce((sum, s) => sum + s.total, 0) || 697;
+    const todaySales = AnalyticsEngine.filterSalesByDate(sales, today, new Date());
+    const metrics = AnalyticsEngine.calculateMetrics(todaySales, products);
+    
+    const todaySalesTotal = sales.length > 0 ? metrics.totalRevenue : 697;
     const lowStockCount = products.filter(p => p.stock > 0 && p.stock < (p.minStock || 5)).length || 1;
     const pendingCredit = customers.reduce((sum, c) => sum + c.creditBalance, 0) || 0;
     
-    return { todaySales, lowStockCount, pendingCredit };
+    return { todaySales: todaySalesTotal, lowStockCount, pendingCredit };
   }, [sales, products, customers]);
 
   const storeContext = useMemo(() => {

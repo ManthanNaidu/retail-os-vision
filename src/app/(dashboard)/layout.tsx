@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { ProtectedRoute } from '@/components/shared/ProtectedRoute';
-import { AppSidebar } from '@/components/shared/AppSidebar';
-import { BottomNav } from '@/components/shared/BottomNav';
-import { TopBar } from '@/components/shared/TopBar';
-import { PhonePreview } from '@/components/shared/PhonePreview';
+import { ProtectedRoute } from '@/components/ui/ProtectedRoute';
+import { AppSidebar } from '@/components/ui/AppSidebar';
+import { BottomNav } from '@/components/ui/BottomNav';
+import { TopBar } from '@/components/ui/TopBar';
+import { PhonePreview } from '@/components/ui/PhonePreview';
 import { getGlobalAnnouncement } from '@/lib/licenseManager';
 import { Megaphone, EyeOff } from 'lucide-react';
 

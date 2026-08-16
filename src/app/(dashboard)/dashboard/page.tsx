@@ -8,10 +8,17 @@ import { Bell, Menu, ChevronDown, Store, AlertTriangle, CheckCircle, ChevronRigh
 import { useAppStore } from '@/stores/appStore';
 import { formatCurrency } from '@/lib/utils';
 import { getStoreType } from '@/lib/storeTypes';
-
+import { AnalyticsEngine } from '@/lib/services/analyticsEngine';
+import { BIEngine } from '@/lib/services/biEngine';
+import { RecommendationEngine } from '@/lib/services/recommendationEngine';
+import { InsightDiscoveryEngine } from '@/lib/services/insightDiscoveryEngine';
+import { RecommendationMemoryService } from '@/lib/services/recommendationMemoryService';
+import { BusinessPulseEngine } from '@/lib/services/businessPulseEngine';
+import { AIInsightsPanel } from '@/components/features/dashboard/AIInsightsPanel';
+import { AIInsight } from '@/types';
 export default function DashboardPage() {
     const router = useRouter();
-    const { products, sales, customers, notifications, markNotificationRead, markAllRead, addNotification } = useAppStore();
+    const { products, sales, customers, notifications, markNotificationRead, markAllRead, addNotification, aiPreferences, recommendationMemory, addRecommendation } = useAppStore();
     const unreadCount = notifications.filter(n => !n.isRead && (!n.section || n.section === '/dashboard')).length;
     const sectionNotifications = notifications.filter(n => !n.section || n.section === '/dashboard');
     
@@ -22,6 +29,10 @@ export default function DashboardPage() {
     
     const [showNotifications, setShowNotifications] = useState(false);
     const [showServicesMenu, setShowServicesMenu] = useState(false);
+    
+    const [showDateFilter, setShowDateFilter] = useState(false);
+    const [dateFilter, setDateFilter] = useState('Today');
+    const [customDate, setCustomDate] = useState('');
     
     useEffect(() => {
         setIsClient(true);
@@ -75,42 +86,38 @@ export default function DashboardPage() {
     const greeting = getGreeting();
     const isDay = new Date().getHours() > 5 && new Date().getHours() < 18;
 
-    // Stats calculations
+    // Stats calculations via centralized AnalyticsEngine
     const stats = useMemo(() => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const yesterday = new Date(today);
         yesterday.setDate(yesterday.getDate() - 1);
 
-        const todaySales = sales.filter(s => new Date(s.createdAt) >= today);
-        const yesterdaySales = sales.filter(s => {
-            const d = new Date(s.createdAt);
-            return d >= yesterday && d < today;
-        });
+        const todaySales = AnalyticsEngine.filterSalesByDate(sales, today, new Date());
+        const yesterdaySales = AnalyticsEngine.filterSalesByDate(sales, yesterday, new Date(today.getTime() - 1));
 
-        const todayRevenue = todaySales.reduce((s, a) => s + a.total, 0);
-        const yesterdayRevenue = yesterdaySales.reduce((s, a) => s + a.total, 0) || 1; // avoid /0
+        const todayMetrics = AnalyticsEngine.calculateMetrics(todaySales, products);
+        const yesterdayMetrics = AnalyticsEngine.calculateMetrics(yesterdaySales, products);
 
-        const calcProfit = (arr: any[]) => arr.reduce((s, a) => s + (a.total * 0.2), 0); // Mock 20% profit
+        const diagnostic = BIEngine.comparePeriods(todayMetrics, yesterdayMetrics);
 
-        const todayProfit = calcProfit(todaySales);
-        const yesterdayProfit = calcProfit(yesterdaySales);
-
-        const revenueGrowth = Math.round(((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100);
-        const profitGrowth = Math.round(((todayProfit - yesterdayProfit) / (yesterdayProfit || 1)) * 100);
-        const salesGrowth = Math.round(((todaySales.length - yesterdaySales.length) / (yesterdaySales.length || 1)) * 100);
+        const yestSalesCount = yesterdaySales.length || 1;
+        const salesGrowth = Math.round(((todaySales.length - yesterdaySales.length) / yestSalesCount) * 100);
         
-        const todayAvg = todaySales.length ? Math.round(todayRevenue / todaySales.length) : 0;
-        const yestAvg = yesterdaySales.length ? Math.round(yesterdayRevenue / yesterdaySales.length) : 1;
-        const avgGrowth = Math.round(((todayAvg - yestAvg) / yestAvg) * 100);
+        const yestAvg = yesterdayMetrics.avgOrderValue || 1;
+        const avgGrowth = Math.round(((todayMetrics.avgOrderValue - yestAvg) / yestAvg) * 100);
 
         return {
-            revenue: todayRevenue, revenueGrowth,
-            profit: todayProfit, profitGrowth,
-            sales: todaySales.length, salesGrowth,
-            avgOrder: todayAvg, avgGrowth
+            revenue: todayMetrics.totalRevenue, 
+            revenueGrowth: Math.round(diagnostic.revenueGrowth),
+            profit: Math.round(todayMetrics.totalProfit), 
+            profitGrowth: Math.round(diagnostic.profitGrowth),
+            sales: todayMetrics.totalOrders, 
+            salesGrowth,
+            avgOrder: Math.round(todayMetrics.avgOrderValue), 
+            avgGrowth
         };
-    }, [sales]);
+    }, [sales, products]);
 
     const topSelling = useMemo(() => {
         return products.slice(0, 3).map((p, i) => ({...p, soldCount: 25 - (i * 4)}));
@@ -119,6 +126,52 @@ export default function DashboardPage() {
     const lowStock = useMemo(() => {
         return products.filter(p => (p.stock || 0) <= (p.minStock || 5)).slice(0, 3);
     }, [products]);
+
+    const generatedInsights = useMemo(() => {
+        // 1. Get base deterministic insights
+        const baseInsights = RecommendationEngine.generateInsights(sales, products, customers);
+        
+        // 2. Map to AIInsight format
+        const formattedBase: AIInsight[] = baseInsights.map(ins => ({
+            id: ins.id,
+            category: ins.category,
+            priority: ins.priority,
+            title: ins.what,
+            description: `${ins.why} ${ins.evidence}`,
+            action: ins.action,
+            expectedImpact: ins.expectedImpact,
+            icon: 'Sparkles'
+        }));
+
+        // 3. Add Discoveries and Records
+        const discoveries: AIInsight[] = [];
+        const record = InsightDiscoveryEngine.detectRecords(sales);
+        if (record) discoveries.push(record);
+        
+        const combos = InsightDiscoveryEngine.detectProductCombinations(sales);
+        if (combos) discoveries.push(combos);
+
+        const champion = InsightDiscoveryEngine.getQuietProfitChampion(sales, products);
+        if (champion) discoveries.push(champion);
+
+        const allInsights = [...formattedBase, ...discoveries];
+
+        // 4. Run through Business Pulse Personality Engine and suppress duplicates
+        const activeInsights: AIInsight[] = [];
+        for (const insight of allInsights) {
+            if (!RecommendationMemoryService.shouldSuppress(insight, recommendationMemory)) {
+                // Apply personality presentation
+                const presentation = BusinessPulseEngine.presentInsight(insight, aiPreferences?.tone || 'Balanced');
+                activeInsights.push({
+                    ...insight,
+                    title: presentation.title,
+                    description: presentation.body
+                });
+            }
+        }
+
+        return activeInsights.slice(0, 3); // Top 3 insights for dashboard
+    }, [sales, products, customers, recommendationMemory, aiPreferences]);
 
     if (!isClient) return null;
 
@@ -227,9 +280,55 @@ export default function DashboardPage() {
                 <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', padding: '0 4px' }}>
                         <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#111827' }}>Business Overview</h2>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'white', padding: '4px 8px', borderRadius: '8px', border: '1px solid #E2E8F0', fontSize: '12px', fontWeight: 600, color: '#475569' }}>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                            Today <ChevronDown size={14} />
+                        <div style={{ position: 'relative' }}>
+                            <button 
+                                onClick={() => setShowDateFilter(!showDateFilter)}
+                                style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'white', padding: '4px 8px', borderRadius: '8px', border: '1px solid #E2E8F0', fontSize: '12px', fontWeight: 600, color: '#475569', cursor: 'pointer' }}
+                            >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                {dateFilter === 'Custom Date' && customDate ? customDate : dateFilter} <ChevronDown size={14} />
+                            </button>
+                            
+                            <AnimatePresence>
+                                {showDateFilter && (
+                                    <>
+                                        <div className="fixed inset-0 z-40" onClick={() => setShowDateFilter(false)} />
+                                        <motion.div 
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: 10 }}
+                                            className="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-[#E2E8F0] overflow-hidden z-50 min-w-[150px]"
+                                        >
+                                            {['Today', 'Tomorrow', 'This Week', 'This Month', 'This Year', 'Custom Date'].map(option => (
+                                                <div key={option} className="flex flex-col">
+                                                    <button 
+                                                        className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 transition-colors ${dateFilter === option ? 'font-bold text-[#FF7A00] bg-orange-50/50' : 'text-slate-600'}`}
+                                                        onClick={() => {
+                                                            setDateFilter(option);
+                                                            if (option !== 'Custom Date') setShowDateFilter(false);
+                                                        }}
+                                                    >
+                                                        {option}
+                                                    </button>
+                                                    {option === 'Custom Date' && dateFilter === 'Custom Date' && (
+                                                        <div className="p-3 border-t border-slate-100 bg-slate-50">
+                                                            <input 
+                                                                type="date" 
+                                                                className="w-full text-sm p-1.5 rounded border border-slate-200 outline-none focus:border-[#FF7A00] bg-white text-slate-800"
+                                                                value={customDate}
+                                                                onChange={(e) => {
+                                                                    setCustomDate(e.target.value);
+                                                                    if (e.target.value) setShowDateFilter(false);
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </motion.div>
+                                    </>
+                                )}
+                            </AnimatePresence>
                         </div>
                     </div>
                     
@@ -346,6 +445,13 @@ export default function DashboardPage() {
                         </ResponsiveContainer>
                     </div>
                 </div>
+
+                {/* AI Insights Panel */}
+                {generatedInsights.length > 0 && (
+                    <div style={{ marginTop: '-4px' }}>
+                        <AIInsightsPanel insights={generatedInsights as any} />
+                    </div>
+                )}
 
                 {/* Bottom Lists */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>

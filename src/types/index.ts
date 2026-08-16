@@ -58,6 +58,7 @@ export interface Supplier {
 export interface SaleItem {
   productId: string;
   productName: string;
+  image?: string;
   quantity: number;
   sellingPrice: number;
   purchasePrice?: number;  // Cost price for profit calculation
@@ -119,13 +120,49 @@ export interface Notification {
 
 export interface AIInsight {
   id: string;
-  category: 'profit' | 'inventory' | 'customer' | 'pricing' | 'forecast';
+  category: 'profit' | 'inventory' | 'customer' | 'pricing' | 'forecast' | 'anomaly' | 'discovery' | 'record';
   priority: 'high' | 'medium' | 'low';
   title: string;
   description: string;
   action: string;
   expectedImpact?: string;
   icon: string;
+}
+
+export type InsightTone = 'SMART_WITTY' | 'FRIENDLY' | 'PLAYFUL' | 'ANALYTICAL' | 'MOTIVATIONAL' | 'URGENT' | 'CELEBRATORY' | 'CURIOUS' | 'CALM' | 'PROFESSIONAL';
+export type CommunicationStyle = 'Professional' | 'Balanced' | 'Friendly' | 'Playful';
+export type EscalationStatus = 'UNRESOLVED' | 'ESCALATING' | 'ACTIONED' | 'RESOLVED';
+
+export interface RecommendationOutcome {
+  id: string;
+  recommendationId: string;
+  category: string;
+  entityType: string;
+  entityId: string;
+  title: string;
+  message: string;
+  reason: string;
+  dataSnapshot: Record<string, any>;
+  shownAt: string;
+  viewedAt?: string;
+  actionedAt?: string;
+  dismissedAt?: string;
+  status: EscalationStatus;
+  outcome?: string;
+  actionTaken?: string;
+  estimatedImpact?: number;
+  actualImpact?: number;
+  confidence?: number;
+  templateId?: string;
+  tone?: InsightTone;
+}
+
+export interface BusinessPulseTimelineEvent {
+  id: string;
+  timestamp: string;
+  type: 'opportunity' | 'warning' | 'record' | 'discovery' | 'info';
+  message: string;
+  hasMeaningfulChange: boolean;
 }
 
 export interface DashboardKPIs {

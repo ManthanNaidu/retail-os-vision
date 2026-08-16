@@ -8,6 +8,7 @@ import {  Zap, Check, Store, Phone, MapPin, Eye, EyeOff, ChevronRight, ArrowRigh
 import * as LucideIcons from 'lucide-react';
 import { getStoreTypeList, StoreType } from '@/lib/storeTypes';
 import { registerStore } from '@/lib/licenseManager';
+import WelcomeScreen from '@/components/features/setup/WelcomeScreen';
 
 export default function SetupPage() {
   const router = useRouter();
@@ -360,121 +361,12 @@ export default function SetupPage() {
           </motion.div>
         );
 
-      case 4:
-        return (
-          <motion.div
-            key="step4"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col h-full absolute inset-0 pb-[120px]"
-          >
-            {/* Top Graphics */}
-            <div className="absolute -top-10 -left-8 -right-8 h-48 bg-[#FFF8F3] -z-10 rounded-t-[2rem]"></div>
-
-            <div className="overflow-y-auto px-6 pt-2 pb-6 flex-1 custom-scrollbar w-full">
-              <div className="flex flex-col items-center mt-8 mb-6 relative">
-                <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 rounded-[2rem]">
-                  {[...Array(15)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      className="absolute text-2xl"
-                      initial={{ top: -50, left: `${Math.random() * 100}%`, rotate: 0, opacity: 1 }}
-                      animate={{ top: '120%', rotate: 360, opacity: 0 }}
-                      transition={{ duration: 4 + Math.random() * 5, repeat: Infinity, delay: Math.random() * 5, ease: "linear" }}
-                    >
-                      {['🌸', '🌼', '🏵️', '🌺', '🌻', '🌷', '🌹'][Math.floor(Math.random() * 7)]}
-                    </motion.div>
-                  ))}
-                </div>
-                <div className="w-24 h-24 bg-[#10B981] rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(16,185,129,0.3)] mb-4 z-10 relative">
-                   <Check className="w-12 h-12 text-white" strokeWidth={4} />
-                </div>
-                <h1 className="text-[32px] font-black text-slate-900 tracking-tight leading-tight z-10 relative">Welcome Onboard!</h1>
-                <p className="text-[14px] font-bold mt-1 text-slate-600 z-10 relative"><span className="text-[#FF6B00]">Shubh Aarambh!</span> Your store is ready.</p>
-              </div>
-              
-              <div className="bg-[#FFF8F3] border border-orange-100 rounded-[20px] p-4 w-full mb-6 flex items-center gap-4">
-                <div className="w-16 h-16 rounded-xl bg-white shadow-sm flex items-center justify-center overflow-hidden shrink-0 border border-orange-50 p-1">
-                   {selectedType?.image ? (
-                     <img src={selectedType?.image} alt="Store type" className="w-full h-full object-cover scale-110" />
-                   ) : (
-                     <Store size={32} className="text-slate-400" strokeWidth={1.5} />
-                   )}
-                </div>
-                <div className="flex flex-col items-start text-left flex-1">
-                  <h2 className="text-[16px] font-black text-slate-900 mb-0.5 leading-tight">{storeDetails.storeName || 'Shree Ram Stores'}</h2>
-                  <div className="flex items-center gap-1.5 text-[12px] text-slate-500 font-semibold mb-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> {selectedType?.name || 'Grocery / Kirana'}
-                  </div>
-                  <div className="flex items-center gap-1 text-[11px] text-slate-400 font-medium">
-                    <MapPin className="w-3 h-3" /> {storeDetails.city || 'Bengaluru, Karnataka'}
-                  </div>
-                </div>
-              </div>
-              
-              <h3 className="text-[11px] font-bold text-slate-400 tracking-wider uppercase mb-2 px-1">Your Store is Ready</h3>
-              
-              <div className="bg-white border border-slate-100 rounded-3xl py-2 px-1 mb-6">
-                {[
-                  { icon: Store, title: 'Store Profile', subtitle: 'Completed', color: 'text-[#FF6B00]', bg: 'bg-orange-50' },
-                  { icon: LucideIcons.Receipt, title: 'Billing & Invoicing', subtitle: 'Ready to use', color: 'text-[#9333EA]', bg: 'bg-[#F3E8FF]' },
-                  { icon: LucideIcons.Package, title: 'Inventory Management', subtitle: 'Configured', color: 'text-[#EA580C]', bg: 'bg-[#FFEDD5]' },
-                  { icon: LucideIcons.Users, title: 'Customers & Credit', subtitle: 'Enabled', color: 'text-[#0284C7]', bg: 'bg-[#E0F2FE]' },
-                  { icon: LucideIcons.Bot, title: 'RetailBot AI Assistant', subtitle: 'Active & Ready', color: 'text-[#7C3AED]', bg: 'bg-[#F3E8FF]' }
-                ].map((item, i) => (
-                  <div key={i} className={`flex items-center gap-3 p-2.5 ${i !== 4 ? 'border-b border-slate-50' : ''}`}>
-                    <div className={`w-10 h-10 rounded-full ${item.bg} flex items-center justify-center shrink-0`}>
-                      <item.icon className={`w-5 h-5 ${item.color}`} />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="text-[13px] font-bold text-slate-800 leading-tight">{item.title}</h4>
-                      <p className="text-[11px] text-slate-400 font-medium mt-0.5">{item.subtitle}</p>
-                    </div>
-                    <div className="w-5 h-5 rounded-full border border-green-500 flex items-center justify-center shrink-0">
-                      <Check className="w-3 h-3 text-green-500" strokeWidth={3} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* RetailBot Promo */}
-              <div className="bg-[#F8F5FF] border border-[#E9D5FF] rounded-[20px] p-4 flex items-center gap-4 mb-2">
-                <div className="w-14 h-14 rounded-full bg-white shadow-sm border border-[#E9D5FF] flex items-center justify-center overflow-hidden shrink-0">
-                  <img src="/images/retailbot.jpg" alt="RetailBot" className="w-full h-full object-cover mix-blend-multiply" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="text-[13px] font-bold text-[#7C3AED] leading-tight flex items-center gap-1 mb-1">RetailBot is here to help you <Sparkles className="w-3.5 h-3.5" /></h4>
-                  <p className="text-[10px] text-slate-500 font-medium mt-0.5 mb-2 leading-tight">I've set up everything for your store. What would you like to do next?</p>
-                  <button className="text-[#7C3AED] text-[11px] font-bold flex items-center gap-1">
-                    Ask RetailBot <Sparkles className="w-3 h-3" />
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-white via-white to-transparent pt-10 pb-6 px-6 z-50">
-              <button
-                onClick={finishSetup}
-                className="w-full py-3.5 rounded-full font-bold text-white bg-[#FF6B00] shadow-lg shadow-orange-500/20 active:scale-[0.98] transition-all flex items-center justify-center text-[16px] relative"
-              >
-                Launch Dashboard <LucideIcons.Rocket className="ml-2 w-5 h-5" fill="currentColor" />
-              </button>
-              
-              <button onClick={finishSetup} className="w-full text-center mt-3 text-[#7C3AED] font-bold text-[13px]">
-                Explore features
-              </button>
-              
-              <div className="mt-4 flex justify-center w-full">
-                <div className="bg-[#FFF8F3] border border-orange-100 rounded-md px-3 py-1.5 flex items-center gap-1.5">
-                  <Shield className="w-3.5 h-3.5 text-[#FF7A00]" />
-                  <span className="text-[11px] font-bold text-slate-800 tracking-wide uppercase">Made for Indian Retailers</span>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        );
     }
   };
+
+  if (step === 4) {
+    return <WelcomeScreen storeDetails={storeDetails} selectedType={selectedType} onFinish={finishSetup} />;
+  }
 
   return (
 

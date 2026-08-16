@@ -10,7 +10,7 @@ import {
 import { useAppStore } from '@/stores/appStore';
 import { Customer } from '@/types';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { ConfirmDelete } from '@/components/shared/ConfirmDelete';
+import { ConfirmDelete } from '@/components/ui/ConfirmDelete';
 
 type Segment = 'all' | 'VIP' | 'Regular' | 'Inactive' | 'New';
 

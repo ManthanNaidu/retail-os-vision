@@ -12,10 +12,18 @@ import {
 import * as LucideIcons from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { getStoreTypeList } from '@/lib/storeTypes';
-import { ConfirmDelete } from '@/components/shared/ConfirmDelete';
+import { ConfirmDelete } from '@/components/ui/ConfirmDelete';
 import { formatCurrency } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/providers/AuthProvider';
+import { 
+  SettingsHeader, 
+  StoreSummary, 
+  SettingsSection, 
+  SettingsCard, 
+  PlanCard 
+} from '@/components/features/settings';
+import { SecurityCenter } from '@/components/features/settings/SecurityCenter';
 
 // Interfaces
 interface Profile {
@@ -247,202 +255,142 @@ const SettingsPage = () => {
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="pb-[100px]"
+      className="pb-[100px] min-h-screen bg-[#FAFAF8]"
     >
-      {/* Header */}
-      <div className="flex items-center justify-between px-6 pt-6 pb-4">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 flex items-center justify-center" onClick={() => router.back()}>
-            <LucideIcons.Menu className="w-6 h-6 text-[#101B35]" />
-          </div>
-          <div>
-            <h1 className="text-[22px] font-black text-[#101B35] leading-tight tracking-tight">Settings</h1>
-            <p className="text-[13px] font-medium text-[#64748B]">Manage your store and account</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Bell className="w-6 h-6 text-[#101B35]" strokeWidth={1.5} />
-            <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 border-2 border-[#FAFAFA] rounded-full"></span>
-          </div>
-          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#FF7A00] to-[#FF4D00] flex items-center justify-center text-white font-bold text-[16px] shadow-sm">
-            {profile.ownerName ? profile.ownerName.charAt(0).toUpperCase() : 'U'}
-          </div>
-        </div>
-      </div>
+      <SettingsHeader ownerName={profile.ownerName} />
 
-      <div className="px-5 flex flex-col gap-5">
-        
-        {/* Business Snapshot */}
-        <div className="flex gap-3 overflow-x-auto pb-2 custom-scrollbar -mx-5 px-5">
-          <div className="bg-white border border-[#E8ECF2] rounded-[20px] p-4 min-w-[130px] flex-1 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between h-[100px]">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center">
-                <Package className="w-4 h-4 text-purple-600" />
-              </div>
-              <span className="text-[12px] font-bold text-[#64748B]">Products</span>
-            </div>
-            <div>
-              <div className="text-[22px] font-black text-[#101B35] leading-none mb-1">{stats.products}</div>
-              <div className="text-[10px] font-medium text-[#64748B]">Items in stock</div>
-            </div>
-          </div>
+      <div className="px-4 flex flex-col">
+        <StoreSummary 
+          productsCount={stats.products}
+          customersCount={stats.customers}
+          salesTotal={stats.sales}
+        />
 
-          <div className="bg-white border border-[#E8ECF2] rounded-[20px] p-4 min-w-[130px] flex-1 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between h-[100px]">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
-                <Users className="w-4 h-4 text-blue-500" />
-              </div>
-              <span className="text-[12px] font-bold text-[#64748B]">Customers</span>
-            </div>
-            <div>
-              <div className="text-[22px] font-black text-[#101B35] leading-none mb-1">{stats.customers}</div>
-              <div className="text-[10px] font-medium text-[#64748B]">Total customers</div>
-            </div>
-          </div>
-
-          <div className="bg-white border border-[#E8ECF2] rounded-[20px] p-4 min-w-[140px] flex-1 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between h-[100px]">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center">
-                <span className="text-[16px] font-bold text-green-600">₹</span>
-              </div>
-              <span className="text-[12px] font-bold text-[#64748B]">Sales</span>
-            </div>
-            <div>
-              <div className="text-[22px] font-black text-[#101B35] leading-none mb-1">₹{stats.sales.toLocaleString()}</div>
-              <div className="text-[10px] font-medium text-[#64748B]">Total sales</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Settings Categories */}
-        <SectionCard>
-          <SettingsRow 
-            icon={Store} color="text-orange-500" bg="bg-orange-50"
-            title="Store Profile" subtitle="Store details, address, GST, UPI & more"
+        <SettingsSection title="Store">
+          <SettingsCard
+            icon={Store}
+            iconBgColor="bg-[#FFF4E5]"
+            iconColor="text-[#FF8A00]"
+            title="Store Profile"
+            subtitle="Store details, address, GST, UPI & more"
             badge={{ text: 'Updated', style: 'orange' }}
             onClick={() => setActiveView('profile')}
           />
-          <div className="h-[1px] bg-[#F1F5F9] mx-4" />
-          <SettingsRow 
-            icon={Wallet} color="text-green-600" bg="bg-green-50"
-            title="Billing & Payments" subtitle="Invoices, taxes, UPI, payment methods"
+        </SettingsSection>
+
+        <SettingsSection title="Operations">
+          <SettingsCard
+            icon={Wallet}
+            iconBgColor="bg-[#ECFDF3]"
+            iconColor="text-[#027A48]"
+            title="Billing & Payments"
+            subtitle="Invoices, taxes, UPI & payment methods"
             onClick={() => openComingSoon('Billing & Payments')}
           />
-          <div className="h-[1px] bg-[#F1F5F9] mx-4" />
-          <SettingsRow 
-            icon={Box} color="text-orange-500" bg="bg-orange-50"
-            title="Inventory" subtitle="Stock alerts, units, barcodes, expiry"
+          <SettingsCard
+            icon={Box}
+            iconBgColor="bg-[#FFF4E5]"
+            iconColor="text-[#FF8A00]"
+            title="Inventory"
+            subtitle="Stock alerts, units, barcodes & expiry"
             onClick={() => openComingSoon('Inventory')}
           />
-          <div className="h-[1px] bg-[#F1F5F9] mx-4" />
-          <SettingsRow 
-            icon={Users} color="text-blue-500" bg="bg-blue-50"
-            title="Customers" subtitle="Credit, loyalty points, messaging"
+        </SettingsSection>
+
+        <SettingsSection title="Customers">
+          <SettingsCard
+            icon={Users}
+            iconBgColor="bg-[#E0F2FE]"
+            iconColor="text-[#0284C7]"
+            title="Customers"
+            subtitle="Credit, loyalty points & messaging"
             onClick={() => openComingSoon('Customers')}
           />
-          <div className="h-[1px] bg-[#F1F5F9] mx-4" />
-          <SettingsRow 
-            icon={ShieldCheck} color="text-purple-600" bg="bg-purple-50"
-            title="Team & Permissions" subtitle="Manage team, roles and access"
+        </SettingsSection>
+
+        <SettingsSection title="Access">
+          <SettingsCard
+            icon={ShieldCheck}
+            iconBgColor="bg-[#F3F0FF]"
+            iconColor="text-[#6941C6]"
+            title="Team & Permissions"
+            subtitle="Manage team, roles & access"
             badge={{ text: '1 Member', style: 'purple' }}
             onClick={() => openComingSoon('Team & Permissions')}
           />
-          <div className="h-[1px] bg-[#F1F5F9] mx-4" />
-          <SettingsRow 
-            icon={Bot} color="text-purple-600" bg="bg-purple-50"
-            title="RetailBot AI ✦" subtitle="AI assistant, insights & recommendations"
+        </SettingsSection>
+
+        <SettingsSection title="Intelligence">
+          <SettingsCard
+            icon={Bot}
+            iconBgColor="bg-[#FDF4FF]"
+            iconColor="text-[#C026D3]"
+            title="RetailBot AI"
+            subtitle="AI assistant, insights & recommendations"
             onClick={() => openComingSoon('RetailBot AI')}
           />
-        </SectionCard>
+        </SettingsSection>
 
-        {/* Subscription Plan */}
-        <div className="bg-[#FFF9F0] border border-[#FFEDD5] rounded-[24px] p-5 shadow-[0_4px_20px_rgba(255,122,0,0.05)] relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 pointer-events-none translate-x-4 -translate-y-4 z-0">
-             <img src="/images/setup_store.jpg" className="w-full h-full object-contain" alt="Store" />
-          </div>
-          
-          <div className="flex items-start gap-4 mb-5 relative z-10">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-orange-400 to-orange-500 flex items-center justify-center shrink-0 shadow-sm shadow-orange-500/20">
-              <Crown className="w-6 h-6 text-white" strokeWidth={2.5} />
-            </div>
-            <div>
-              <div className="text-[12px] font-bold text-[#64748B] tracking-wide uppercase mb-0.5">Your Plan</div>
-              <h3 className="text-[20px] font-black text-[#101B35] leading-tight mb-1">{subscription.plan}</h3>
-              <p className="text-[13px] font-bold text-[#FF7A00]">{subscription.daysRemaining} days remaining</p>
-              <p className="text-[12px] text-[#64748B] font-medium mt-1">Explore Pro features and grow your business.</p>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-[16px] p-3 flex gap-3 mb-4 shadow-sm border border-[#FFEDD5]/50 relative z-10">
-            <div className="flex-1 flex flex-col items-center border-r border-[#F1F5F9] pr-3">
-              <Package className="w-4 h-4 text-purple-600 mb-1" />
-              <div className="text-[10px] font-bold text-[#64748B] mb-0.5">Products</div>
-              <div className="text-[13px] font-black text-[#101B35]">{stats.products} <span className="text-[#94A3B8] font-semibold text-[11px]">/ 500</span></div>
-            </div>
-            <div className="flex-1 flex flex-col items-center border-r border-[#F1F5F9] px-2">
-              <Users className="w-4 h-4 text-blue-500 mb-1" />
-              <div className="text-[10px] font-bold text-[#64748B] mb-0.5">Customers</div>
-              <div className="text-[13px] font-black text-[#101B35]">{stats.customers} <span className="text-[#94A3B8] font-semibold text-[11px]">/ 1,000</span></div>
-            </div>
-            <div className="flex-1 flex flex-col items-center pl-3">
-              <FileText className="w-4 h-4 text-green-600 mb-1" />
-              <div className="text-[10px] font-bold text-[#64748B] mb-0.5">Invoices</div>
-              <div className="text-[13px] font-black text-[#101B35]">42 <span className="text-[#94A3B8] font-semibold text-[11px]">/ 1,000</span></div>
-            </div>
-          </div>
-          
-          <button className="w-full bg-gradient-to-r from-[#FF7A00] to-[#FF4D00] hover:from-[#FF6B00] hover:to-[#E64500] text-white font-bold text-[15px] py-3.5 rounded-[16px] flex items-center justify-center gap-2 shadow-[0_4px_14px_rgba(255,122,0,0.25)] transition-all active:scale-[0.98] relative z-10">
-            <Crown className="w-4 h-4" /> Upgrade to Pro <ArrowRight className="w-4 h-4 ml-1" />
-          </button>
-        </div>
+        <SettingsSection title="Plan">
+          <PlanCard
+            plan={subscription.plan}
+            daysRemaining={subscription.daysRemaining}
+            productsCount={stats.products}
+            customersCount={stats.customers}
+            salesCount={42}
+          />
+        </SettingsSection>
 
-        {/* Security Section */}
-        <h3 className="text-[15px] font-bold text-[#101B35] pl-2 mb-[-12px]">Security</h3>
-        <SectionCard>
-          <SettingsRow 
-            icon={Shield} color="text-green-600" bg="bg-green-50"
-            title="Security" subtitle="Change password, devices, 2FA"
+        <SettingsSection title="Security">
+          <SettingsCard
+            icon={Shield}
+            iconBgColor="bg-[#ECFDF3]"
+            iconColor="text-[#027A48]"
+            title="Security"
+            subtitle="Change password, devices & 2FA"
             onClick={() => setActiveView('security')}
           />
-        </SectionCard>
-        
-        {/* Help & Support */}
-        <h3 className="text-[15px] font-bold text-[#101B35] pl-2 mb-[-12px]">Support & More</h3>
-        <SectionCard>
-          <SettingsRow 
-            icon={HelpCircle} color="text-orange-500" bg="bg-orange-50"
-            title="Help & Support" subtitle="Contact support, help center"
+        </SettingsSection>
+
+        <SettingsSection title="Support & Data">
+          <SettingsCard
+            icon={HelpCircle}
+            iconBgColor="bg-[#FFF4E5]"
+            iconColor="text-[#FF8A00]"
+            title="Help & Support"
+            subtitle="Contact support, help center"
             onClick={() => openComingSoon('Help & Support')}
           />
-          <div className="h-[1px] bg-[#F1F5F9] mx-4" />
-          <SettingsRow 
-            icon={AlertCircle} color="text-blue-500" bg="bg-blue-50"
-            title="About RetailOS" subtitle="App version, rate us, privacy policy"
+          <SettingsCard
+            icon={AlertCircle}
+            iconBgColor="bg-[#E0F2FE]"
+            iconColor="text-[#0284C7]"
+            title="About RetailOS"
+            subtitle="App version, rate us, privacy policy"
             onClick={() => openComingSoon('About')}
           />
-        </SectionCard>
-
-        {/* Data & Export */}
-        <SectionCard>
-          <SettingsRow 
-            icon={Download} color="text-[#64748B]" bg="bg-slate-100"
-            title="Export My Data" subtitle="Download all your store data"
+          <SettingsCard
+            icon={Download}
+            iconBgColor="bg-[#F1F5F9]"
+            iconColor="text-[#64748B]"
+            title="Export My Data"
+            subtitle="Download all your store data"
             onClick={exportData}
           />
-          <div className="h-[1px] bg-[#F1F5F9] mx-4" />
-          <SettingsRow 
-            icon={Trash2} color="text-red-500" bg="bg-red-50"
-            title="Clear All Data" subtitle="Wipe data from this device"
+          <SettingsCard
+            icon={Trash2}
+            iconBgColor="bg-red-50"
+            iconColor="text-red-500"
+            title="Clear All Data"
+            subtitle="Wipe data from this device"
             danger
             onClick={() => setIsClearDataOpen(true)}
           />
-        </SectionCard>
+        </SettingsSection>
 
-        {/* Logout */}
         <div 
           onClick={() => setIsLogoutOpen(true)}
-          className="flex items-center justify-center gap-2 py-4 mt-4 cursor-pointer"
+          className="flex items-center justify-center gap-2 py-4 mt-2 mb-8 cursor-pointer active:scale-95 transition-transform"
         >
           <LogOut className="w-5 h-5 text-red-500" />
           <span className="text-[16px] font-bold text-red-500">Log out of RetailOS</span>
@@ -625,96 +573,11 @@ const SettingsPage = () => {
           <button onClick={() => setActiveView('main')} className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-slate-50 transition-colors">
             <ChevronLeft className="w-6 h-6 text-[#101B35]" />
           </button>
-          <h2 className="text-[18px] font-black text-[#101B35]">Security</h2>
+          <h2 className="text-[18px] font-black text-[#101B35]">Security Center</h2>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 py-6 custom-scrollbar flex flex-col gap-6 pb-[100px]">
-        
-        <div className="bg-white border border-[#E8ECF2] rounded-[20px] p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col gap-5">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center shrink-0">
-              <Shield className="w-5 h-5 text-green-600" />
-            </div>
-            <div>
-              <h3 className="text-[16px] font-bold text-[#101B35] leading-tight mb-0.5">Password</h3>
-              <p className="text-[12px] font-medium text-[#64748B]">Update your account password</p>
-            </div>
-          </div>
-          
-          {hasPassword && (
-            <div>
-              <label className="text-[13px] font-bold text-[#64748B] mb-1.5 block">Current Password</label>
-              <div className="relative">
-                <input 
-                  type={showCurrentPassword ? "text" : "password"}
-                  className="w-full bg-[#FAFAFA] border border-[#E8ECF2] rounded-[14px] px-4 py-3 pr-12 text-[15px] font-bold text-[#101B35] outline-none focus:border-[#FF7A00] focus:bg-white transition-colors"
-                  value={passwordForm.current}
-                  onChange={e => setPasswordForm({...passwordForm, current: e.target.value})}
-                />
-                <button 
-                  type="button"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#64748B] p-1"
-                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                >
-                  {showCurrentPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-            </div>
-          )}
-          
-          <div>
-            <label className="text-[13px] font-bold text-[#64748B] mb-1.5 block">New Password</label>
-            <div className="relative">
-              <input 
-                type={showNewPassword ? "text" : "password"}
-                className="w-full bg-[#FAFAFA] border border-[#E8ECF2] rounded-[14px] px-4 py-3 pr-12 text-[15px] font-bold text-[#101B35] outline-none focus:border-[#FF7A00] focus:bg-white transition-colors"
-                value={passwordForm.new}
-                onChange={e => setPasswordForm({...passwordForm, new: e.target.value})}
-              />
-              <button 
-                type="button"
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-[#64748B] p-1"
-                onClick={() => setShowNewPassword(!showNewPassword)}
-              >
-                {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-              </button>
-            </div>
-          </div>
-          
-          <div>
-            <label className="text-[13px] font-bold text-[#64748B] mb-1.5 block">Confirm New Password</label>
-            <input 
-              type={showNewPassword ? "text" : "password"}
-              className="w-full bg-[#FAFAFA] border border-[#E8ECF2] rounded-[14px] px-4 py-3 text-[15px] font-bold text-[#101B35] outline-none focus:border-[#FF7A00] focus:bg-white transition-colors"
-              value={passwordForm.confirm}
-              onChange={e => setPasswordForm({...passwordForm, confirm: e.target.value})}
-            />
-          </div>
-          
-          <button 
-            className="w-full bg-[#101B35] hover:bg-slate-800 text-white font-bold text-[15px] py-3.5 rounded-[14px] transition-all active:scale-[0.98] mt-2" 
-            onClick={handlePasswordSave}
-          >
-            {hasPassword ? 'Update Password' : 'Set Password'}
-          </button>
-        </div>
-
-        <SectionCard>
-          <SettingsRow 
-            icon={LucideIcons.Smartphone} color="text-blue-500" bg="bg-blue-50"
-            title="Devices & Sessions" subtitle="Manage logged-in devices"
-            onClick={() => openComingSoon('Devices & Sessions')}
-          />
-          <div className="h-[1px] bg-[#F1F5F9] mx-4" />
-          <SettingsRow 
-            icon={LucideIcons.Key} color="text-purple-600" bg="bg-purple-50"
-            title="Two-Factor Authentication" subtitle="Add an extra layer of security"
-            onClick={() => openComingSoon('Two-Factor Auth')}
-          />
-        </SectionCard>
-
-      </div>
+      <SecurityCenter />
     </motion.div>
   );
 
@@ -750,7 +613,7 @@ const SettingsPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA]">
+    <div className="min-h-screen bg-[#FAFAF8] w-full">
       <AnimatePresence mode="wait">
         {activeView === 'main' && <div key="main">{renderMainView()}</div>}
         {activeView === 'profile' && <div key="profile">{renderProfileView()}</div>}

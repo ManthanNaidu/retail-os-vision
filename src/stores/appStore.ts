@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { CartItem, Product, Customer, Sale, Notification } from '@/types';
+import { CartItem, Product, Customer, Sale, Notification, RecommendationOutcome, BusinessPulseTimelineEvent, CommunicationStyle } from '@/types';
 import { generateInvoiceNumber } from '@/lib/utils';
 
 // ─── App Store (Global) ────────────────────────────────────────
@@ -13,6 +13,9 @@ interface AppState {
   products: Product[];
   customers: Customer[];
   sales: Sale[];
+  recommendationMemory: RecommendationOutcome[];
+  businessPulseHistory: BusinessPulseTimelineEvent[];
+  aiPreferences: { tone: CommunicationStyle; humorEnabled: boolean };
   toggleSidebar: () => void;
   markNotificationRead: (id: string) => void;
   markAllRead: () => void;
@@ -25,6 +28,10 @@ interface AppState {
   addSale: (sale: Sale) => void;
   deleteSale: (id: string) => void;
   addNotification: (n: Notification) => void;
+  addRecommendation: (rec: RecommendationOutcome) => void;
+  updateRecommendation: (id: string, updates: Partial<RecommendationOutcome>) => void;
+  addPulseEvent: (event: BusinessPulseTimelineEvent) => void;
+  updateAiPreferences: (updates: Partial<{ tone: CommunicationStyle; humorEnabled: boolean }>) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -36,6 +43,9 @@ export const useAppStore = create<AppState>()(
       products: [],
       customers: [],
       sales: [],
+      recommendationMemory: [],
+      businessPulseHistory: [],
+      aiPreferences: { tone: 'Balanced', humorEnabled: true },
 
       toggleSidebar: () => set(state => ({ sidebarOpen: !state.sidebarOpen })),
 
@@ -90,10 +100,26 @@ export const useAppStore = create<AppState>()(
         notifications: [n, ...state.notifications],
         unreadCount: state.unreadCount + 1,
       })),
+      
+      addRecommendation: (rec) => set(state => ({
+        recommendationMemory: [rec, ...state.recommendationMemory]
+      })),
+      
+      updateRecommendation: (id, updates) => set(state => ({
+        recommendationMemory: state.recommendationMemory.map(r => r.id === id ? { ...r, ...updates } : r)
+      })),
+      
+      addPulseEvent: (event) => set(state => ({
+        businessPulseHistory: [event, ...state.businessPulseHistory]
+      })),
+      
+      updateAiPreferences: (updates) => set(state => ({
+        aiPreferences: { ...state.aiPreferences, ...updates }
+      })),
     }),
     { 
       name: 'retailos-app',
-      version: 2
+      version: 3
     }
   )
 );

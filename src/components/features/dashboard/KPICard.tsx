@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { TrendingUp, TrendingDown, DollarSign, TrendingUp as Profit, BarChart3, Wallet, CreditCard, ShoppingCart } from 'lucide-react';
-import { CountUp } from '@/components/shared/CountUp';
+import { CountUp } from '@/components/ui/CountUp';
 
 const ICON_MAP: Record<string, React.ElementType> = {
   sales: DollarSign,

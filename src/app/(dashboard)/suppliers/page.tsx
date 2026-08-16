@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { formatCurrency } from '@/lib/utils';
-import { ConfirmDelete } from '@/components/shared/ConfirmDelete';
+import { ConfirmDelete } from '@/components/ui/ConfirmDelete';
 
 interface Supplier {
   id: string;

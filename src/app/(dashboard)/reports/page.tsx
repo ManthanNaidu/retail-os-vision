@@ -10,37 +10,23 @@ import { useAppStore } from '@/stores/appStore';
 import { formatCurrency } from '@/lib/utils';
 import { Download, TrendingUp, TrendingDown } from 'lucide-react';
 
+import { AnalyticsEngine } from '@/lib/services/analyticsEngine';
+import { BIEngine } from '@/lib/services/biEngine';
+
 const COLORS = ['#1a56db', '#059669', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
-function buildDailyData(sales: any[]) {
+function buildDailyData(sales: any[], products: any[]) {
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   return days.map((day, i) => {
     const daySales = sales.filter(s => new Date(s.createdAt).getDay() === (i + 1) % 7);
-    const revenue = daySales.reduce((sum: number, s: any) => sum + s.total, 0) || Math.round(8000 + i * 2100 + (i === 5 ? 5000 : 0));
-    const profit = Math.round(revenue * 0.27);
-    return { day, sales: Math.round(revenue), profit, orders: daySales.length || Math.floor(15 + i * 6 + (i === 5 ? 15 : 0)) };
+    const metrics = AnalyticsEngine.calculateMetrics(daySales, products);
+    
+    // Use fallback numbers if mock data is completely empty to preserve chart visual
+    const revenue = daySales.length > 0 ? metrics.totalRevenue : Math.round(8000 + i * 2100 + (i === 5 ? 5000 : 0));
+    const profit = daySales.length > 0 ? metrics.totalProfit : Math.round(revenue * 0.27);
+    
+    return { day, sales: Math.round(revenue), profit: Math.round(profit), orders: daySales.length || Math.floor(15 + i * 6 + (i === 5 ? 15 : 0)) };
   });
-}
-
-function buildCategoryData(products: any[], sales: any[]) {
-  const categories: Record<string, number> = {};
-  sales.forEach(sale => {
-    (sale.items || []).forEach((item: any) => {
-      const product = products.find((p: any) => p.id === item.productId);
-      const cat = product?.category || 'Others';
-      categories[cat] = (categories[cat] || 0) + item.total;
-    });
-  });
-  if (Object.keys(categories).length === 0) {
-    return [
-      { name: 'Grocery', value: 145000 },
-      { name: 'Medicine', value: 98000 },
-      { name: 'Dairy', value: 67000 },
-      { name: 'Hygiene', value: 54000 },
-      { name: 'Others', value: 42000 },
-    ];
-  }
-  return Object.entries(categories).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
 }
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -75,18 +61,36 @@ export default function ReportsPage() {
   const [period, setPeriod] = useState<'week' | 'month' | 'year'>('week');
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'gst' | 'customers'>('overview');
 
-  const dailyData = useMemo(() => buildDailyData(sales), [sales]);
-  const categoryData = useMemo(() => buildCategoryData(products, sales), [products, sales]);
+  const dailyData = useMemo(() => buildDailyData(sales, products), [sales, products]);
+  
+  const categoryData = useMemo(() => {
+    const cats = BIEngine.getCategoryPerformance(sales, products);
+    if (cats.length === 0) {
+      return [
+        { name: 'Grocery', value: 145000 },
+        { name: 'Medicine', value: 98000 },
+        { name: 'Dairy', value: 67000 },
+        { name: 'Hygiene', value: 54000 },
+        { name: 'Others', value: 42000 },
+      ];
+    }
+    return cats.map(c => ({ name: c.name, value: c.revenue }));
+  }, [products, sales]);
 
   const kpis = useMemo(() => {
-    const totalRevenue = sales.reduce((s, sale) => s + sale.total, 0) || 456000;
-    const totalProfit = Math.round(totalRevenue * 0.27);
-    const gstCollected = sales.reduce((s, sale) => s + sale.gstAmount, 0) || 48320;
-    const avgOrderValue = sales.length > 0 ? Math.round(totalRevenue / sales.length) : 412;
+    const metrics = AnalyticsEngine.calculateMetrics(sales, products);
+    
+    // Use fallback mock numbers if no sales to keep UI populated
+    const totalRevenue = sales.length > 0 ? metrics.totalRevenue : 456000;
+    const totalProfit = sales.length > 0 ? metrics.totalProfit : Math.round(totalRevenue * 0.27);
+    const gstCollected = sales.length > 0 ? metrics.totalGstCollected : 48320;
+    const avgOrderValue = sales.length > 0 ? metrics.avgOrderValue : 412;
+    
     const gstPayable = Math.round(gstCollected * 0.336);
     const totalCredit = customers.reduce((s, c) => s + c.creditBalance, 0) || 93500;
+    
     return { totalRevenue, totalProfit, gstCollected, avgOrderValue, gstPayable, totalCredit };
-  }, [sales, customers]);
+  }, [sales, customers, products]);
 
   const topProducts = useMemo(() => {
     const map: Record<string, { name: string; revenue: number; qty: number }> = {};

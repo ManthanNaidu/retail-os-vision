@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Tenant isolated data structure
+    // We treat the "users/{tenantId}" document as the tenant's container.
+    match /users/{tenantId} {
+      
+      // Helper functions for Authorization
+      function isAuthenticated() {
+        return request.auth != null;
+      }
+      
+      function isTenantOwner() {
+        // The user is the owner if their UID matches the tenantId
+        return request.auth.uid == tenantId;
+      }
+      
+      function belongsToTenant() {
+        // Or if they have a custom claim mapping them to this tenant
+        return request.auth.token.tenant_id == tenantId;
+      }
+      
+      function hasRole(roleName) {
+        return request.auth.token.role == roleName;
+      }
+
+      function canRead() {
+        return isAuthenticated() && (isTenantOwner() || belongsToTenant());
+      }
+      
+      function canWrite() {
+        // Cashiers cannot perform arbitrary writes to the entire tenant document 
+        // (This rule can be refined based on specific collections if we break data out of the single doc)
+        return isAuthenticated() && (isTenantOwner() || (belongsToTenant() && !hasRole('CASHIER')));
+      }
+
+      // Base rules for the tenant document
+      allow read: if canRead();
+      allow write: if canWrite();
+      
+      // If we move to subcollections for better scalability:
+      match /sales/{saleId} {
+        allow read: if canRead();
+        // Cashiers can create sales, but not delete them
+        allow create: if isAuthenticated() && (isTenantOwner() || belongsToTenant());
+        allow update, delete: if isAuthenticated() && (isTenantOwner() || (belongsToTenant() && hasRole('MANAGER')));
+      }
+      
+      match /products/{productId} {
+        allow read: if canRead();
+        // Cashiers cannot create/delete products
+        allow write: if isAuthenticated() && (isTenantOwner() || (belongsToTenant() && hasRole('MANAGER')));
+      }
+    }
+  }
+}
